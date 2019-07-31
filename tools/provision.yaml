@@ -1,0 +1,16 @@
+- hosts: all
+  tasks:
+    - name: ensure git, python 3.6 and nginx are installed
+      yum:
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - git
+          - python36
+          - nginx
+    - name: enable service nginx and ensure it is not masked
+      systemd:
+        name: nginx
+        enabled: yes
+        masked: no
+        state: started

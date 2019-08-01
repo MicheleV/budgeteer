@@ -93,9 +93,22 @@ Install the requirements::
 
     pip install -r test-requirements.txt 
 
-Run the functional test::
+Run both function and unit test suite::
 
-    python functional_tests.py
+    python manage.py test
+
+Run the functional test suite::
+
+    python manage.py test functional_tests
+
+Run a single functional test::
+
+    python manage.py test functional_tests.tests.<Test-ClassName>.<test-method-name> --failfast
+
+Run the unit test suite::
+
+     python manage.py test budgets
+
 
 References and useful links
 =======

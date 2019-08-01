@@ -23,6 +23,7 @@ class ItemValidationTest(FunctionalTest):
     self.assertIn('Budgeteer', self.browser.title)
 
   def test_cannot_access_admin_page(self):
-    self.browser.get(self.live_server_url)
+    self.browser.get(f"{self.live_server_url}/admin")
+    print(f"{self.live_server_url}/admin")
     header_text = self.browser.find_element_by_tag_name('h1').text
-    self.assertIn('404', header_text)
+    self.assertIn('Not Found', header_text)

@@ -1,0 +1,28 @@
+# Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from selenium import webdriver
+from django.test import LiveServerTestCase
+
+class FunctionalTest(LiveServerTestCase):
+
+  @classmethod
+  def setUpClass(self):
+    super(FunctionalTest, self).setUpClass()
+    self.browser = webdriver.Firefox()
+
+  @classmethod
+  def tearDownClass(self):
+    super(FunctionalTest, self).setUpClass()
+    self.browser.quit()
+
+class ItemValidationTest(FunctionalTest):
+
+  def test_can_access_home_page(self):
+    self.browser.get(self.live_server_url)
+    self.assertIn('Budgeteer', self.browser.title)
+
+  def test_cannot_access_admin_page(self):
+    self.browser.get(self.live_server_url)
+    header_text = self.browser.find_element_by_tag_name('h1').text
+    self.assertIn('404', header_text)

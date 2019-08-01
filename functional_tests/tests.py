@@ -16,14 +16,18 @@ class FunctionalTest(LiveServerTestCase):
     super(FunctionalTest, self).setUpClass()
     self.browser.quit()
 
-class ItemValidationTest(FunctionalTest):
+class PageAccessTest(FunctionalTest):
 
   def test_can_access_home_page(self):
     self.browser.get(self.live_server_url)
     self.assertIn('Budgeteer', self.browser.title)
 
+  def test_can_access_list_categories_page(self):
+    self.browser.get(f"{self.live_server_url}/categories")
+    header_text = self.browser.find_element_by_tag_name('title').text
+    self.assertIn('Categories', self.browser.title)
+
   def test_cannot_access_admin_page(self):
     self.browser.get(f"{self.live_server_url}/admin")
-    print(f"{self.live_server_url}/admin")
     header_text = self.browser.find_element_by_tag_name('h1').text
     self.assertIn('Not Found', header_text)

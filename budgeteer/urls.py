@@ -17,5 +17,6 @@ from django.urls import path
 from budgets import views
 
 urlpatterns = [
-    path('', views.home_page, name='home')
+    path('', views.home_page, name='home'),
+    path('categories', views.categories_page, name='categories')
 ]

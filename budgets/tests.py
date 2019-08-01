@@ -4,7 +4,7 @@ from django.urls import resolve, reverse
 from django.test import TestCase
 from django.http import HttpRequest
 
-from budgets.views import home_page
+from budgets.views import home_page, categories_page
 
 class HomePageTest(TestCase):
 
@@ -22,3 +22,21 @@ class HomePageTest(TestCase):
     url = reverse('home')
     response = self.client.get(url)
     self.assertTemplateUsed(response, 'home.html')
+
+class CategoriesPageTest(TestCase):
+
+  def test_title_is_displayed(self):
+    url = reverse('categories')
+    response = self.client.get(url)
+    self.assertContains(response,'Categories')
+
+  def test_uses_categories_view(self):
+    url = reverse('categories')
+    found = resolve(url)
+    self.assertEqual(found.func, categories_page)
+
+  def test_uses_home_template(self):
+    url = reverse('categories')
+    response = self.client.get(url)
+    self.assertTemplateUsed(response, 'categories.html')
+

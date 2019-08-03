@@ -3,11 +3,13 @@
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+# Docs at https://selenium-python.readthedocs.io/waits.html
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+# Docs at https://seleniumhq.github.io/selenium/docs/api/py/webdriver_support/selenium.webdriver.support.expected_conditions.html
 from selenium.webdriver.support import expected_conditions as EC
 from django.test import LiveServerTestCase
-import time
+from django.urls import reverse
 from budgets.models import Category
 
 class FunctionalTest(LiveServerTestCase):
@@ -51,6 +53,19 @@ class PagesAccessTest(FunctionalTest):
     self.browser.get(f"{self.live_server_url}/admin")
     header_text = self.browser.find_element_by_tag_name('h1').text
     self.assertIn('Not Found', header_text)
+
+class PageContentTest(FunctionalTest):
+
+  def test_home_page_has_link_categories_page(self):
+    url_to_find = reverse('categories')
+    url = reverse('home')
+    self.browser.get(f"{self.live_server_url}{url}")
+
+    links = self.browser.find_elements_by_tag_name('a')
+    self.assertTrue(
+      any(url_to_find in link.get_attribute('href') for link in links),
+      f"No url: {url} was found in the Page. links were\n{links}",
+    )
 
 class CategoriesTest(FunctionalTest):
 

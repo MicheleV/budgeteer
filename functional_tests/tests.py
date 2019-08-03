@@ -3,8 +3,12 @@
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from django.test import LiveServerTestCase
 import time
+from budgets.models import Category
 
 class FunctionalTest(LiveServerTestCase):
 
@@ -17,6 +21,20 @@ class FunctionalTest(LiveServerTestCase):
   def tearDownClass(self):
     super(FunctionalTest, self).setUpClass()
     self.browser.quit()
+
+  # Credits to Tommy Beadle: http://disq.us/p/x1r1v2
+  def wait_for_page_to_reload(self):
+    MAX_DELAY = 5
+    wait = WebDriverWait(self.browser, MAX_DELAY)
+    old_page = self.browser.find_element_by_tag_name('html')
+    element = wait.until(EC.staleness_of(old_page))
+
+  def find_text_inside_table(self,text, table):
+    rows = table.find_elements_by_tag_name('td')
+    self.assertTrue(
+      any(text in row.text for row in rows),
+      f"No {text} in rows. Contents were\n{table.text}",
+    )
 
 class PagesAccessTest(FunctionalTest):
 
@@ -34,7 +52,7 @@ class PagesAccessTest(FunctionalTest):
     header_text = self.browser.find_element_by_tag_name('h1').text
     self.assertIn('Not Found', header_text)
 
-class CreateCategoriesTest(FunctionalTest):
+class CategoriesTest(FunctionalTest):
 
   def test_can_create_category(self):
     self.browser.get(f"{self.live_server_url}/categories")
@@ -46,14 +64,16 @@ class CreateCategoriesTest(FunctionalTest):
 
     inputbox.send_keys('Rent')
     inputbox.send_keys(Keys.ENTER)
-    time.sleep(3)
+    self.wait_for_page_to_reload()
 
     table = self.browser.find_element_by_id('id_categories')
-    rows = table.find_elements_by_tag_name('td')
+    self.find_text_inside_table('Rent', table)
 
-    self.assertTrue(
-      any('Rent' in row.text for row in rows),
-      f"No Rent in rows. Contents were\n{table.text}",
-    )
+    inputbox = self.browser.find_element_by_id('id_new_category')
 
-    self.fail('Finish the test!')
+    inputbox.send_keys('Food')
+    inputbox.send_keys(Keys.ENTER)
+    self.wait_for_page_to_reload()
+
+    table = self.browser.find_element_by_id('id_categories')
+    self.find_text_inside_table('Food', table)

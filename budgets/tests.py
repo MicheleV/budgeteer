@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.http import HttpRequest
 
 from budgets.views import home_page, categories_page
+from budgets.models import Category
 
 class HomePageTest(TestCase):
 
@@ -27,6 +28,25 @@ class HomePageTest(TestCase):
     url = reverse('categories')
     response = self.client.post(url,  data={'category_text': 'Rent'})
     self.assertEqual(response.status_code,302)
+    self.assertEqual(response['location'],url)
+
+  def test_save_on_POST(self):
+    url = reverse('new_category')
+    response = self.client.post(url,  data={'category_text': 'Rent'})
+
+    self.assertEqual(Category.objects.count(), 1)
+    new_category = Category.objects.first()
+    self.assertEqual(new_category.text, 'Rent')
+
+  def test_displays_all_categories(self):
+    Category.objects.create(text='Rent')
+    Category.objects.create(text='Food')
+
+    url = reverse('categories')
+    response = self.client.get(url)
+
+    self.assertContains(response, 'Rent')
+    self.assertContains(response, 'Food')
 
 class CategoriesPageTest(TestCase):
 
@@ -40,8 +60,24 @@ class CategoriesPageTest(TestCase):
     found = resolve(url)
     self.assertEqual(found.func, categories_page)
 
-  def test_uses_home_template(self):
+  def test_uses_categories_template(self):
     url = reverse('categories')
     response = self.client.get(url)
     self.assertTemplateUsed(response, 'categories.html')
 
+  def test_save_and_retrieve_categories(self):
+    first_category = Category()
+    first_category.text = 'Rent'
+    first_category.save()
+
+    second_category = Category()
+    second_category.text = 'Food'
+    second_category.save()
+
+    saved_categories = Category.objects.all()
+    self.assertEqual( saved_categories.count(), 2)
+
+    first_saved_category = saved_categories[0]
+    second_saved_category = saved_categories[1]
+    self.assertEqual(first_saved_category.text, 'Rent')
+    self.assertEqual(second_saved_category.text, 'Food')

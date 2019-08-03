@@ -8,7 +8,7 @@
 
     <table id="id_categories">
       {% for category in categories %}
-        <tr><td>1: {{ category.text }}</td></tr>
+        <tr><td>{{ forloop.counter }}: {{ category.text }}</td></tr>
       {% endfor %}
     </table>
   </body>

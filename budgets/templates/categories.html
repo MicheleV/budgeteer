@@ -1,3 +1,15 @@
 <html>
   <title>Categories</title>
+  <body>
+    <form method="POST" action="new_category">
+      <input name="category_text" id="id_new_category" placeholder="Enter a new category" />
+      {% csrf_token %}
+    </form>
+
+    <table id="id_categories">
+      {% for category in categories %}
+        <tr><td>1: {{ category.text }}</td></tr>
+      {% endfor %}
+    </table>
+  </body>
 </html>

@@ -18,5 +18,6 @@ from budgets import views
 
 urlpatterns = [
     path('', views.home_page, name='home'),
-    path('categories', views.categories_page, name='categories')
+    path('categories', views.categories_page, name='categories'),
+    path('new_category', views.categories_page, name='new_category'),
 ]

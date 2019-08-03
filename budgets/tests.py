@@ -23,6 +23,11 @@ class HomePageTest(TestCase):
     response = self.client.get(url)
     self.assertTemplateUsed(response, 'home.html')
 
+  def test_redirect_on_POST(self):
+    url = reverse('categories')
+    response = self.client.post(url,  data={'category_text': 'Rent'})
+    self.assertEqual(response.status_code,302)
+
 class CategoriesPageTest(TestCase):
 
   def test_title_is_displayed(self):

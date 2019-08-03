@@ -101,13 +101,13 @@ Run the functional test suite::
 
     python manage.py test functional_tests
 
-Run a single functional test::
+Run all the functional tests in a given file::
 
-    python manage.py test functional_tests.tests.<Test-ClassName>.<test-method-name> --failfast
+    python manage.py test functional_tests.<file_name_from_functional_test_folder_without_py_extension>
 
 Run the unit test suite::
 
-     python manage.py test budgets
+    python manage.py test budgets
 
 
 References and useful links

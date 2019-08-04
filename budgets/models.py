@@ -3,8 +3,15 @@
 from django.db import models
 
 class Category(models.Model):
-  text = models.TextField(default='')
+  text = models.CharField(max_length=20,default='')
 
   # def get_absolute_url(self):
   #   return reverse('category', args=[self.id])
 
+class Expense(models.Model):
+  # TODO should we really delete expenses item on Category deletion?
+  # This will remove history!
+  category = models.ForeignKey(Category, default=None, on_delete=models.CASCADE)
+  amount = models.IntegerField()
+  note = models.CharField(max_length=150,default='')
+  spended_date = models.DateField()

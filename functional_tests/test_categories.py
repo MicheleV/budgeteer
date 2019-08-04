@@ -3,11 +3,13 @@
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from budgets.models import Category
+from unittest import skip
 from .base import FunctionalTest
 
 class CategoriesTest(FunctionalTest):
 
-  def test_can_create_category(self):
+  def test_can_create_categories(self):
     self.browser.get(f"{self.live_server_url}/categories")
     inputbox = self.browser.find_element_by_id('id_new_category')
     self.assertEqual(
@@ -31,5 +33,15 @@ class CategoriesTest(FunctionalTest):
     table = self.browser.find_element_by_id('id_categories')
     self.find_text_inside_table('Food', table)
 
+    # @skip
     def test_cannot_add_empty_categories(self):
-      pass
+      self.browser.get(f"{self.live_server_url}/categories")
+      self.browser.find_element_by_id('id_new_category').send_keys(Keys.ENTER)
+      self.wait_for_page_to_reload()
+
+      self.assertEqual(
+        self.browser.find_element_by_css_selector('.has_error').text,
+        "You can't have empty Categories"
+      )
+
+      self.fail("TODO: finish me")

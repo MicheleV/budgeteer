@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.http import HttpRequest
 
 from budgets.views import home_page, categories_page
-from budgets.models import Category
+from budgets.models import Category, Expense
 
 class HomePageTest(TestCase):
 
@@ -81,3 +81,41 @@ class CategoriesPageTest(TestCase):
     second_saved_category = saved_categories[1]
     self.assertEqual(first_saved_category.text, 'Rent')
     self.assertEqual(second_saved_category.text, 'Food')
+
+class ModelsTest(TestCase):
+
+  def test_saving_and_retrieving_expenses(self):
+    category = Category()
+    category.text = 'Rent'
+    category.save()
+
+    first_expense = Expense()
+    first_expense.category = category
+    first_expense.amount = 5000
+    first_expense.note = 'First month of rent'
+    first_expense.spended_date = '2019-08-04'
+    first_expense.save()
+
+    second_expense = Expense()
+    second_expense.category = category
+    second_expense.amount = 4200
+    second_expense.note = 'Second month of rent (discounted) in advance'
+    second_expense.spended_date = '2019-09-04'
+    second_expense.save()
+
+    saved_category = Category.objects.first()
+    self.assertEqual(saved_category, category)
+    saves_expenses = Expense.objects.all()
+    self.assertEqual(saves_expenses.count(), 2)
+    first_saved_item = saves_expenses[0]
+    second_saved_item = saves_expenses[1]
+
+    self.assertEqual(first_saved_item.category, category)
+    self.assertEqual(first_saved_item.amount, 5000)
+    self.assertEqual(first_saved_item.note, 'First month of rent')
+    self.assertEqual(str(first_saved_item.spended_date), '2019-08-04')
+
+    self.assertEqual(second_saved_item.category, category)
+    self.assertEqual(second_saved_item.amount, 4200)
+    self.assertEqual(second_saved_item.note, 'Second month of rent (discounted) in advance')
+    self.assertEqual(str(second_saved_item.spended_date), '2019-09-04')

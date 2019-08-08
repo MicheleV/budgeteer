@@ -118,10 +118,10 @@ class ModelsTest(BaseTest):
 
     saved_category = Category.objects.first()
     self.assertEqual(saved_category, category)
-    saves_expenses = Expense.objects.all()
-    self.assertEqual(saves_expenses.count(), 2)
-    first_saved_item = saves_expenses[0]
-    second_saved_item = saves_expenses[1]
+    saved_expenses = Expense.objects.all()
+    self.assertEqual(saved_expenses.count(), 2)
+    first_saved_item = saved_expenses[0]
+    second_saved_item = saved_expenses[1]
 
     self.assertEqual(first_saved_item.category, category)
     self.assertEqual(first_saved_item.amount, 5000)

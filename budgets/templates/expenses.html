@@ -3,7 +3,9 @@
   <body>
     <form method="POST" action="new_expense">
       <input name="expense_amount" id="id_new_expense_amount" placeholder="Enter a new expense" />
+      <input name="note" id="id_new_expense_note" placeholder="Enter a memo about the expense" />
       <!-- <input name="release_date" id="id_new_expense_date" placeholder="Enter the date of the expenses" /> -->
+      <input type="submit" id="id_submit" value="Submit">
     <select name="category" id="id_expenses_category">
       {% for category in categories %}
         <option value="{{ category.id }}">{{ category.text }}</option>

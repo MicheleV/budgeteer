@@ -32,7 +32,8 @@ def new_expense_page(request):
   Expense.objects.create(
     amount=request.POST.get("expense_amount",0),
     category_id=request.POST.get("category",None),
-    # TODO, insert a inputfield in the template
+    # TODO, insert a inputfield for the date inside the template
     spended_date=request.POST.get("release_date",'2019-08-04'),
   )
+
   return redirect('/expenses')

@@ -13,5 +13,5 @@ class Expense(models.Model):
   # This will remove history!
   category = models.ForeignKey(Category, default=None, on_delete=models.CASCADE)
   amount = models.IntegerField()
-  note = models.CharField(max_length=150,default='')
+  note = models.CharField(max_length=150, default='')
   spended_date = models.DateField()

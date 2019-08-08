@@ -9,6 +9,7 @@ from budgets.models import Category
 from django.urls import reverse
 from unittest import skip
 from .base import FunctionalTest
+import time
 class ExpensesTest(FunctionalTest):
 
   def test_can_create_expense(self):
@@ -35,10 +36,21 @@ class ExpensesTest(FunctionalTest):
     # They choose that category
     dropdown.select_by_visible_text(CATEGORY_NAME)
 
-    # They press the ENTER button
-    inputbox.send_keys(Keys.ENTER)
+    #They see an input box
+    note_inputbox = self.browser.find_element_by_id('id_new_expense_note')
+    #They enter a note abotu the expenses, so that later they remember what this was about
+    note_inputbox.send_keys('First month of rent')
+
+    # They see a submit button
+    submit_button = self.browser.find_element_by_id('id_submit')
+    # # They click the button to save the entry
+    submit_button.click()
+    # self.click_through_to_new_page('id_submit')
+
     # The page reload and the expense item thye've entered is displayed correctly
-    self.wait_for_page_to_reload()
+    # TODO code smell, this wait_for_page_to_reload() should be needed
+    # self.wait_for_page_to_reload()
+
     table = self.browser.find_element_by_id('id_expenses')
     self.find_text_inside_table(CATEGORY_NAME, table)
     self.find_text_inside_table(str(500), table)

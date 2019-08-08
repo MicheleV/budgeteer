@@ -7,7 +7,29 @@ from django.http import HttpRequest
 from budgets.views import home_page, categories_page
 from budgets.models import Category, Expense
 
-class HomePageTest(TestCase):
+class BaseTest(TestCase):
+
+  def create_category(self, text):
+    category = Category()
+    category.text = text
+    category.save()
+    return category
+
+  def create_expense(self, category, amount, note, spended_date):
+    first_expense = Expense()
+    first_expense.category = category
+    first_expense.amount = amount
+    first_expense.note = note
+    first_expense.spended_date = spended_date
+    first_expense.save()
+    return first_expense
+
+  def get_response_from_named_url(self, named_url):
+    url = reverse(named_url)
+    response = self.client.get(url)
+    return response
+
+class HomePageTest(BaseTest):
 
   def test_title_is_displayed(self):
     url = reverse('home')
@@ -48,11 +70,10 @@ class HomePageTest(TestCase):
     self.assertContains(response, 'Rent')
     self.assertContains(response, 'Food')
 
-class CategoriesPageTest(TestCase):
+class CategoriesPageTest(BaseTest):
 
   def test_title_is_displayed(self):
-    url = reverse('categories')
-    response = self.client.get(url)
+    response = self.get_response_from_named_url('categories')
     self.assertContains(response,'Categories')
 
   def test_uses_categories_view(self):
@@ -61,18 +82,12 @@ class CategoriesPageTest(TestCase):
     self.assertEqual(found.func, categories_page)
 
   def test_uses_categories_template(self):
-    url = reverse('categories')
-    response = self.client.get(url)
+    response = self.get_response_from_named_url('categories')
     self.assertTemplateUsed(response, 'categories.html')
 
   def test_save_and_retrieve_categories(self):
-    first_category = Category()
-    first_category.text = 'Rent'
-    first_category.save()
-
-    second_category = Category()
-    second_category.text = 'Food'
-    second_category.save()
+    first_category = self.create_category('Rent')
+    second_category = self.create_category('Food')
 
     saved_categories = Category.objects.all()
     self.assertEqual( saved_categories.count(), 2)
@@ -82,26 +97,24 @@ class CategoriesPageTest(TestCase):
     self.assertEqual(first_saved_category.text, 'Rent')
     self.assertEqual(second_saved_category.text, 'Food')
 
-class ModelsTest(TestCase):
+class ModelsTest(BaseTest):
 
   def test_saving_and_retrieving_expenses(self):
-    category = Category()
-    category.text = 'Rent'
-    category.save()
+    category =  self.create_category('Rent')
 
-    first_expense = Expense()
-    first_expense.category = category
-    first_expense.amount = 5000
-    first_expense.note = 'First month of rent'
-    first_expense.spended_date = '2019-08-04'
-    first_expense.save()
+    first_expense = self.create_expense(
+      category=category,
+      amount=5000,
+      note='First month of rent',
+      spended_date='2019-08-04'
+    )
 
-    second_expense = Expense()
-    second_expense.category = category
-    second_expense.amount = 4200
-    second_expense.note = 'Second month of rent (discounted) in advance'
-    second_expense.spended_date = '2019-09-04'
-    second_expense.save()
+    second_expense = self.create_expense(
+      category=category,
+      amount=4200,
+      note='Second month of rent (discounted) in advance',
+      spended_date='2019-09-04'
+    )
 
     saved_category = Category.objects.first()
     self.assertEqual(saved_category, category)

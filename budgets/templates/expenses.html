@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block title %}Expenses{% endblock %}
+
 {% block content %}
 <form method="POST" action="new_expense">
   <input name="expense_amount" id="id_new_expense_amount" placeholder="Enter a new expense" />

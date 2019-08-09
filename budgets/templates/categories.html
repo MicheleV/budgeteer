@@ -1,21 +1,31 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<form method="POST" action="new_category" style="text-align: center;">
-  <input name="category_text" id="id_new_category" placeholder="Enter a new category" />
-  {% csrf_token %}
-</form>
+{% block title %}Categories{% endblock %}
 
-<table id="id_categories">
-  <tr>
-    <th>Category ID</th>
-    <th>Category name</th>
-  </tr>
-  {% for category in categories %}
-    <tr>
-      <td>{{ forloop.counter }}</td>
-      <td>{{ category.text }}</td>
-    </tr>
-  {% endfor %}
-</table>
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 col-md-offset-3">
+      <div class="text-center">
+        <form method="POST" action="new_category">
+          <input name="category_text" id="id_new_category" placeholder="Enter a new category" />
+          {% csrf_token %}
+        </form>
+
+        <table id="id_categories">
+          <tr>
+            <th>Category ID</th>
+            <th>Category name</th>
+          </tr>
+          {% for category in categories %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ category.text }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

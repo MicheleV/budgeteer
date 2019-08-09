@@ -51,13 +51,19 @@ class ExpensesTest(FunctionalTest):
     submit_button.click()
 
     # They can see the information the correct information on the page
-    self.veirfy_expense_was_created(amount,category_name,note)
+    self.verify_expense_was_created(amount,category_name,note)
 
     # The page reload and the expense item thye've entered is displayed correctly
     # TODO code smell, this wait_for_page_to_reload() should be needed
     # self.wait_for_page_to_reload()
 
-  def veirfy_expense_was_created(self, amount, category_name, note):
+  def verify_category_was_created(self, category_name):
+    # They see the category name is present on the page
+    table = self.browser.find_element_by_id('id_expenses')
+    self.find_text_inside_table(category_name, table)
+
+  def verify_expense_was_created(self, amount, category_name, note):
+    # They see all the details about the expese displayed on the page
     table = self.browser.find_element_by_id('id_expenses')
     self.find_text_inside_table(str(amount), table)
     self.find_text_inside_table(category_name, table)

@@ -30,10 +30,9 @@ def expenses_page(request):
 @require_http_methods(["POST"])
 def new_expense_page(request):
   Expense.objects.create(
-    amount=request.POST.get("expense_amount",0),
+    amount=request.POST.get("expense_amount",None),
     category_id=request.POST.get("category",None),
-    # TODO, insert a inputfield for the date inside the template
-    spended_date=request.POST.get("release_date",'2019-08-04'),
+    spended_date=request.POST.get("release_date",None),
   )
 
   return redirect('/expenses')

@@ -36,10 +36,15 @@ class ExpensesTest(FunctionalTest):
     # They choose that category
     dropdown.select_by_visible_text(CATEGORY_NAME)
 
-    #They see an input box
+    # They see an input box
     note_inputbox = self.browser.find_element_by_id('id_new_expense_note')
-    #They enter a note abotu the expenses, so that later they remember what this was about
+    # They enter a note abotu the expenses, so that later they remember what this was about
     note_inputbox.send_keys('First month of rent')
+
+    # They see an input box
+    date_inputbox = self.browser.find_element_by_id('id_new_expense_date')
+    # They enter the date of when the expenses was made
+    date_inputbox.send_keys('2019-08-09')
 
     # They see a submit button
     submit_button = self.browser.find_element_by_id('id_submit')
@@ -56,3 +61,6 @@ class ExpensesTest(FunctionalTest):
     self.find_text_inside_table(str(500), table)
     # TODO: the view will print the date using the browser locale, the following line will fail
     # self.find_text_inside_table('2019-08-04', table)
+
+  # TODO add negative test
+  # I.e. try to post with missing fields, etc

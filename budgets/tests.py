@@ -3,6 +3,9 @@
 from django.urls import resolve, reverse
 from django.test import TestCase
 from django.http import HttpRequest
+from django.db.utils import IntegrityError
+# Credits https://stackoverflow.com/a/24589930
+from django.db import transaction
 
 from budgets.views import home_page, categories_page
 from budgets.models import Category, Expense
@@ -132,3 +135,50 @@ class ModelsTest(BaseTest):
     self.assertEqual(second_saved_item.amount, 4200)
     self.assertEqual(second_saved_item.note, 'Second month of rent (discounted) in advance')
     self.assertEqual(str(second_saved_item.spended_date), '2019-09-04')
+
+  def test_missing_parameter_saving_triggers_errors(self):
+    category =  self.create_category('Rent')
+    # No category
+
+    with transaction.atomic():
+      with self.assertRaises(IntegrityError) as e:
+        first_expense = self.create_expense(
+          category=None,
+          amount=5000,
+          note='Rent for August 2019',
+          spended_date='2019-08-04'
+        )
+      self.assertEqual(IntegrityError,type(e.exception))
+
+    # No amount
+    with transaction.atomic():
+      with self.assertRaises(IntegrityError) as e:
+        first_expense = self.create_expense(
+          category=category,
+          amount=None,
+          note='Rent for August 2019',
+          spended_date='2019-08-04'
+        )
+      self.assertEqual(IntegrityError,type(e.exception))
+
+    # No note
+    with transaction.atomic():
+      with self.assertRaises(IntegrityError) as e:
+        first_expense = self.create_expense(
+          category=category,
+          amount=5000,
+          note=None,
+          spended_date='2019-08-04'
+        )
+      self.assertEqual(IntegrityError,type(e.exception))
+
+    # No spended date
+    with transaction.atomic():
+      with self.assertRaises(IntegrityError) as e:
+        first_expense = self.create_expense(
+          category=category,
+          amount=5000,
+          note='Rent for August 2019',
+          spended_date=None
+        )
+      self.assertEqual(IntegrityError,type(e.exception))

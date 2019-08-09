@@ -3,8 +3,8 @@
   <body>
     <form method="POST" action="new_expense">
       <input name="expense_amount" id="id_new_expense_amount" placeholder="Enter a new expense" />
-      <input name="note" id="id_new_expense_note" placeholder="Enter a memo about the expense" />
-      <input name="release_date" id="id_new_expense_date" placeholder="Enter the date of the expenses" />
+      <input name="note" id="id_new_expense_note" placeholder="Enter a note about the expense" />
+      <input name="release_date" id="id_new_expense_date" placeholder="%Y-%m-%d" />
       <input type="submit" id="id_submit" value="Submit">
     <select name="category" id="id_expenses_category">
       {% for category in categories %}
@@ -17,8 +17,19 @@
     <hr>
 
     <table id="id_expenses">
+      <tr>
+        <th>Amount</th>
+        <th>Category</th>
+        <th>Spended date</th>
+        <th>Note</th>
+      </tr>
       {% for expense in expenses %}
-        <tr><td>{{ expense.amount }} : {{ expense.category.text }} ({{ expense.spended_date }})</td></tr>
+        <tr>
+          <td>{{ expense.amount }}</td>
+          <td>{{ expense.category.text }}</td>
+          <td>{{ expense.spended_date }}</td>
+          <td>{{ expense.note }}</td>
+        </tr>
       {% endfor %}
     </table>
 

@@ -33,6 +33,7 @@ def new_expense_page(request):
     amount=request.POST.get("expense_amount",None),
     category_id=request.POST.get("category",None),
     spended_date=request.POST.get("release_date",None),
+    note=request.POST.get("note",None),
   )
 
   return redirect('/expenses')

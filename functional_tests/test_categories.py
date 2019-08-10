@@ -9,42 +9,16 @@ from .base import FunctionalTest
 
 class CategoriesTest(FunctionalTest):
 
-  def test_can_create_categories(self):
-    url = reverse('categories')
-    self.browser.get(f"{self.live_server_url}{url}")
-    inputbox = self.browser.find_element_by_id('id_new_category')
-    self.assertEqual(
-      inputbox.get_attribute('placeholder'),
-      'Enter a new category'
-    )
+  def test_can_create_multiple_categories(self):
+    # Users can create a category to log expenses related to their rent
+    self.create_a_category('Rent')
+    # Users can create a category to log their food expenses
+    self.create_a_category('Food')
 
-    inputbox.send_keys('Rent')
-    inputbox.send_keys(Keys.ENTER)
-    self.wait_for_page_to_reload()
+  def test_cannot_create_an_empty_category(self):
+    category_text = None
+    self.create_a_category(category_text, False)
 
+    # Verify we do not have any category (No category with ID 1)
     table = self.browser.find_element_by_id('id_categories')
-    self.find_text_inside_table('Rent', table)
-
-    inputbox = self.browser.find_element_by_id('id_new_category')
-
-    inputbox.send_keys('Food')
-    inputbox.send_keys(Keys.ENTER)
-    self.wait_for_page_to_reload()
-
-    table = self.browser.find_element_by_id('id_categories')
-    self.find_text_inside_table('Food', table)
-
-    # @skip
-    def test_cannot_add_empty_categories(self):
-      url = reverse('categories')
-      self.browser.get(f"{self.live_server_url}{url}")
-
-      self.browser.find_element_by_id('id_new_category').send_keys(Keys.ENTER)
-      self.wait_for_page_to_reload()
-
-      self.assertEqual(
-        self.browser.find_element_by_css_selector('.has_error').text,
-        "You can't have empty Categories"
-      )
-
-      self.fail("TODO: finish me")
+    self.assert_text_is_not_inside_table('1', table)

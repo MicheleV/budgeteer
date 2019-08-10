@@ -4,6 +4,7 @@ from django.urls import resolve, reverse
 from django.test import TestCase
 from django.http import HttpRequest
 from django.db.utils import IntegrityError
+from django.core.exceptions import ValidationError
 # Credits https://stackoverflow.com/a/24589930
 from django.db import transaction
 
@@ -16,6 +17,7 @@ class BaseTest(TestCase):
     category = Category()
     category.text = text
     category.save()
+    category.full_clean()
     return category
 
   def create_expense(self, category, amount, note, spended_date):
@@ -25,6 +27,7 @@ class BaseTest(TestCase):
     first_expense.note = note
     first_expense.spended_date = spended_date
     first_expense.save()
+    first_expense.full_clean()
     return first_expense
 
   def get_response_from_named_url(self, named_url):
@@ -137,13 +140,20 @@ class ModelsTest(BaseTest):
     self.assertEqual(second_saved_item.note, 'Second month of rent (discounted) in advance')
     self.assertEqual(str(second_saved_item.spended_date), '2019-09-04')
 
-  def test_saving_malformed_categories_triggers_errors(self):
+  def test_malformed_categories_triggers_errors(self):
+    # None is not allowed
     with transaction.atomic():
       with self.assertRaises(IntegrityError) as e:
         category =  self.create_category(None)
         self.assertEqual(IntegrityError,type(e.exception))
 
-  def test_saving_malformed_expenses_triggers_errors(self):
+    # Empty strigs are not allowed either
+    with transaction.atomic():
+      with self.assertRaises(ValidationError) as e:
+        category =  self.create_category('')
+        self.assertEqual(ValidationError,type(e.exception))
+
+  def test_malformed_expenses_triggers_errors(self):
     category =  self.create_category('Rent')
 
     # No category
@@ -155,9 +165,10 @@ class ModelsTest(BaseTest):
           note='Rent for August 2019',
           spended_date='2019-08-04'
         )
+        first_expense.full_clean()
       self.assertEqual(IntegrityError,type(e.exception))
 
-    # No amount
+    # amount field: None is not allowed
     with transaction.atomic():
       with self.assertRaises(IntegrityError) as e:
         first_expense = self.create_expense(
@@ -166,9 +177,10 @@ class ModelsTest(BaseTest):
           note='Rent for August 2019',
           spended_date='2019-08-04'
         )
+        first_expense.full_clean()
       self.assertEqual(IntegrityError,type(e.exception))
 
-    # No note
+    # note field: None is not allowed
     with transaction.atomic():
       with self.assertRaises(IntegrityError) as e:
         first_expense = self.create_expense(
@@ -177,9 +189,21 @@ class ModelsTest(BaseTest):
           note=None,
           spended_date='2019-08-04'
         )
+        first_expense.full_clean()
       self.assertEqual(IntegrityError,type(e.exception))
+    # note field: Empty strigs are not allowed either
+    with transaction.atomic():
+      with self.assertRaises(ValidationError) as e:
+        first_expense = self.create_expense(
+          category=category,
+          amount=5000,
+          note='',
+          spended_date='2019-08-04'
+        )
+        first_expense.full_clean()
+      self.assertEqual(ValidationError,type(e.exception))
 
-    # No spended date
+    # spended_date field: None is not allowed
     with transaction.atomic():
       with self.assertRaises(IntegrityError) as e:
         first_expense = self.create_expense(
@@ -188,4 +212,16 @@ class ModelsTest(BaseTest):
           note='Rent for August 2019',
           spended_date=None
         )
+        first_expense.full_clean()
       self.assertEqual(IntegrityError,type(e.exception))
+    # spended_date field: Empty strigs are not allowed either
+    with transaction.atomic():
+      with self.assertRaises(ValidationError) as e:
+        first_expense = self.create_expense(
+          category=category,
+          amount=5000,
+          note='',
+          spended_date='2019-08-04'
+        )
+        first_expense.full_clean()
+      self.assertEqual(ValidationError,type(e.exception))

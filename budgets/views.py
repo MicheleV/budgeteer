@@ -11,8 +11,9 @@ def home_page(request):
 
 @require_http_methods(["GET", "POST"])
 def categories_page(request):
-  if request.method == 'POST':
-    Category.objects.create(text=request.POST.get("category_text",""))
+  category_name = request.POST.get("category_text",None)
+  if request.method == 'POST' and category_name:
+    Category.objects.create(text=category_name)
     return redirect('/categories')
 
   categories = Category.objects.all()

@@ -137,10 +137,16 @@ class ModelsTest(BaseTest):
     self.assertEqual(second_saved_item.note, 'Second month of rent (discounted) in advance')
     self.assertEqual(str(second_saved_item.spended_date), '2019-09-04')
 
-  def test_missing_parameter_saving_triggers_errors(self):
-    category =  self.create_category('Rent')
-    # No category
+  def test_saving_malformed_categories_triggers_errors(self):
+    with transaction.atomic():
+      with self.assertRaises(IntegrityError) as e:
+        category =  self.create_category(None)
+        self.assertEqual(IntegrityError,type(e.exception))
 
+  def test_saving_malformed_expenses_triggers_errors(self):
+    category =  self.create_category('Rent')
+
+    # No category
     with transaction.atomic():
       with self.assertRaises(IntegrityError) as e:
         first_expense = self.create_expense(

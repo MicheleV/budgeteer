@@ -29,12 +29,12 @@ class PageContentTest(FunctionalTest):
   def test_layout_and_styling(self):
       # Credits http://www.obeythetestinggoat.com/book/chapter_prettification.html#_static_files_in_django
       # User loads the page
-      url = reverse('categories')
+      url = reverse('home')
       self.browser.get(f"{self.live_server_url}{url}")
       self.browser.set_window_size(1024, 768)
 
-      # User notices the input box is nicely centered
-      inputbox = self.browser.find_element_by_id('id_new_category')
+      # User notices the logo at the bottom is nicely centered
+      inputbox = self.browser.find_element_by_css_selector('#footer_text')
       self.assertAlmostEqual(
           inputbox.location['x'] + inputbox.size['width'] / 2,
           512,

@@ -14,9 +14,10 @@ class ExpensesTest(FunctionalTest):
 
   def create_a_category(self, category_name):
     # Users create a category
-    self.browser.get(f"{self.live_server_url}/categories")
-    inputbox = self.browser.find_element_by_id('id_new_category')
+    url = reverse('categories')
+    self.browser.get(f"{self.live_server_url}{url}")
 
+    inputbox = self.browser.find_element_by_id('id_new_category')
     inputbox.send_keys(category_name)
     inputbox.send_keys(Keys.ENTER)
     self.wait_for_page_to_reload()

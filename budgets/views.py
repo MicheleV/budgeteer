@@ -12,6 +12,7 @@ def home_page(request):
 @require_http_methods(["GET", "POST"])
 def categories_page(request):
   category_name = request.POST.get("category_text",None)
+  # TODO, this should throw 30X instead of redirecting and ignoring the missing param
   if request.method == 'POST' and category_name:
     Category.objects.create(text=category_name)
     return redirect('/categories')
@@ -30,11 +31,14 @@ def expenses_page(request):
 
 @require_http_methods(["POST"])
 def new_expense_page(request):
-  Expense.objects.create(
+  expense = Expense.objects.create(
     amount=request.POST.get("expense_amount",None),
     category_id=request.POST.get("category",None),
     spended_date=request.POST.get("release_date",None),
     note=request.POST.get("note",None),
   )
+  expense.full_clean()
+  expense.save()
+
 
   return redirect('/expenses')

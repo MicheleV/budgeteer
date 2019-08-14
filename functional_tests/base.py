@@ -26,40 +26,27 @@ class FunctionalTest(LiveServerTestCase):
   @classmethod
   def setUpClass(self):
     super(FunctionalTest, self).setUpClass()
-    # headless = True
-    # browser = "Firefox"
     self.setup_browser(self.BROWSER,self.HEADLESS)
-    # if headless:
-    #   options = Options()
-    #   options.add_argument('-headless')
-    #   self.browser = webdriver.Firefox(options=options)
-    # else:
-    #   self.browser = webdriver.Firefox()
-    # options = webdriver.ChromeOptions()?
-    # options = Options()
-    # options.add_argument('--ignore-certificate-errors')
-    # options.add_argument("--test-type")
-    # options.add_argument('--headless')
-    # options.binary_location = "/usr/bin/chromium-browser"
-    # self.browser = webdriver.Chrome(chrome_options=options)
 
   @classmethod
   def setup_browser(self, browser="Firefox", headless= True):
     if browser == "Firefox":
       options = Options()
-      options.add_argument('--ignore-certificate-errors')
-      options.add_argument("--test-type")
       if headless:
         options.add_argument('-headless')
       self.browser = webdriver.Firefox(options=options)
     else:
-      options = webdriver.Options()
+      options = webdriver.ChromeOptions()
       options.add_argument('--ignore-certificate-errors')
       options.add_argument("--test-type")
+      options.add_argument('--no-proxy-server')
       if headless:
         options.add_argument('--headless')
+        # You need this if running the tests as root (run as root!?)
+        # options.add_argument('--no-sandbox')
       options.binary_location = "/usr/bin/chromium-browser"
       self.browser = webdriver.Chrome(chrome_options=options)
+
 
   @classmethod
   def tearDownClass(self):
@@ -74,6 +61,7 @@ class FunctionalTest(LiveServerTestCase):
       old_page = self.browser.find_element_by_tag_name('html')
       element = wait.until(EC.staleness_of(old_page))
     else:
+      # TODO investigate why chromium does work without this
       pass
 
   def find_text_inside_table(self,text, table):

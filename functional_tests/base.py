@@ -10,16 +10,56 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 # Docs at https://seleniumhq.github.io/selenium/docs/api/py/webdriver_support/selenium.webdriver.support.select.html
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.firefox.options import Options
 from django.test import LiveServerTestCase
 from django.urls import resolve, reverse
 from budgets.models import Category
 
 class FunctionalTest(LiveServerTestCase):
+  # chromium true 11.931s
+  # chormium false 16.099s
+  # firefox true 16.813s ~ 42.180s
+  # firefox false 17.952s
+  BROWSER = "Firefox"
+  HEADLESS = True
 
   @classmethod
   def setUpClass(self):
     super(FunctionalTest, self).setUpClass()
-    self.browser = webdriver.Firefox()
+    # headless = True
+    # browser = "Firefox"
+    self.setup_browser(self.BROWSER,self.HEADLESS)
+    # if headless:
+    #   options = Options()
+    #   options.add_argument('-headless')
+    #   self.browser = webdriver.Firefox(options=options)
+    # else:
+    #   self.browser = webdriver.Firefox()
+    # options = webdriver.ChromeOptions()?
+    # options = Options()
+    # options.add_argument('--ignore-certificate-errors')
+    # options.add_argument("--test-type")
+    # options.add_argument('--headless')
+    # options.binary_location = "/usr/bin/chromium-browser"
+    # self.browser = webdriver.Chrome(chrome_options=options)
+
+  @classmethod
+  def setup_browser(self, browser="Firefox", headless= True):
+    if browser == "Firefox":
+      options = Options()
+      options.add_argument('--ignore-certificate-errors')
+      options.add_argument("--test-type")
+      if headless:
+        options.add_argument('-headless')
+      self.browser = webdriver.Firefox(options=options)
+    else:
+      options = webdriver.Options()
+      options.add_argument('--ignore-certificate-errors')
+      options.add_argument("--test-type")
+      if headless:
+        options.add_argument('--headless')
+      options.binary_location = "/usr/bin/chromium-browser"
+      self.browser = webdriver.Chrome(chrome_options=options)
 
   @classmethod
   def tearDownClass(self):
@@ -28,10 +68,13 @@ class FunctionalTest(LiveServerTestCase):
 
   # Credits to Tommy Beadle: http://disq.us/p/x1r1v2
   def wait_for_page_to_reload(self):
-    MAX_DELAY = 5
-    wait = WebDriverWait(self.browser, MAX_DELAY)
-    old_page = self.browser.find_element_by_tag_name('html')
-    element = wait.until(EC.staleness_of(old_page))
+    if self.BROWSER == "Firefox":
+      MAX_DELAY = 3
+      wait = WebDriverWait(self.browser, MAX_DELAY)
+      old_page = self.browser.find_element_by_tag_name('html')
+      element = wait.until(EC.staleness_of(old_page))
+    else:
+      pass
 
   def find_text_inside_table(self,text, table):
     rows = table.find_elements_by_tag_name('td')

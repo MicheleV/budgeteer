@@ -7,21 +7,25 @@ from .base import BaseTest
 
 class HomePageTest(BaseTest):
 
+  # TODO, move this to a base PageTest class
   def test_title_is_displayed(self):
     url = reverse('home')
     response = self.client.get(url)
     self.assertContains(response,'Budgeteer')
 
+  # TODO, move this to a base PageTest class
   def test_uses_home_view(self):
     url = reverse('home')
     found = resolve(url)
     self.assertEqual(found.func, home_page)
 
+  # TODO, move this to a base PageTest class
   def test_uses_home_template(self):
     url = reverse('home')
     response = self.client.get(url)
     self.assertTemplateUsed(response, 'home.html')
 
+# TODO, move this to a base PageTest class
   def test_redirect_on_POST(self):
     url = reverse('categories')
     response = self.client.post(url,  data={'category_text': 'Rent'})
@@ -37,6 +41,7 @@ class HomePageTest(BaseTest):
     self.assertEqual(new_category.text, 'Rent')
 
   def test_displays_all_categories(self):
+    # TODO: does create calls save()? Should we execute full_clean() before save()?
     Category.objects.create(text='Rent')
     Category.objects.create(text='Food')
 

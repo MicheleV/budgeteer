@@ -14,15 +14,21 @@ from selenium.webdriver.firefox.options import Options
 from django.test import LiveServerTestCase
 from django.urls import resolve, reverse
 from budgets.models import Category
+import functional_tests.test_categories as TestCategories
+import functional_tests.test_expenses as TestExpenses
+import functional_tests.test_page_access as TestPageAccess
+import functional_tests.test_views_and_layout as TestViewsAndLayout
 
+# Docs at https://docs.djangoproject.com/en/2.2/topics/testing/tools/#django.test.TransactionTestCase
+# Credits to 4c5 https://stackoverflow.com/users/267540/e4c5
+# https://stackoverflow.com/questions/36988906/
+# Given that TransactionTestCase is very slow,
+# I've merged all the Instances of LiveServerTestCase so that we avoid the overhead
 class FunctionalTest(LiveServerTestCase):
-  # chromium true 11.931s
-  # chormium false 16.099s
-  # firefox true 16.813s ~ 42.180s
-  # firefox false 17.952s
   BROWSER = "Firefox"
   HEADLESS = True
 
+  ## Setup
   @classmethod
   def setUpClass(self):
     super(FunctionalTest, self).setUpClass()
@@ -47,12 +53,12 @@ class FunctionalTest(LiveServerTestCase):
       options.binary_location = "/usr/bin/chromium-browser"
       self.browser = webdriver.Chrome(chrome_options=options)
 
-
   @classmethod
   def tearDownClass(self):
     super(FunctionalTest, self).setUpClass()
     self.browser.quit()
 
+  ## Helpers
   # Credits to Tommy Beadle: http://disq.us/p/x1r1v2
   def wait_for_page_to_reload(self):
     if self.BROWSER == "Firefox":
@@ -147,3 +153,22 @@ class FunctionalTest(LiveServerTestCase):
     # TODO: the view will print the date using the browser locale, the following line will fail
     # self.find_text_inside_table('2019-08-04', table)
 
+  ## Actual tests
+  def test_categories_first_set(self):
+    TestCategories.test_cannot_create_an_empty_category(self)
+    TestCategories.test_can_create_multiple_categories(self)
+
+  def test_expenses(self):
+    TestExpenses.test_can_create_multiple_expense(self)
+    TestExpenses.test_can_create_multiple_expense(self)
+    TestExpenses.test_can_not_create_malformed_expenses(self)
+
+  def test_access(self):
+    TestPageAccess.test_can_access_home_page(self)
+    TestPageAccess.test_can_access_list_categories_page(self)
+    TestPageAccess.test_can_access_list_expenses_page(self)
+    TestPageAccess.test_cannot_access_admin_page(self)
+
+  def test_views_and_layout(self):
+    TestViewsAndLayout.test_home_page_has_link_categories_page(self)
+    TestViewsAndLayout.test_layout_and_styling(self)

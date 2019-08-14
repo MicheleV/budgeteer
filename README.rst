@@ -93,21 +93,23 @@ Install the requirements::
 
     pip install -r test-requirements.txt 
 
+`keep option docs <https://docs.djangoproject.com/en/2.2/topics/testing/overview/#the-test-database>`_
+
 Run both function and unit test suite::
 
-    python manage.py test
+    python manage.py test --keep
 
 Run the functional test suite::
 
-    python manage.py test functional_tests
+    python manage.py test functional_tests --keep
 
-Run all the functional tests in a given file::
+Run a single functional test::
 
-    python manage.py test functional_tests.<file_name_from_functional_test_folder_without_py_extension>
+    python manage.py test functional_tests.<file_name_without_py>.<class_name>.<method_name> --keep
 
 Run the unit test suite::
 
-    python manage.py test budgets
+    python manage.py test budgets --keep
 
 
 References and useful links

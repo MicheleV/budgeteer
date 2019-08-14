@@ -2,7 +2,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
-# Credits https://stackoverflow.com/a/24589930
 from django.db import transaction
 from budgets.models import Category, Expense
 from .base import BaseTest
@@ -44,6 +43,7 @@ class ModelsTest(BaseTest):
     self.assertEqual(second_saved_item.note, 'Second month of rent (discounted) in advance')
     self.assertEqual(str(second_saved_item.spended_date), '2019-09-04')
 
+  # Credits https://stackoverflow.com/a/24589930
   def test_malformed_categories_triggers_errors(self):
     # None is not allowed
     with transaction.atomic():

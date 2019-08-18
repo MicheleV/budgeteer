@@ -15,3 +15,10 @@ class Expense(models.Model):
   amount = models.IntegerField()
   note = models.CharField(max_length=150, default='')
   spended_date = models.DateField()
+
+class MonthlyBudget(models.Model):
+  # TODO should we really delete Monthly Budgets on Category deletion?
+  # This will remove history!
+  category = models.ForeignKey(Category, default=None, on_delete=models.CASCADE)
+  amount = models.IntegerField()
+  date = models.DateField()

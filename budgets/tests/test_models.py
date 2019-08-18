@@ -3,7 +3,7 @@
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from budgets.models import Category, Expense
+from budgets.models import Category, Expense, MonthlyBudget
 from .base import BaseTest
 
 class ModelsTest(BaseTest):
@@ -129,3 +129,69 @@ class ModelsTest(BaseTest):
         )
         first_expense.full_clean()
       self.assertEqual(ValidationError,type(e.exception))
+
+  def test_saving_and_retrieving_monthly_budgets(self):
+    category =  self.create_category('Rent')
+
+    first_budget = self.create_monthly_budgets(
+      category=category,
+      amount=5000,
+      date='2019-08-01'
+    )
+    second_budget = self.create_monthly_budgets(
+      category=category,
+      amount=4200,
+      date='2019-09-01'
+    )
+
+    saved_category = Category.objects.first()
+    saved_budgets = MonthlyBudget.objects.all()
+    first_saved_item = saved_budgets[0]
+    second_saved_item = saved_budgets[1]
+
+    self.assertEqual(saved_category, category)
+    self.assertEqual(saved_budgets.count(), 2)
+
+    self.assertEqual(first_saved_item.category, category)
+    self.assertEqual(first_saved_item.amount, 5000)
+    self.assertEqual(str(first_saved_item.date), '2019-08-01')
+
+    self.assertEqual(second_saved_item.category, category)
+    self.assertEqual(second_saved_item.amount, 4200)
+    self.assertEqual(str(second_saved_item.date), '2019-09-01')
+
+  def test_malformed_monthly_budgets_triggers_errors(self):
+    category =  self.create_category('Rent')
+
+    # No category
+    with transaction.atomic():
+      with self.assertRaises(IntegrityError) as e:
+        budget = self.create_monthly_budgets(
+          category=None,
+          amount=4200,
+          date='2019-09-01'
+        )
+        budget.full_clean()
+      self.assertEqual(IntegrityError,type(e.exception))
+
+    # amount field: None is not allowed
+    with transaction.atomic():
+      with self.assertRaises(IntegrityError) as e:
+        budget = self.create_monthly_budgets(
+          category=category,
+          amount=None,
+          date='2019-09-01'
+        )
+        budget.full_clean()
+      self.assertEqual(IntegrityError,type(e.exception))
+
+    # date field: None is not allowed
+    with transaction.atomic():
+      with self.assertRaises(IntegrityError) as e:
+        budget = self.create_monthly_budgets(
+          category=category,
+          amount=5000,
+          date=None,
+        )
+        budget.full_clean()
+      self.assertEqual(IntegrityError,type(e.exception))

@@ -3,7 +3,7 @@
 from django.shortcuts import render, redirect
 # Docs at https://docs.djangoproject.com/en/2.2/topics/http/decorators/
 from django.views.decorators.http import require_http_methods
-from budgets.models import Category,Expense
+from budgets.models import Category,Expense, MonthlyBudget
 
 @require_http_methods(["GET"])
 def home_page(request):
@@ -39,6 +39,24 @@ def new_expense_page(request):
   )
   expense.full_clean()
   expense.save()
-
-
   return redirect('/expenses')
+
+@require_http_methods(["POST"])
+def new_monthly_budgets_page(request):
+  budget = MonthlyBudget.objects.create(
+    amount=request.POST.get("budget_amount",None),
+    category_id=request.POST.get("category",None),
+    date=request.POST.get("budget_date",None),
+  )
+  budget.full_clean()
+  budget.save()
+  return redirect('/monthly_budgets')
+
+@require_http_methods(["GET"])
+def monthly_budgets_page(request):
+  categories = Category.objects.all()
+  monthly_budgets = MonthlyBudget.objects.all()
+  return render(request, 'monthly_budgets.html', {
+      'categories': categories,
+      'monthly_budgets': monthly_budgets,
+  })

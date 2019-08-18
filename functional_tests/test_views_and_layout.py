@@ -5,21 +5,12 @@ from django.urls import reverse
 def test_home_page_has_link_categories_page(self):
   first_url_to_find = reverse('categories')
   second_url_to_find = reverse('expenses')
+  third_url_to_find = reverse('monthly_budgets')
 
-  url = reverse('home')
-  self.browser.get(f"{self.live_server_url}{url}")
+  self.find_url_in_home_page(first_url_to_find)
+  self.find_url_in_home_page(second_url_to_find)
+  self.find_url_in_home_page(third_url_to_find)
 
-  links = self.browser.find_elements_by_tag_name('a')
-  # TODO code smell, this should be refactored in a helper function when get a
-  # third link
-  self.assertTrue(
-    any(first_url_to_find in link.get_attribute('href') for link in links),
-    f"No url: {url} was found in the Page. links were\n{links}",
-  )
-  self.assertTrue(
-    any(second_url_to_find in link.get_attribute('href') for link in links),
-    f"No url: {url} was found in the Page. links were\n{links}",
-  )
 
 # Credits http://www.obeythetestinggoat.com/book/chapter_prettification.html#_static_files_in_django
 # Verify css is properly loaded

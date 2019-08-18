@@ -9,7 +9,7 @@ def test_cannot_create_an_empty_category(self):
   self.assert_text_is_not_inside_table('1', table)
 
 def test_can_create_multiple_categories(self):
-  # Users can create a category to log expenses related to their rent
+  # Frank can create a category to log expenses related to his rent
   self.create_a_category('Rent')
-  # Users can create a category to log their food expenses
+  # Frank can create a category to log his food expenses
   self.create_a_category('Food')

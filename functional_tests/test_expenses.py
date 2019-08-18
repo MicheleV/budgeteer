@@ -4,7 +4,7 @@ def test_can_create_multiple_expense(self):
   CATEGORY_NAME = 'Rent'
   self.create_a_category(CATEGORY_NAME)
 
-  # Users visit expenses url and enters the expens details
+  # Frank visits the expenses url and enters the expens details
   self.create_an_expense(
     500,
     CATEGORY_NAME,
@@ -12,7 +12,7 @@ def test_can_create_multiple_expense(self):
     '2019-08-09'
   )
 
-  # Users visit expenses url again and enters a second expense with its details
+  # Frank visits the expenses url again and enters a second expense with its details
   self.create_an_expense(
     420,
     CATEGORY_NAME,

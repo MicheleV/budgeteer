@@ -97,7 +97,7 @@ class FunctionalTest(LiveServerTestCase):
   )
 
   def create_a_category(self, category_name, verify_creation=True):
-    # Users create a category
+    # Frank creates a category
     url = reverse('categories')
     self.browser.get(f"{self.live_server_url}{url}")
 
@@ -143,36 +143,36 @@ class FunctionalTest(LiveServerTestCase):
       self.verify_monthly_expense_was_created(category_name, amount, date)
 
   def create_an_expense(self, amount, category_name, note, expense_date, verify_creation=True):
-    # Users visit expenses page
+    # Frank visits the expenses page
     url = reverse('expenses')
     self.browser.get(f"{self.live_server_url}{url}")
-    # They see an input box
+    # Frank sees an input box
     inputbox = self.browser.find_element_by_id('id_new_expense_amount')
-    # They input the price of the expense item
+    # Frank inputs the price of the expense item
     inputbox.send_keys(amount)
-    # They see a dropdown
+    # Frank sees a dropdown
     dropdown = Select(self.browser.find_element_by_id('id_expenses_category'))
     # The dropdown includes the Category they've just created
-    # They choose that category
+    # Frank chooses that category
     dropdown.select_by_visible_text(category_name)
 
-    # They see another input box
+    # Frank sees another input box
     note_inputbox = self.browser.find_element_by_id('id_new_expense_note')
-    # They enter a note abotu the expenses, so that later they remember what this was about
+    # Frank enters a note abotu the expenses, so that later they remember what this was about
     note_inputbox.send_keys(note)
 
-    # They see one more input box
+    # Frank sees one more input box
     date_inputbox = self.browser.find_element_by_id('id_new_expense_date')
-    # They enter the date of when the expenses was made
+    # Frank enters the date of when the expense was made
     date_inputbox.send_keys(expense_date)
 
-    # They see a submit button
+    # Frank see a submit button
     submit_button = self.browser.find_element_by_id('id_submit')
-    # They click the button to save the entry
+    # Frank clicks the button to save the entry
     submit_button.click()
 
     if verify_creation:
-      # They can see the information the correct information on the page
+      # Frank can see the information the correct information on the page
       self.verify_expense_was_created(amount,category_name,note)
 
     # The page reload and the expense item thye've entered is displayed correctly
@@ -180,12 +180,12 @@ class FunctionalTest(LiveServerTestCase):
     # self.wait_for_page_to_reload()
 
   def verify_category_was_created(self, category_name):
-    # They see the category name is present on the page
+    # Frank sees the category name is present on the page
     table = self.browser.find_element_by_id('id_categories')
     self.find_text_inside_table(category_name, table)
 
   def verify_expense_was_created(self, amount, category_name, note):
-    # They see all the details about the expese displayed on the page
+    # Frank sees all the details about the expese displayed on the page
     table = self.browser.find_element_by_id('id_expenses')
     self.find_text_inside_table(str(amount), table)
     self.find_text_inside_table(category_name, table)

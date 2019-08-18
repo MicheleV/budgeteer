@@ -15,12 +15,12 @@ def test_home_page_has_link_categories_page(self):
 # Credits http://www.obeythetestinggoat.com/book/chapter_prettification.html#_static_files_in_django
 # Verify css is properly loaded
 def test_layout_and_styling(self):
-  # User loads the page
+  # Frank loads the page
   url = reverse('home')
   self.browser.get(f"{self.live_server_url}{url}")
   self.browser.set_window_size(1024, 768)
 
-  # User notices the logo at the bottom is nicely centered
+  # Frank notices the logo at the bottom is nicely centered
   inputbox = self.browser.find_element_by_css_selector('#footer_text')
   self.assertAlmostEqual(
       inputbox.location['x'] + inputbox.size['width'] / 2,

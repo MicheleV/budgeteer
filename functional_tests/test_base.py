@@ -1,6 +1,5 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 # Docs at https://selenium-python.readthedocs.io/waits.html
@@ -42,6 +41,7 @@ class FunctionalTest(LiveServerTestCase):
       if headless:
         options.add_argument('-headless')
       self.browser = webdriver.Firefox(options=options)
+      # self.browser.set_window_size(1024, 768)
     else:
       options = webdriver.ChromeOptions()
       options.add_argument('--ignore-certificate-errors')
@@ -184,6 +184,7 @@ class FunctionalTest(LiveServerTestCase):
     table = self.browser.find_element_by_id('id_categories')
     self.find_text_inside_table(category_name, table)
 
+  # TODO duplicate code, move to utilities
   def verify_expense_was_created(self, amount, category_name, note):
     # Frank sees all the details about the expese displayed on the page
     table = self.browser.find_element_by_id('id_expenses')
@@ -207,8 +208,8 @@ class FunctionalTest(LiveServerTestCase):
     TestCategories.test_can_create_multiple_categories(self)
 
   def test_expenses(self):
-    TestExpenses.test_can_create_multiple_expense(self)
     TestExpenses.test_can_not_create_malformed_expenses(self)
+    TestExpenses.test_expenses_sum_appears_on_home_page(self)
 
   def test_monthly_budgets(self):
     TestMonthlyBudgets.test_cannot_create_an_empty_monthly_budget(self)
@@ -224,3 +225,4 @@ class FunctionalTest(LiveServerTestCase):
   def test_views_and_layout(self):
     TestViewsAndLayout.test_home_page_has_link_categories_page(self)
     TestViewsAndLayout.test_layout_and_styling(self)
+

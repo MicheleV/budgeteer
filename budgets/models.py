@@ -9,6 +9,9 @@ class Category(models.Model):
   #   return reverse('category', args=[self.id])
 
 class Expense(models.Model):
+
+  def __str__(self):
+    return f"{self.category.id} ({self.category.text}), {self.amount}, {self.note}, {self.spended_date}"
   # TODO should we really delete expenses item on Category deletion?
   # This will remove history!
   category = models.ForeignKey(Category, default=None, on_delete=models.CASCADE)

@@ -17,6 +17,24 @@
 </form>
 <hr>
 
+
+{% if categories %}
+<h4>Expenses total, per category</h4>
+<table id="id_expenses_total">
+  <tr>
+    <th>Amount</th>
+    <th>Category</th>
+  </tr>
+  {% for subtotal in categories %}
+    <tr>
+      <td>{{ subtotal.text }}</td>
+      <td>{{ subtotal.total }}</td>
+    </tr>
+  {% endfor %}
+</table>
+<hr>
+{% endif %}
+
 <table id="id_expenses">
   <tr>
     <th>Amount</th>

@@ -22,8 +22,15 @@ def categories_page(request):
 
 @require_http_methods(["GET"])
 def expenses_page(request):
+  # TODO refactor these queries after reading Django docs about annotation and aggregation
   categories = Category.objects.all()
+  for cat in categories:
+    expenses = Expense.objects.filter(category_id=cat.id)
+    expenses_sum = sum(ex.amount for ex in expenses)
+    cat.total = expenses_sum
+
   expenses = Expense.objects.all()
+
   return render(request, 'expenses.html', {
     'categories': categories,
     'expenses': expenses

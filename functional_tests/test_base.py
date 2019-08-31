@@ -71,14 +71,14 @@ class FunctionalTest(LiveServerTestCase):
       # TODO investigate why chromium does work without this
       pass
 
-  def find_text_inside_table(self,text, table):
+  def find_text_inside_table(self, text, table):
     rows = table.find_elements_by_tag_name('td')
     self.assertTrue(
       any(text in row.text for row in rows),
       f"No {text} in rows. Contents were\n{table.text}",
     )
 
-  def assert_text_is_not_inside_table(self,text, table):
+  def assert_text_is_not_inside_table(self, text, table):
     rows = table.find_elements_by_tag_name('td')
     self.assertFalse(
       any(text in row.text for row in rows),
@@ -209,7 +209,7 @@ class FunctionalTest(LiveServerTestCase):
 
   def test_expenses(self):
     TestExpenses.test_can_not_create_malformed_expenses(self)
-    TestExpenses.test_expenses_sum_appears_on_home_page(self)
+    TestExpenses.test_expenses_sum_appear_on_home_page(self)
 
   def test_monthly_budgets(self):
     TestMonthlyBudgets.test_cannot_create_an_empty_monthly_budget(self)

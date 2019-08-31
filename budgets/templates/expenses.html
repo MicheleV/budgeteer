@@ -3,6 +3,8 @@
 {% block title %}Expenses{% endblock %}
 
 {% block content %}
+<h5 id="id_current_month_date">Expenses logged during {% now 'Y-m' %}</h5>
+<hr>
 <form method="POST" action="new_expense">
   <select name="category" id="id_expenses_category">
     {% for category in categories %}
@@ -19,7 +21,7 @@
 
 
 {% if categories %}
-<h4>Expenses total, per category</h4>
+<h5>Expenses total, per category</h5>
 <table id="id_expenses_total">
   <tr>
     <th>Amount</th>

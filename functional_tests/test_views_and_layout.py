@@ -3,6 +3,9 @@
 from django.urls import reverse
 
 def test_home_page_has_link_categories_page(self):
+  url = reverse('home')
+  self.browser.get(f"{self.live_server_url}{url}")
+
   first_url_to_find = reverse('categories')
   second_url_to_find = reverse('expenses')
   third_url_to_find = reverse('monthly_budgets')
@@ -10,6 +13,7 @@ def test_home_page_has_link_categories_page(self):
   self.find_url_in_home_page(first_url_to_find)
   self.find_url_in_home_page(second_url_to_find)
   self.find_url_in_home_page(third_url_to_find)
+  # TODO
 
 
 # Credits http://www.obeythetestinggoat.com/book/chapter_prettification.html#_static_files_in_django

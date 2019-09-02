@@ -125,7 +125,7 @@ class FunctionalTest(LiveServerTestCase):
     inputbox.send_keys(amount)
     # Frank sees a dropdown
     dropdown = Select(self.browser.find_element_by_id('id_budget_category'))
-    # The dropdown includes the Category they want to set a budget for
+    # The dropdown includes the Category Frank wants to set a budget for
     # Frank chooses that category
     dropdown.select_by_visible_text(category_name)
 

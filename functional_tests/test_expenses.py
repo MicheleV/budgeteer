@@ -1,7 +1,7 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.urls import reverse
-import datetime
+from datetime import date, timedelta
 # TODO add negative test
 # I.e. try to post with missing fields, etc
 def test_can_not_create_malformed_expenses(self):
@@ -18,13 +18,16 @@ def check_amount_and_cat_name(self, amount, category_name):
 def create_category_and_two_expenses(self, first_amount, second_amount, category_name):
   self.create_a_category(category_name)
 
+  first_date = date.today().replace(day=1)
+  delta = timedelta(weeks=10)
+  second_date = first_date + delta
+
   # Frank visits the expenses url and enters the expense details
   self.create_an_expense(
     first_amount,
     category_name,
     'First month of rent',
-    # TODO change this to be dynamic, otherwise tests will get flanky after Sep 2019
-    '2019-08-09'
+    first_date.strftime("%Y-%m-%d")
   )
 
   # Frank visits the expenses url again and enters a second expense with its details
@@ -32,14 +35,13 @@ def create_category_and_two_expenses(self, first_amount, second_amount, category
     second_amount,
     category_name,
     'Second month of rent (discounted)',
-    # TODO change this to be dynamic, otherwise tests will get flanky after Sep 2019
-    '2019-12-09',
+    second_date.strftime("%Y-%m-%d"),
     # Note False, since this expense is in the future (see comment above)
     False
   )
 
 def check_whether_current_month_date_is_displayed(self):
-  today_string = datetime.date.today().strftime("%Y-%m")
+  today_string = date.today().strftime("%Y-%m")
   date_container = self.browser.find_element_by_id('id_current_month_date')
   self.assertIn(today_string, date_container.text)
 

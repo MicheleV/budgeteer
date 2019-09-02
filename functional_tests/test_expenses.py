@@ -65,10 +65,10 @@ def test_expenses_sum_appear_on_home_page(self):
   without_paramters_expenses_page_shows_only_current_month_expenses(self, current_mont_amount, category_name)
 
 def test_expenses_page_can_show_old_expenses(self):
-  # TODO
+  # TODO: implement a get parameter and a dropdown to jump there
   pass
 
-def test_expenses_page_defaults_to_current_month_expenses_for_date_in_the_future(self):
+def test_expenses_will_not_show_expenses_in_the_future(self):
   # TODO
   pass
 

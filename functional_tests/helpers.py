@@ -154,5 +154,4 @@ def verify_monthly_expense_was_created(self, category_name, amount, date):
   table = self.browser.find_element_by_id('id_monthly_budgets')
   find_text_inside_table(self, str(amount), table)
   find_text_inside_table(self, category_name, table)
-  # TODO: the view will print the date using the browser locale, the following line will fail
-  # find_text_inside_table('2019-08-04', table)
+  find_text_inside_table('2019-08', table)

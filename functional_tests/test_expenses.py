@@ -2,28 +2,24 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.urls import reverse
 from datetime import date, timedelta
+import functional_tests.helpers as Helpers
+
 # TODO add negative test
 # I.e. try to post with missing fields, etc
 def test_can_not_create_malformed_expenses(self):
   # TODO at the moment being, empty memo field will succeed
   pass
 
-# TODO duplicate code, move to utilities
-def check_amount_and_cat_name(self, amount, category_name):
-  # Frank sees all the details sum  displayed on the page
-  table = self.browser.find_element_by_id('id_expenses_total')
-  self.find_text_inside_table(str(amount), table)
-  self.find_text_inside_table(category_name, table)
-
 def create_category_and_two_expenses(self, first_amount, second_amount, category_name):
-  self.create_a_category(category_name)
+  Helpers.create_a_category(self, category_name)
 
   first_date = date.today().replace(day=1)
   delta = timedelta(weeks=10)
   second_date = first_date + delta
 
   # Frank visits the expenses url and enters the expense details
-  self.create_an_expense(
+  Helpers.create_an_expense(
+    self,
     first_amount,
     category_name,
     'First month of rent',
@@ -31,7 +27,8 @@ def create_category_and_two_expenses(self, first_amount, second_amount, category
   )
 
   # Frank visits the expenses url again and enters a second expense with its details
-  self.create_an_expense(
+  Helpers.create_an_expense(
+    self,
     second_amount,
     category_name,
     'Second month of rent (discounted)',
@@ -47,7 +44,7 @@ def check_whether_current_month_date_is_displayed(self):
 
 def without_paramters_expenses_page_shows_only_current_month_expenses(self, current_month_amount, category_name):
   table = self.browser.find_element_by_id('id_expenses_total')
-  self.find_text_inside_table(str(current_month_amount), table)
+  Helpers.find_text_inside_table(self, str(current_month_amount), table)
 
 def test_expenses_sum_appear_on_home_page(self):
   category_name = 'Rent'
@@ -59,7 +56,7 @@ def test_expenses_sum_appear_on_home_page(self):
   # Frank sees the sum of this month expenses on the home page
   url = reverse('expenses')
   self.browser.get(f"{self.live_server_url}{url}")
-  check_amount_and_cat_name(self, current_mont_amount, category_name)
+  Helpers.check_amount_and_cat_name(self, current_mont_amount, category_name)
 
   # Frank notices that the current month id displayed in the expense page
   check_whether_current_month_date_is_displayed(self)

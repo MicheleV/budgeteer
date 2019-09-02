@@ -1,6 +1,7 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.urls import reverse
+import functional_tests.helpers as Helpers
 
 def test_home_page_has_link_categories_page(self):
   url = reverse('home')
@@ -10,11 +11,10 @@ def test_home_page_has_link_categories_page(self):
   second_url_to_find = reverse('expenses')
   third_url_to_find = reverse('monthly_budgets')
 
-  self.find_url_in_home_page(first_url_to_find)
-  self.find_url_in_home_page(second_url_to_find)
-  self.find_url_in_home_page(third_url_to_find)
+  Helpers.find_url_in_home_page(self, first_url_to_find)
+  Helpers.find_url_in_home_page(self, second_url_to_find)
+  Helpers.find_url_in_home_page(self, third_url_to_find)
   # TODO
-
 
 # Credits http://www.obeythetestinggoat.com/book/chapter_prettification.html#_static_files_in_django
 # Verify css is properly loaded

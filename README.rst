@@ -50,6 +50,9 @@ Install the requirements::
 
     pip install -r requirements.txt
 
+Gather the static files::
+    python manage.py collectstatic
+
 Provisioning and deploying
 ---------------------
 

@@ -38,9 +38,9 @@ class HomePageTest(BaseTest):
         url = reverse('new_category')
         response = self.client.post(url,  data={'category_text': 'Rent'})
 
-    self.assertEqual(Category.objects.count(), 1)
-    new_category = Category.objects.first()
-    self.assertEqual(new_category.text, 'Rent')
+        self.assertEqual(Category.objects.count(), 1)
+        new_category = Category.objects.first()
+        self.assertEqual(new_category.text, 'Rent')
 
     def test_displays_all_categories(self):
         # TODO: does create calls save()? Should we execute
@@ -48,11 +48,10 @@ class HomePageTest(BaseTest):
         Category.objects.create(text='Rent')
         Category.objects.create(text='Food')
 
-    url = reverse('categories')
-    response = self.client.get(url)
-
-    self.assertContains(response, 'Rent')
-    self.assertContains(response, 'Food')
+        url = reverse('categories')
+        response = self.client.get(url)
+        self.assertContains(response, 'Rent')
+        self.assertContains(response, 'Food')
 
 
 class CategoriesPageTest(BaseTest):

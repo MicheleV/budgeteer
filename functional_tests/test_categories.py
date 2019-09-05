@@ -4,7 +4,7 @@
 import functional_tests.helpers as Helpers
 
 
-def test_cannot_create_an_empty_category(self):
+def test_cant_create_an_empty_category(self):
     category_text = None
     Helpers.create_a_category(self, category_text, False)
 

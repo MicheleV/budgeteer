@@ -6,13 +6,6 @@ from datetime import date, timedelta
 import functional_tests.helpers as Helpers
 
 
-# TODO add negative test
-# I.e. try to post with missing fields, etc
-def test_can_not_create_malformed_expenses(self):
-    # TODO at the moment being, empty memo field will succeed
-    pass
-
-
 def create_category_and_two_expenses(self, first_amount, second_amount,
                                      category_name):
     Helpers.create_a_category(self, category_name)
@@ -49,10 +42,16 @@ def check_whether_current_month_date_is_displayed(self):
     self.assertIn(today_string, date_container.text)
 
 
-def without_paramters_expenses_page_shows_only_current_month_expenses(self,
-                                                                      current_month_amount, category_name):
+def expenses_shows_only_current_month_expenses(self, current_month_amount, category_name):
     table = self.browser.find_element_by_id('id_expenses_total')
     Helpers.find_text_inside_table(self, str(current_month_amount), table)
+
+
+# TODO add negative test
+# I.e. try to post with missing fields, etc
+def test_cant_create_malformed_expenses(self):
+    # TODO at the moment being, empty memo field will succeed
+    pass
 
 
 def test_expenses_sum_appear_on_home_page(self):
@@ -73,8 +72,7 @@ def test_expenses_sum_appear_on_home_page(self):
 
     # Frank also notices that only expenses related to the current month are
     # displayed
-    without_paramters_expenses_page_shows_only_current_month_expenses(self,
-                                                                      current_mont_amount, category_name)
+    expenses_shows_only_current_month_expenses(self, current_mont_amount, category_name)
 
 
 def test_expenses_page_can_show_old_expenses(self):
@@ -82,11 +80,11 @@ def test_expenses_page_can_show_old_expenses(self):
     pass
 
 
-def test_expenses_will_not_show_expenses_in_the_future(self):
+def test_expenses_wont_show_expenses_in_the_future(self):
     # TODO
     pass
 
 
-def test_creating_expenses_without_first_creating_a_category_will_fail(self):
+def test_creating_expenses_before_categories_will_fail(self):
     # TODO
     pass

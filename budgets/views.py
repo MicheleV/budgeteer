@@ -2,12 +2,10 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.shortcuts import render, redirect
-# Docs at https://docs.djangoproject.com/en/2.2/topics/http/decorators/
 from django.views.decorators.http import require_http_methods
 from budgets.models import Category
 from budgets.models import Expense
 from budgets.models import MonthlyBudget
-# Docs [1] https://docs.python.org/3/library/calendar.html#calendar.monthrange
 import datetime
 import calendar
 
@@ -31,23 +29,20 @@ def categories_page(request):
 
 
 # TODO set the server to JST (or to your locale) when provisioning, otherwise
-# see what happens below
+# Timezone is assumed to be UTC.
+# E.g. being JST +8 , the query will be off by one month
 # print( Expense.objects.filter(category_id=cat.id). \
-#           filter(spended_date__range=(start_date, end_date)).query)
+#           filter(spended_date__range=(beginning, end_date)).query)
 # BETWEEN 2012-02-01 AND 2012-02-29) <---On `Wed  1 Feb 09:00:16 JST 2012`
 # BETWEEN 2012-01-01 AND 2012-01-31) <--- On `Wed  1 Feb 08:59:00 JST 2012`
-# Timezone is assumed to be UTC, and being JST +8 (in Feb), the query will be
-# off by one month
+
 @require_http_methods(["GET"])
 # TODO later, add a parameter to select the month
 def expenses_page(request):
-    start_date = datetime.date.today().replace(day=1)
-    # from docs[1] Returns weekday of first day of the month and number of
-    # days in month,
-    # for the specified year and month.
-    month_range = calendar.monthrange(start_date.year, start_date.month)
-    last_day_of_month = month_range[1]
-    end_date = datetime.date(start_date.year, start_date.month, last_day_of_month)
+    start = datetime.date.today().replace(day=1)
+    month_range = calendar.monthrange(start.year, start.month)
+    end = month_range[1]
+    end_date = datetime.date(start.year, start.month, end)
     # TODO this should be programmatically as we're querying again all
     # the expenses for that month after the for loop, see jsut before
     # return statemnt
@@ -58,11 +53,11 @@ def expenses_page(request):
         # TODO refactor these queries after reading Django docs about
         # annotation and aggregation
         expenses = Expense.objects.filter(category_id=cat.id). \
-                   filter(spended_date__range=(start_date, end_date))
+                   filter(spended_date__range=(start, end_date))
         expenses_sum = sum(ex.amount for ex in expenses)
         cat.total = expenses_sum
 
-    expenses = Expense.objects.filter(spended_date__range=(start_date, end_date))
+    expenses = Expense.objects.filter(spended_date__range=(start, end_date))
     return render(request, 'expenses.html', {
         'categories': categories,
         'expenses': expenses

@@ -85,7 +85,8 @@ def create_a_monthly_budget(self, category_name, amount, date,
     self.browser.get(f"{self.live_server_url}{url}")
 
     # Frank sees an input box
-    inputbox = self.browser.find_element_by_id('id_new_monthly_expenses_amount')
+    inputbox = self.browser.find_element_by_id(
+                    'id_new_monthly_expenses_amount')
     # Frank inputs the price of the expense item
     inputbox.send_keys(amount)
     # Frank sees a dropdown
@@ -172,4 +173,4 @@ def verify_monthly_expense_was_created(self, category_name, amount, date):
     table = self.browser.find_element_by_id('id_monthly_budgets')
     find_text_inside_table(self, str(amount), table)
     find_text_inside_table(self, category_name, table)
-    find_text_inside_table('2019-08', table)
+    find_text_inside_table(self, '2019-09', table)

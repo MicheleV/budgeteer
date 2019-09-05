@@ -22,7 +22,7 @@ def test_can_access_list_expenses_page(self):
     self.assertIn('Expense', self.browser.title)
 
 
-def test_cannot_access_admin_page(self):
+def test_cant_access_admin_page(self):
     self.browser.get(f"{  self.live_server_url}/admin")
     header_text = self.browser.find_element_by_tag_name('h1').text
     self.assertIn('not found', header_text.lower())

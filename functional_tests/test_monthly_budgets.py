@@ -5,7 +5,7 @@ import datetime
 import functional_tests.helpers as Helpers
 
 
-def test_cannot_create_an_empty_monthly_budget(self):
+def test_cant_create_an_empty_monthly_budget(self):
     # TODO Franks wants to create a budget but being confused,
     pass
 
@@ -17,7 +17,7 @@ def test_can_create_multiple_monthly_budgets(self):
 
     budget_date = datetime.date.today().replace(day=1)
     amount = 7000
-    Helpers.create_a_monthly_budget(self, category_name, amount, 
+    Helpers.create_a_monthly_budget(self, category_name, amount,
                                     budget_date.strftime("%Y-%m-%d"))
 
     # TODO Frank hopes that one day he will not have to do this operation every
@@ -25,6 +25,6 @@ def test_can_create_multiple_monthly_budgets(self):
     # self.fail("Write me!")
 
 
-def test_can_not_create_multiple_monthly_budgets_for_the_same_month(self):
+def test_cant_create_multiple_monthly_budgets_for_same_month(self):
     # TODO Franks wants to update the budget amount
     pass

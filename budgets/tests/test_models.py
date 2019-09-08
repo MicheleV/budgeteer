@@ -19,31 +19,32 @@ class ModelsTest(BaseTest):
           note='First month of rent',
           spended_date='2019-08-04'
         )
-
+        # Storing the string here to fit into 79 chars limit (PEP8) down below
+        note_field_2 = 'Second month of rent (discounted) in advance'
         second_expense = self.create_expense(
           category=category,
           amount=4200,
-          note='Second month of rent (discounted) in advance',
+          note=note_field_2,
           spended_date='2019-09-04'
         )
 
         saved_category = Category.objects.first()
         saved_expenses = Expense.objects.all()
-        first_saved_item = saved_expenses[0]
-        second_saved_item = saved_expenses[1]
+        saved_item_1 = saved_expenses[0]
+        saved_item_2 = saved_expenses[1]
 
         self.assertEqual(saved_category, category)
         self.assertEqual(saved_expenses.count(), 2)
 
-        self.assertEqual(first_saved_item.category, category)
-        self.assertEqual(first_saved_item.amount, 5000)
-        self.assertEqual(first_saved_item.note, 'First month of rent')
-        self.assertEqual(str(first_saved_item.spended_date), '2019-08-04')
+        self.assertEqual(saved_item_1.category, category)
+        self.assertEqual(saved_item_1.amount, 5000)
+        self.assertEqual(saved_item_1.note, 'First month of rent')
+        self.assertEqual(str(saved_item_1.spended_date), '2019-08-04')
 
-        self.assertEqual(second_saved_item.category, category)
-        self.assertEqual(second_saved_item.amount, 4200)
-        self.assertEqual(second_saved_item.note, 'Second month of rent (discounted) in advance')
-        self.assertEqual(str(second_saved_item.spended_date), '2019-09-04')
+        self.assertEqual(saved_item_2.category, category)
+        self.assertEqual(saved_item_2.amount, 4200)
+        self.assertEqual(saved_item_2.note, note_field_2)
+        self.assertEqual(str(saved_item_2.spended_date), '2019-09-04')
 
     # Credits https://stackoverflow.com/a/24589930
     def test_malformed_categories_triggers_errors(self):

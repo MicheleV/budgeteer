@@ -106,14 +106,14 @@ class ExpensesPageTest(BaseTest):
         pass
 
     # TODO
-    def test_create_malformed_expenses(self):
+    def test_creating_malformed_expenses_throw_errors(self):
         pass
 
-    def test_creating_expenses_without_first_creating_a_category_will_fail(self):
+    def test_creating_expese_before_category_will_fail(self):
         # TODO
         pass
 
-    def test_deleting_a_category_without_deleting_the_related_expense_will_not_generate_500_errors(self):
+    def test_deleting_categories_witho_attached_expense_will_throw_error(self):
         # NOTE: Atm we do use `on_delete=models.CASCADE` on Expense model,
         # but this test will be necessary in case we do change that
         pass

@@ -14,10 +14,16 @@ class Category(models.Model):
 class Expense(models.Model):
 
     def __str__(self):
-        return f"{self.category.id} ({self.category.text}), {self.amount}, {self.note}, {self.spended_date}"
+        # Shortening params to fit into 79 chars (PEP8)
+        id = self.category.id
+        text = self.category.text
+        amount = self.amount
+        note = self.note
+        date = self.spended_date
+        return f"{id}: ({text}), {amount}, {note}, {date}"
     # TODO should we really delete expenses item on Category deletion?
     # This will remove history!
-    category = models.ForeignKey(Category, default=None, 
+    category = models.ForeignKey(Category, default=None,
                                  on_delete=models.CASCADE)
     amount = models.IntegerField()
     note = models.CharField(max_length=150, default='')

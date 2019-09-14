@@ -19,6 +19,8 @@ def exp_shows_only_current_month(self, current_month_amount, category_name):
     """
     table = self.browser.find_element_by_id('id_expenses_total')
     Helpers.find_text_inside_table(self, str(current_month_amount), table)
+    # TODO add two expense in different months (current, past) and confirm
+    # only the expense for the current month is displayed
 
 
 # TODO add negative test

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load budgets_tags %}
 
 {% block title %}Budgeteer{% endblock %}
 
@@ -11,12 +12,20 @@
     <th>Category</th>
     <th>Spended amount</th>
     <th>Budgeted amount</th>
+    <th>Status</th>
   </tr>
-  {% for subtotal in categories %}
+  {% for cat in categories %}
     <tr>
-      <td>{{ subtotal.text }}</td>
-      <td>{{ subtotal.total }}</td>
-      <td>{{ subtotal.mb.amount|default:"No monthly budget for this month" }}</td>
+      <td>{{ cat.text }}</td>
+      <td>{{ cat.total }}</td>
+      <td>{{ cat.mb.amount|default:"No monthly budget for this month" }}</td>
+      {% if cat.mb.amount %}
+      <td class="{% if cat.mb.amount|sub:cat.total < 0 %}text-danger{% else %}text-success{% endif %}">
+        {{ cat.mb.amount|sub:cat.total }}
+      </td>
+      {% else %}
+      <td> {{ "N/A" }} </td>
+      {% endif %}
     </tr>
   {% endfor %}
 </table>

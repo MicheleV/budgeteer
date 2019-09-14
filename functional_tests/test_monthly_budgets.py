@@ -36,6 +36,35 @@ def test_can_create_multiple_monthly_budgets(self):
     Helpers.find_text_inside_table(self, str(amount), table)
     Helpers.find_text_inside_table(self, category_name, table)
 
+    # Frank logs a fraction of his rent (he was confused with this previous
+    # apartment)
+    wrong_amt = 4000
+    note = 'First month of rent'
+    rent_date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+    Helpers.create_an_expense(self, wrong_amt, category_name, note, rent_date)
+
+    # Frank notices that the home page is showing he still has room for
+    # spending, in the Rent category
+    url = reverse('home')
+    self.browser.get(f"{self.live_server_url}{url}")
+    remainder = amount - wrong_amt
+    table = self.browser.find_element_by_id('id_expenses_total')
+    Helpers.find_text_inside_table(self, str(remainder), table)
+
+    # Frank also notices the amount is green, meaning he still has room for
+    # spending!
+    # TODO, check for "text-danger" class
+
+    # Frank notices his error and logs the full amount of the rent
+    # creating a new expenses (Frank can't find how to edit an entry)
+    remainder = 5000
+    note = 'First month of rent'
+    rent_date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+    Helpers.create_an_expense(self, remainder, category_name, note, rent_date)
+
+    # Frank now notices he is overspending, he should have not moved!
+    # TODO, check for "text-success" class
+
     # Frank hopes that one day he will not have to do this operation every
     # month, but the system will remember his preferences and automatically
     # do this *boring* operation for him

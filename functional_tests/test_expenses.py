@@ -5,37 +5,6 @@ from django.urls import reverse
 from datetime import date, timedelta
 import functional_tests.helpers as Helpers
 
-
-def create_category_and_two_expenses(self, first_amount, second_amount,
-                                     category_name):
-    Helpers.create_a_category(self, category_name)
-
-    first_date = date.today().replace(day=1)
-    delta = timedelta(weeks=10)
-    second_date = first_date + delta
-
-    # Frank visits the expenses url and enters the expense details
-    Helpers.create_an_expense(
-      self,
-      first_amount,
-      category_name,
-      'First month of rent',
-      first_date.strftime("%Y-%m-%d")
-    )
-
-    # Frank visits the expenses url again and enters a second expense with its
-    # details
-    Helpers.create_an_expense(
-      self,
-      second_amount,
-      category_name,
-      'Second month of rent (discounted)',
-      second_date.strftime("%Y-%m-%d"),
-      # Note False, since this expense is in the future (see comment above)
-      False
-    )
-
-
 def check_whether_current_month_date_is_displayed(self):
     today_string = date.today().strftime("%Y-%m")
     date_container = self.browser.find_element_by_id('id_current_month_date')
@@ -60,23 +29,23 @@ def test_cant_create_malformed_expenses(self):
 
 def test_expenses_sum_appear_on_home_page(self):
     category_name = 'Rent'
-    current_mont_amount = 500
-    future_month_amount = 420
-    total_amount = current_mont_amount + future_month_amount
-    create_category_and_two_expenses(self, current_mont_amount,
-                                     future_month_amount, category_name)
+    curr_mont_amount = 500
+    next_month_amount = 420
+    total_amount = curr_mont_amount + next_month_amount
+    Helpers.create_category_and_two_expenses(self, curr_mont_amount,
+                                             next_month_amount, category_name)
 
     # Frank sees the sum of this month expenses on the home page
     url = reverse('expenses')
     self.browser.get(f"{self.live_server_url}{url}")
-    Helpers.check_amount_and_cat_name(self, current_mont_amount, category_name)
+    Helpers.check_amount_and_cat_name(self, curr_mont_amount, category_name)
 
     # Frank notices that the current month id displayed in the expense page
     check_whether_current_month_date_is_displayed(self)
 
     # Frank also notices that only expenses related to the current month are
     # displayed
-    exp_shows_only_current_month(self, current_mont_amount, category_name)
+    exp_shows_only_current_month(self, curr_mont_amount, category_name)
 
 
 def test_expenses_page_can_show_old_expenses(self):

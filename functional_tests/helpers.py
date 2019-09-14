@@ -2,6 +2,7 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # Docs at https://selenium-python.readthedocs.io/waits.html
+from datetime import date, timedelta
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
@@ -147,6 +148,36 @@ def create_an_expense(self, amount, category_name, note, expense_date,
     # The page reload and the expense entered item is displayed correctly
     # TODO code smell, this wait_for_page_to_reload() should be needed
     # wait_for_page_to_reload(self)
+
+
+def create_category_and_two_expenses(self, first_amount, second_amount,
+                                     category_name):
+    create_a_category(self, category_name)
+
+    first_date = date.today().replace(day=1)
+    delta = timedelta(weeks=10)
+    second_date = first_date + delta
+
+    # Frank visits the expenses url and enters the expense details
+    create_an_expense(
+      self,
+      first_amount,
+      category_name,
+      'First month of rent',
+      first_date.strftime("%Y-%m-%d")
+    )
+
+    # Frank visits the expenses url again and enters a second expense with its
+    # details
+    create_an_expense(
+      self,
+      second_amount,
+      category_name,
+      'Second month of rent (discounted)',
+      second_date.strftime("%Y-%m-%d"),
+      # Note False, since this expense is in the future (see comment above)
+      False
+    )
 
 
 def verify_category_was_created(self, category_name):

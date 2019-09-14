@@ -10,9 +10,28 @@ import datetime
 import calendar
 
 
+def current_month_boundaries():
+    start = datetime.date.today().replace(day=1)
+    month_range = calendar.monthrange(start.year, start.month)
+    last_day_of_month = month_range[1]
+    end = datetime.date(start.year, start.month, last_day_of_month)
+    return (start, end)
+
 @require_http_methods(["GET"])
 def home_page(request):
-    return render(request, 'home.html')
+    (start, end) = current_month_boundaries()
+    categories = Category.objects.all()
+    for cat in categories:
+        # TODO refactor these queries after reading Django docs about
+        # annotation and aggregation
+        expenses = Expense.objects.filter(category_id=cat.id). \
+                   filter(spended_date__range=(start, end))
+        expenses_sum = sum(ex.amount for ex in expenses)
+        cat.total = expenses_sum
+
+    return render(request, 'home.html', {
+        'categories': categories,
+    })
 
 
 @require_http_methods(["GET", "POST"])
@@ -39,25 +58,15 @@ def categories_page(request):
 @require_http_methods(["GET"])
 # TODO later, add a parameter to select the month
 def expenses_page(request):
-    start = datetime.date.today().replace(day=1)
-    month_range = calendar.monthrange(start.year, start.month)
-    end = month_range[1]
-    end_date = datetime.date(start.year, start.month, end)
+    (start, end) = current_month_boundaries()
     # TODO this should be programmatically as we're querying again all
     # the expenses for that month after the for loop, see jsut before
     # return statemnt
     # refactor these queries after reading Django docs about annotation and
     # aggregation
     categories = Category.objects.all()
-    for cat in categories:
-        # TODO refactor these queries after reading Django docs about
-        # annotation and aggregation
-        expenses = Expense.objects.filter(category_id=cat.id). \
-                   filter(spended_date__range=(start, end_date))
-        expenses_sum = sum(ex.amount for ex in expenses)
-        cat.total = expenses_sum
 
-    expenses = Expense.objects.filter(spended_date__range=(start, end_date))
+    expenses = Expense.objects.filter(spended_date__range=(start, end))
     return render(request, 'expenses.html', {
         'categories': categories,
         'expenses': expenses

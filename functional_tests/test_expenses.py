@@ -36,7 +36,7 @@ def test_expenses_sum_appear_on_home_page(self):
                                              next_month_amount, category_name)
 
     # Frank sees the sum of this month expenses on the home page
-    url = reverse('expenses')
+    url = reverse('home')
     self.browser.get(f"{self.live_server_url}{url}")
     Helpers.check_amount_and_cat_name(self, curr_mont_amount, category_name)
 

@@ -3,4 +3,22 @@
 {% block title %}Budgeteer{% endblock %}
 
 {% block content %}
+
+{% if categories %}
+<h5 id="id_current_month_date">Summary for {% now 'Y-m' %}</h5>
+<table id="id_expenses_total">
+  <tr>
+    <th>Amount</th>
+    <th>Category</th>
+  </tr>
+  {% for subtotal in categories %}
+    <tr>
+      <td>{{ subtotal.text }}</td>
+      <td>{{ subtotal.total }}</td>
+    </tr>
+  {% endfor %}
+</table>
+<hr>
+{% endif %}
+
 {% endblock %}

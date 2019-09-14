@@ -9,14 +9,15 @@ def test_home_page_has_link_categories_page(self):
     url = reverse('home')
     self.browser.get(f"{self.live_server_url}{url}")
 
-    first_url_to_find = reverse('categories')
-    second_url_to_find = reverse('expenses')
-    third_url_to_find = reverse('monthly_budgets')
+    first_url_to_find = reverse('home')
+    second_url_to_find = reverse('categories')
+    third_url_to_find = reverse('expenses')
+    fourth_url_to_find = reverse('monthly_budgets')
 
     Helpers.find_url_in_home_page(self, first_url_to_find)
     Helpers.find_url_in_home_page(self, second_url_to_find)
     Helpers.find_url_in_home_page(self, third_url_to_find)
-    # TODO
+    Helpers.find_url_in_home_page(self, fourth_url_to_find)
 
 
 # Credits http://www.obeythetestinggoat.com/book/

@@ -20,6 +20,7 @@ def current_month_boundaries():
 @require_http_methods(["GET"])
 def home_page(request):
     (start, end) = current_month_boundaries()
+    # TODO check whether prefetch_related can be used for related models
     categories = Category.objects.all()
     for cat in categories:
         # TODO refactor these queries after reading Django docs about
@@ -28,7 +29,7 @@ def home_page(request):
                    filter(spended_date__range=(start, end))
         expenses_sum = sum(ex.amount for ex in expenses)
         cat.total = expenses_sum
-
+        cat.mb = cat.monthlybudget_set.filter(date=start).first()
     return render(request, 'home.html', {
         'categories': categories,
     })

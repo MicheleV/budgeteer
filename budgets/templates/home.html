@@ -8,13 +8,15 @@
 <h5 id="id_current_month_date">Summary for {% now 'Y-m' %}</h5>
 <table id="id_expenses_total">
   <tr>
-    <th>Amount</th>
     <th>Category</th>
+    <th>Spended amount</th>
+    <th>Budgeted amount</th>
   </tr>
   {% for subtotal in categories %}
     <tr>
       <td>{{ subtotal.text }}</td>
       <td>{{ subtotal.total }}</td>
+      <td>{{ subtotal.mb.amount|default:"No monthly budget for this month" }}</td>
     </tr>
   {% endfor %}
 </table>

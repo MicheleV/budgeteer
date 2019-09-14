@@ -5,6 +5,7 @@ from django.urls import reverse
 from datetime import date, timedelta
 import functional_tests.helpers as Helpers
 
+
 def check_whether_current_month_date_is_displayed(self):
     today_string = date.today().strftime("%Y-%m")
     date_container = self.browser.find_element_by_id('id_current_month_date')

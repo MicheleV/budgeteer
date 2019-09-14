@@ -17,8 +17,7 @@ def test_can_create_multiple_monthly_budgets(self):
 
     budget_date = datetime.date.today().replace(day=1)
     amount = 7000
-    Helpers.create_a_monthly_budget(self, category_name, amount,
-                                    budget_date.strftime("%Y-%m-%d"))
+    Helpers.create_a_monthly_budget(self, category_name, amount, budget_date)
 
     # TODO Frank hopes that one day he will not have to do this operation every
     #      month

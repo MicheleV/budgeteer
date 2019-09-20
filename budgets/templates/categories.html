@@ -8,7 +8,12 @@
     <div class="col-md-12">
       <div>
         <form method="POST" action="new_category">
-          <input name="category_text" id="id_new_category" placeholder="Enter a new category" />
+          <div class="form-group">
+            {{ form.text }}
+          </div>
+          {% if error %}
+            <div class="form-control is-invalid">{{ error }}</div>
+          {% endif %}
           {% csrf_token %}
         </form>
 

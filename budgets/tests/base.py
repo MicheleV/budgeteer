@@ -11,8 +11,8 @@ class BaseTest(TestCase):
     def create_category(self, text):
         category = Category()
         category.text = text
-        category.save()
         category.full_clean()
+        category.save()
         return category
 
     def create_expense(self, category, amount, note, spended_date):
@@ -21,8 +21,8 @@ class BaseTest(TestCase):
         expense.amount = amount
         expense.note = note
         expense.spended_date = spended_date
-        expense.save()
         expense.full_clean()
+        expense.save()
         return expense
 
     def create_monthly_budgets(self, category, amount, date):
@@ -30,8 +30,8 @@ class BaseTest(TestCase):
         budget.category = category
         budget.amount = amount
         budget.date = date
-        budget.save()
         budget.full_clean()
+        budget.save()
         return budget
 
     def get_response_from_named_url(self, named_url):

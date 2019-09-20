@@ -8,7 +8,11 @@ def test_cant_create_an_empty_category(self):
     category_text = None
     Helpers.create_a_category(self, category_text, False)
 
-    # Verify we do not have any category (No category with ID 1)
+    # Frank notices his browser his forcing him to input something
+    Helpers.wait_for_required_input(self, "id_text")
+
+    # Frank does not follows the browser instruction, and stares at the screen
+    # in disdain. He thought he could create an empty Category
     table = self.browser.find_element_by_id('id_categories')
     Helpers.assert_text_is_not_inside_table(self, '1', table)
 

@@ -50,9 +50,9 @@ class ModelsTest(BaseTest):
     def test_malformed_categories_triggers_errors(self):
         # None is not allowed
         with transaction.atomic():
-            with self.assertRaises(IntegrityError) as e:
+            with self.assertRaises(ValidationError) as e:
                 category = self.create_category(None)
-                self.assertEqual(IntegrityError, type(e.exception))
+                self.assertEqual(ValidationError, type(e.exception))
 
         # Empty strigs are not allowed either
         with transaction.atomic():
@@ -65,7 +65,7 @@ class ModelsTest(BaseTest):
 
         # No category
         with transaction.atomic():
-            with self.assertRaises(IntegrityError) as e:
+            with self.assertRaises(ValidationError) as e:
                 first_expense = self.create_expense(
                   category=None,
                   amount=5000,
@@ -73,11 +73,11 @@ class ModelsTest(BaseTest):
                   spended_date='2019-08-04'
                 )
                 first_expense.full_clean()
-            self.assertEqual(IntegrityError, type(e.exception))
+            self.assertEqual(ValidationError, type(e.exception))
 
         # amount field: None is not allowed
         with transaction.atomic():
-            with self.assertRaises(IntegrityError) as e:
+            with self.assertRaises(ValidationError) as e:
                 first_expense = self.create_expense(
                   category=category,
                   amount=None,
@@ -85,11 +85,11 @@ class ModelsTest(BaseTest):
                   spended_date='2019-08-04'
                 )
                 first_expense.full_clean()
-            self.assertEqual(IntegrityError, type(e.exception))
+            self.assertEqual(ValidationError, type(e.exception))
 
         # note field: None is not allowed
         with transaction.atomic():
-            with self.assertRaises(IntegrityError) as e:
+            with self.assertRaises(ValidationError) as e:
                 first_expense = self.create_expense(
                   category=category,
                   amount=5000,
@@ -97,7 +97,7 @@ class ModelsTest(BaseTest):
                   spended_date='2019-08-04'
                 )
                 first_expense.full_clean()
-            self.assertEqual(IntegrityError, type(e.exception))
+            self.assertEqual(ValidationError, type(e.exception))
         # note field: Empty strigs are not allowed either
         with transaction.atomic():
             with self.assertRaises(ValidationError) as e:
@@ -112,7 +112,7 @@ class ModelsTest(BaseTest):
 
         # spended_date field: None is not allowed
         with transaction.atomic():
-            with self.assertRaises(IntegrityError) as e:
+            with self.assertRaises(ValidationError) as e:
                 first_expense = self.create_expense(
                   category=category,
                   amount=5000,
@@ -120,7 +120,7 @@ class ModelsTest(BaseTest):
                   spended_date=None
                 )
                 first_expense.full_clean()
-            self.assertEqual(IntegrityError, type(e.exception))
+            self.assertEqual(ValidationError, type(e.exception))
         # spended_date field: Empty strigs are not allowed either
         with transaction.atomic():
             with self.assertRaises(ValidationError) as e:
@@ -168,33 +168,33 @@ class ModelsTest(BaseTest):
 
         # No category
         with transaction.atomic():
-            with self.assertRaises(IntegrityError) as e:
+            with self.assertRaises(ValidationError) as e:
                 budget = self.create_monthly_budgets(
                   category=None,
                   amount=4200,
                   date='2019-09-01'
                 )
                 budget.full_clean()
-            self.assertEqual(IntegrityError, type(e.exception))
+            self.assertEqual(ValidationError, type(e.exception))
 
         # amount field: None is not allowed
         with transaction.atomic():
-            with self.assertRaises(IntegrityError) as e:
+            with self.assertRaises(ValidationError) as e:
                 budget = self.create_monthly_budgets(
                   category=category,
                   amount=None,
                   date='2019-09-01'
                 )
                 budget.full_clean()
-            self.assertEqual(IntegrityError, type(e.exception))
+            self.assertEqual(ValidationError, type(e.exception))
 
         # date field: None is not allowed
         with transaction.atomic():
-            with self.assertRaises(IntegrityError) as e:
+            with self.assertRaises(ValidationError) as e:
                 budget = self.create_monthly_budgets(
                   category=category,
                   amount=5000,
                   date=None,
                 )
                 budget.full_clean()
-            self.assertEqual(IntegrityError, type(e.exception))
+            self.assertEqual(ValidationError, type(e.exception))

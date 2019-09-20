@@ -3,9 +3,10 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
-from budgets.models import Category
-from budgets.models import Expense
-from budgets.models import MonthlyBudget
+from django.core.exceptions import ValidationError
+from budgets.models import Category, Expense, MonthlyBudget
+from budgets.forms import EMPTY_CATEGORY_ERROR, CategoryForm
+
 import datetime
 import calendar
 
@@ -37,15 +38,22 @@ def home_page(request):
 
 @require_http_methods(["GET", "POST"])
 def categories_page(request):
-    category_name = request.POST.get("category_text", None)
-    # TODO, this should throw 30X instead of redirecting and ignoring the
-    # missing param
-    if request.method == 'POST' and category_name:
-        Category.objects.create(text=category_name)
-        return redirect('/categories')
-
+    error = None
+    category_name = request.POST.get("text", None)
+    if request.method == 'POST':
+        try:
+            category = Category(text=category_name)
+            category.full_clean()
+            category.save()
+            return redirect('/categories')
+        except ValidationError:
+            error = EMPTY_CATEGORY_ERROR
     categories = Category.objects.all()
-    return render(request, 'categories.html', {'categories': categories})
+    return render(request,
+                  'categories.html',
+                  {'categories': categories,
+                   'error': error,
+                   'form': CategoryForm()})
 
 
 # TODO set the server to JST (or to your locale) when provisioning, otherwise
@@ -94,8 +102,8 @@ def new_monthly_budgets_page(request):
         category_id=request.POST.get("category", None),
         date=request.POST.get("budget_date", None),
     )
-    budget.save()
     budget.full_clean()
+    budget.save()
     return redirect('/monthly_budgets')
 
 

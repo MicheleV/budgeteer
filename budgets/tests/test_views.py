@@ -4,6 +4,7 @@
 from django.urls import resolve, reverse
 from budgets.views import home_page, categories_page, expenses_page
 from budgets.models import Category
+from budgets.forms import CategoryForm
 from .base import BaseTest
 
 
@@ -30,13 +31,13 @@ class HomePageTest(BaseTest):
     # TODO, move this to a base PageTest class
     def test_redirect_on_POST(self):
         url = reverse('categories')
-        response = self.client.post(url,  data={'category_text': 'Rent'})
+        response = self.client.post(url,  data={'text': 'Rent'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], url)
 
     def test_save_on_POST(self):
         url = reverse('new_category')
-        response = self.client.post(url,  data={'category_text': 'Rent'})
+        response = self.client.post(url,  data={'text': 'Rent'})
 
         self.assertEqual(Category.objects.count(), 1)
         new_category = Category.objects.first()
@@ -66,6 +67,10 @@ class CategoriesPageTest(BaseTest):
     def test_uses_categories_template(self):
         response = self.get_response_from_named_url('categories')
         self.assertTemplateUsed(response, 'categories.html')
+
+    def test_uses_category_form(self):
+        response = self.get_response_from_named_url('categories')
+        self.assertIsInstance(response.context['form'], CategoryForm)
 
     def test_save_and_retrieve_categories(self):
         first_category = self.create_category('Rent')

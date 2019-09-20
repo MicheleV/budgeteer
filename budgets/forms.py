@@ -1,3 +1,6 @@
+# Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
+# GNU General Public License v3.0+
+# (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django import forms
 
 from budgets.models import Category
@@ -7,13 +10,16 @@ from budgets.models import Category
 EMPTY_CATEGORY_ERROR = "You can't have an empty Category"
 
 
+# TODO Look into [1] or [2] to avoid widgets
+# Credits http://www.obeythetestinggoat.com
+# [1] https://django-crispy-forms.readthedocs.org/
+# [2] https://django-floppyforms.readthedocs.io/en/latest/
 class CategoryForm(forms.models.ModelForm):
 
     class Meta:
-
         model = Category
         fields = ('text',)
-        widget = {
+        widgets = {
             'text': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter a new category',
                 'class': 'form-control input-lg'
@@ -22,9 +28,3 @@ class CategoryForm(forms.models.ModelForm):
         error_messages = {
             'text': {'required': EMPTY_CATEGORY_ERROR}
         }
-
-    item_text = forms.CharField(
-      widget=forms.fields.TextInput(attrs={
-          'placeholder': 'Enter a new category',
-          'class': 'form-control input-lg'
-        }))

@@ -11,6 +11,8 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
 from django.urls import resolve, reverse
 
+MAX_DELAY = 3
+
 
 def check_amount_and_cat_name(self, amount, category_name):
     # Frank sees all the details sum  displayed on the page
@@ -22,13 +24,18 @@ def check_amount_and_cat_name(self, amount, category_name):
 # Credits to Tommy Beadle: http://disq.us/p/x1r1v2
 def wait_for_page_to_reload(self):
     if self.BROWSER == "Firefox":
-        MAX_DELAY = 3
         wait = WebDriverWait(self.browser, MAX_DELAY)
         old_page = self.browser.find_element_by_tag_name('html')
         element = wait.until(EC.staleness_of(old_page))
     else:
         # TODO investigate why chromium does work without this
         pass
+
+
+def wait_for_required_input(self, elem_id):
+    wait = WebDriverWait(self.browser, MAX_DELAY)
+    invalid = self.browser.find_elements_by_css_selector(f"#{elem_id}:invalid")
+    self.assertEqual(len(invalid), 1)
 
 
 def find_text_inside_table(self, text, table):
@@ -64,7 +71,7 @@ def create_a_category(self, category_name, verify_creation=True):
     url = reverse('categories')
     self.browser.get(f"{self.live_server_url}{url}")
 
-    inputbox = self.browser.find_element_by_id('id_new_category')
+    inputbox = self.browser.find_element_by_id('id_text')
     self.assertEqual(
         inputbox.get_attribute('placeholder'),
         'Enter a new category'

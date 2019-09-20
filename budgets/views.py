@@ -82,8 +82,8 @@ def new_expense_page(request):
         spended_date=request.POST.get("release_date", None),
         note=request.POST.get("note", None),
     )
-    expense.full_clean()
     expense.save()
+    expense.full_clean()
     return redirect('/expenses')
 
 
@@ -94,8 +94,8 @@ def new_monthly_budgets_page(request):
         category_id=request.POST.get("category", None),
         date=request.POST.get("budget_date", None),
     )
-    budget.full_clean()
     budget.save()
+    budget.full_clean()
     return redirect('/monthly_budgets')
 
 

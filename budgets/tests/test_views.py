@@ -43,8 +43,6 @@ class HomePageTest(BaseTest):
         self.assertEqual(new_category.text, 'Rent')
 
     def test_displays_all_categories(self):
-        # TODO: does create calls save()? Should we execute
-        # full_clean() before save()?
         Category.objects.create(text='Rent')
         Category.objects.create(text='Food')
 

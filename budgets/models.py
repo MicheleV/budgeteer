@@ -7,6 +7,9 @@ from django.db import models
 class Category(models.Model):
     text = models.CharField(max_length=20, default=None)
 
+    def __str__(self):
+        return f"{self.text}"
+
     # def get_absolute_url(self):
     #   return reverse('category', args=[self.id])
 

@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ValidationError
 from budgets.models import Category, Expense, MonthlyBudget
-from budgets.forms import EMPTY_CATEGORY_ERROR, CategoryForm
+from budgets.forms import EMPTY_CATEGORY_ERROR, CategoryForm, ExpenseForm
 
 import datetime
 import calendar
@@ -48,6 +48,9 @@ def categories_page(request):
             return redirect('/categories')
         except ValidationError:
             error = EMPTY_CATEGORY_ERROR
+            # TODO this error should not be hard coded, and it should come from
+            # the form, since the field has now max 20 chars, we need to
+            # be able to display both
     categories = Category.objects.all()
     return render(request,
                   'categories.html',
@@ -78,16 +81,17 @@ def expenses_page(request):
     expenses = Expense.objects.filter(spended_date__range=(start, end))
     return render(request, 'expenses.html', {
         'categories': categories,
-        'expenses': expenses
+        'expenses': expenses,
+        'form': ExpenseForm()
     })
 
 
 @require_http_methods(["POST"])
 def new_expense_page(request):
     expense = Expense.objects.create(
-        amount=request.POST.get("expense_amount", None),
+        amount=request.POST.get("amount", None),
         category_id=request.POST.get("category", None),
-        spended_date=request.POST.get("release_date", None),
+        spended_date=request.POST.get("spended_date", None),
         note=request.POST.get("note", None),
     )
     expense.save()

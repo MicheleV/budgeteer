@@ -123,23 +123,23 @@ def create_an_expense(self, amount, category_name, note, expense_date,
     url = reverse('expenses')
     self.browser.get(f"{self.live_server_url}{url}")
     # Frank sees an input box
-    inputbox = self.browser.find_element_by_id('id_new_expense_amount')
+    inputbox = self.browser.find_element_by_id('id_amount')
     # Frank inputs the price of the expense item
     inputbox.send_keys(amount)
     # Frank sees a dropdown
-    dropdown = Select(self.browser.find_element_by_id('id_expenses_category'))
+    dropdown = Select(self.browser.find_element_by_id('id_category'))
     # The dropdown includes the Category they've just created
     # Frank chooses that category
     dropdown.select_by_visible_text(category_name)
 
     # Frank sees another input box
-    note_inputbox = self.browser.find_element_by_id('id_new_expense_note')
+    note_inputbox = self.browser.find_element_by_id('id_note')
     # Frank enters a note abotu the expenses, so that later they remember what
     # this was about
     note_inputbox.send_keys(note)
 
     # Frank sees one more input box
-    date_inputbox = self.browser.find_element_by_id('id_new_expense_date')
+    date_inputbox = self.browser.find_element_by_id('id_spended_date')
     # Frank enters the date of when the expense was made
     date_inputbox.send_keys(expense_date)
 

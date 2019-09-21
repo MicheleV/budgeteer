@@ -30,6 +30,12 @@ def test_cant_create_malformed_expenses(self):
     pass
 
 
+# TODO add test in which Franks does not select any Categoy from the dropdown
+def test_cant_create_expenses_without_selecting_a_category(self):
+    # TODO at the moment being, empty memo field will succeed
+    pass
+
+
 def test_expenses_sum_appear_on_home_page(self):
     category_name = 'Rent'
     curr_mont_amount = 500

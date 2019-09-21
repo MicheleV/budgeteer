@@ -69,6 +69,7 @@ class FunctionalTest(LiveServerTestCase):
         Expenses.test_expenses_page_can_show_old_expenses(self)
         Expenses.test_expenses_wont_show_expenses_in_the_future(self)
         Expenses.test_creating_expenses_before_categories_will_fail(self)
+        Expenses.test_cant_create_expenses_without_selecting_a_category(self)
 
     def test_monthly_budgets(self):
         MBudgets.test_cant_create_an_empty_monthly_budget(self)

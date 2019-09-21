@@ -2,7 +2,7 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.test import TestCase
-from budgets.forms import EMPTY_CATEGORY_ERROR, CategoryForm
+from budgets.forms import EMPTY_CATEGORY_ERROR, CategoryForm, ExpenseForm
 
 
 # Credits http://www.obeythetestinggoat.com/book/chapter_simple_form.html
@@ -20,3 +20,12 @@ class CategoryFormTest(TestCase):
           form.errors['text'],
           [EMPTY_CATEGORY_ERROR]
         )
+
+
+class ExpenseFormTest(TestCase):
+
+    def test_form_renders_correctly(self):
+        form = ExpenseForm()
+        self.assertIn('placeholder="Enter the spended amount"', form.as_p())
+        self.assertIn('placeholder="What did you buy?"', form.as_p())
+        self.assertIn('placeholder="%Y-%m-%d format"', form.as_p())

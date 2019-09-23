@@ -16,6 +16,10 @@ def current_month_boundaries():
     """
     Return a tuple composed of the first and the last day
     of the current month, as datetime objects
+
+    Note: set timezone when providing! Otherwise efault timezone will be UTC
+    If th server is actually in a different time zone, beware off-by-one
+    month errors when using this function
     """
     start = datetime.date.today().replace(day=1)
     month_range = calendar.monthrange(start.year, start.month)
@@ -65,17 +69,8 @@ def categories_page(request):
                    'form': CategoryForm()})
 
 
-# TODO set the server to JST (or to your locale) when provisioning, otherwise
-# Timezone is assumed to be UTC.
-# E.g. being JST +8 , the query will be off by one month
-# print( Expense.objects.filter(category_id=cat.id). \
-#           filter(spended_date__range=(beginning, end_date)).query)
-# BETWEEN 2012-02-01 AND 2012-02-29) <---On `Wed  1 Feb 09:00:16 JST 2012`
-# BETWEEN 2012-01-01 AND 2012-01-31) <--- On `Wed  1 Feb 08:59:00 JST 2012`
-
 @require_http_methods(["GET", "POST"])
-# TODO later, add a parameter to select the month
-def expenses_page(request):
+def expenses_page(request, date=None):
     errors = None
     if request.method == 'POST':
         try:
@@ -88,6 +83,7 @@ def expenses_page(request):
         except ValidationError:
             errors = form.errors
 
+    # TODO: use the date parameter if present to filter
     (start, end) = current_month_boundaries()
     # TODO refactor these queries after reading Django docs about annotation
     # and aggregation
@@ -98,6 +94,17 @@ def expenses_page(request):
         'expenses': expenses,
         'form': ExpenseForm(),
         'errors': errors,
+    })
+
+
+@require_http_methods(["GET"])
+def monthly_budgets_page(request, date=None):
+    # TODO: use the date parameter if present to filter
+    categories = Category.objects.all()
+    monthly_budgets = MonthlyBudget.objects.all()
+    return render(request, 'monthly_budgets.html', {
+      'categories': categories,
+      'monthly_budgets': monthly_budgets,
     })
 
 
@@ -112,13 +119,3 @@ def new_monthly_budgets_page(request):
     budget.save()
     redirect_url = reverse('monthly_budgets')
     return redirect(redirect_url)
-
-
-@require_http_methods(["GET"])
-def monthly_budgets_page(request):
-    categories = Category.objects.all()
-    monthly_budgets = MonthlyBudget.objects.all()
-    return render(request, 'monthly_budgets.html', {
-      'categories': categories,
-      'monthly_budgets': monthly_budgets,
-    })

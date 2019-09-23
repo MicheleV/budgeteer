@@ -26,13 +26,13 @@ def exp_shows_only_current_month(self, current_month_amount, category_name):
 # TODO add negative test
 # I.e. try to post with missing fields, etc
 def test_cant_create_malformed_expenses(self):
-    # TODO at the moment being, empty memo field will succeed
+    # TODO use Helpers.wait_for_required_input(self, "id_text")
     pass
 
 
 # TODO add test in which Franks does not select any Categoy from the dropdown
 def test_cant_create_expenses_without_selecting_a_category(self):
-    # TODO at the moment being, empty memo field will succeed
+    # TODO use Helpers.wait_for_required_input(self, "id_text")
     pass
 
 

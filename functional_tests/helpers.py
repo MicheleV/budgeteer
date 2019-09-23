@@ -193,15 +193,13 @@ def verify_category_was_created(self, category_name):
     find_text_inside_table(self, category_name, table)
 
 
-# TODO duplicate code, move to utilities
 def verify_expense_was_created(self, amount, category_name, note):
     # Frank sees all the details about the expense displayed on the page
     table = self.browser.find_element_by_id('id_expenses')
     find_text_inside_table(self, str(amount), table)
     find_text_inside_table(self, category_name, table)
     find_text_inside_table(self, note, table)
-    # TODO: the view will print the date using the browser locale, the
-    # following line will fail
+    # TODO: Find a way to verify the date taking in account the browser locale
     # find_text_inside_table('2019-08-04', table)
 
 

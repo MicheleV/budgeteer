@@ -38,3 +38,9 @@ class BaseTest(TestCase):
         url = reverse(named_url)
         response = self.client.get(url)
         return response
+
+    def check_if_error_matches(self, text, rows):
+        self.assertTrue(
+            any(text in row for row in rows),
+            f"No {text} in rows. Contents were\n{rows}",
+        )

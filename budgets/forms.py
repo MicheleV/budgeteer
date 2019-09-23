@@ -3,13 +3,11 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django import forms
 
-from budgets.models import Category, Expense
-
-# TODO move all the errors to a file
-# TODO add multilanguage support
-EMPTY_CATEGORY_ERROR = "You can't have an empty Category"
+from budgets.models import Category, Expense, MonthlyBudget
 
 
+# Docs https://docs.djangoproject.com/en/2.2/ref/forms/
+#      fields/#built-in-field-classes
 # TODO Look into [1] or [2] to avoid widgets
 # Credits http://www.obeythetestinggoat.com
 # [1] https://django-crispy-forms.readthedocs.org/
@@ -25,9 +23,6 @@ class CategoryForm(forms.models.ModelForm):
                 'class': 'form-control input-lg'
             })
         }
-        error_messages = {
-            'text': {'required': EMPTY_CATEGORY_ERROR}
-        }
 
 
 class ExpenseForm(forms.models.ModelForm):
@@ -39,6 +34,7 @@ class ExpenseForm(forms.models.ModelForm):
             'amount': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter the spended amount',
             }),
+            # TODO note field should NOT be mandatory
             'note': forms.fields.TextInput(attrs={
                 'placeholder': 'What did you buy?',
             }),
@@ -46,4 +42,20 @@ class ExpenseForm(forms.models.ModelForm):
                 'placeholder': '%Y-%m-%d format',
             }),
             'category': forms.Select(choices=Category.objects.all())
+        }
+
+
+class MonthlyBudgetForm(forms.models.ModelForm):
+
+    class Meta:
+        model = MonthlyBudget
+        fields = ('category', 'amount', 'date')
+        widgets = {
+          'amount': forms.fields.TextInput(attrs={
+              'placeholder': 'Enter the budget amount',
+          }),
+          'date': forms.fields.TextInput(attrs={
+              'placeholder': '%Y-%m-%d format',
+          }),
+          'category': forms.Select(choices=Category.objects.all())
         }

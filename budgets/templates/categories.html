@@ -11,8 +11,10 @@
           <div class="form-group">
             {{ form.text }}
           </div>
-          {% if error %}
-            <div class="form-control is-invalid">{{ error }}</div>
+          {% if errors %}
+            {% for error in errors %}
+              <div class="form-control is-invalid">{{ error }}</div>
+            {% endfor %}
           {% endif %}
           {% csrf_token %}
         </form>

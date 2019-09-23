@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ValidationError
 from budgets.models import Category, Expense, MonthlyBudget
-from budgets.forms import EMPTY_CATEGORY_ERROR, CategoryForm, ExpenseForm
+from budgets.forms import CategoryForm, ExpenseForm
 
 import datetime
 import calendar
@@ -38,7 +38,7 @@ def home_page(request):
 
 @require_http_methods(["GET", "POST"])
 def categories_page(request):
-    error = None
+    errors = None
     category_name = request.POST.get("text", None)
     if request.method == 'POST':
         try:
@@ -47,7 +47,7 @@ def categories_page(request):
             category.save()
             return redirect('/categories')
         except ValidationError:
-            error = EMPTY_CATEGORY_ERROR
+            errors = form.errors
             # TODO this error should not be hard coded, and it should come from
             # the form, since the field has now max 20 chars, we need to
             # be able to display both
@@ -55,7 +55,7 @@ def categories_page(request):
     return render(request,
                   'categories.html',
                   {'categories': categories,
-                   'error': error,
+                   'errors': errors,
                    'form': CategoryForm()})
 
 

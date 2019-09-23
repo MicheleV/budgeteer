@@ -84,9 +84,16 @@ class CategoriesPageTest(BaseTest):
         self.assertEqual(first_saved_category.text, 'Rent')
         self.assertEqual(second_saved_category.text, 'Food')
 
-    # TODO
     def test_create_malformed_categories(self):
-        pass
+        form = CategoryForm(data={'text': ''})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors['text'], ['This field is required.'])
+
+        form = CategoryForm(
+          data={'text': 'text longer than constraints!!!!!!!!!!!!!!!!!!!!!!!'})
+        self.assertFalse(form.is_valid())
+        self.check_if_error_matches('Ensure this value has at most',
+                                    form.errors['text'])
 
 
 class ExpensesPageTest(BaseTest):

@@ -54,11 +54,18 @@ class ModelsTest(BaseTest):
                 category = self.create_category(None)
                 self.assertEqual(ValidationError, type(e.exception))
 
-        # Empty strigs are not allowed either
+        # Empty strigs are not allowed
         with transaction.atomic():
             with self.assertRaises(ValidationError) as e:
                 category = self.create_category('')
                 self.assertEqual(ValidationError, type(e.exception))
+
+        # String longer than 20 chas are not allowed either
+        with transaction.atomic():
+            with self.assertRaises(ValidationError) as e:
+                category = self.create_category(
+                  '----------------text longer than constraints--------------')
+                self.assertEqual(ValidationError, 'x')
 
     def test_malformed_expenses_triggers_errors(self):
         category = self.create_category('Rent')

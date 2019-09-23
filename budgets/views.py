@@ -6,7 +6,7 @@ from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from budgets.models import Category, Expense, MonthlyBudget
-from budgets.forms import CategoryForm, ExpenseForm
+from budgets.forms import CategoryForm, ExpenseForm, MonthlyBudgetForm
 
 import datetime
 import calendar
@@ -97,7 +97,7 @@ def expenses_page(request, date=None):
     })
 
 
-@require_http_methods(["GET"])
+@require_http_methods(["GET", "POST"])
 def monthly_budgets_page(request, date=None):
     # TODO: use the date parameter if present to filter
     categories = Category.objects.all()
@@ -110,6 +110,7 @@ def monthly_budgets_page(request, date=None):
 
 @require_http_methods(["POST"])
 def new_monthly_budgets_page(request):
+    # TODO Start using Monthly MonthlyBudgetForm
     budget = MonthlyBudget.objects.create(
         amount=request.POST.get("budget_amount", None),
         category_id=request.POST.get("category", None),

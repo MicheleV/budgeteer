@@ -4,6 +4,7 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 from budgets.models import Category, Expense, MonthlyBudget
 from budgets.forms import CategoryForm, ExpenseForm
 
@@ -12,6 +13,10 @@ import calendar
 
 
 def current_month_boundaries():
+    """
+    Return a tuple composed of the first and the last day
+    of the current month, as datetime objects
+    """
     start = datetime.date.today().replace(day=1)
     month_range = calendar.monthrange(start.year, start.month)
     last_day_of_month = month_range[1]
@@ -39,18 +44,19 @@ def home_page(request):
 @require_http_methods(["GET", "POST"])
 def categories_page(request):
     errors = None
-    category_name = request.POST.get("text", None)
     if request.method == 'POST':
         try:
-            category = Category(text=category_name)
-            category.full_clean()
-            category.save()
-            return redirect('/categories')
+            form = CategoryForm(data=request.POST)
+            if form.is_valid():
+                form.save()
+                form.full_clean()
+                redirect_url = reverse('categories')
+                return redirect(redirect_url)
+            else:
+                errors = form.errors
         except ValidationError:
             errors = form.errors
-            # TODO this error should not be hard coded, and it should come from
-            # the form, since the field has now max 20 chars, we need to
-            # be able to display both
+
     categories = Category.objects.all()
     return render(request,
                   'categories.html',
@@ -67,36 +73,32 @@ def categories_page(request):
 # BETWEEN 2012-02-01 AND 2012-02-29) <---On `Wed  1 Feb 09:00:16 JST 2012`
 # BETWEEN 2012-01-01 AND 2012-01-31) <--- On `Wed  1 Feb 08:59:00 JST 2012`
 
-@require_http_methods(["GET"])
+@require_http_methods(["GET", "POST"])
 # TODO later, add a parameter to select the month
 def expenses_page(request):
-    (start, end) = current_month_boundaries()
-    # TODO this should be programmatically as we're querying again all
-    # the expenses for that month after the for loop, see jsut before
-    # return statemnt
-    # refactor these queries after reading Django docs about annotation and
-    # aggregation
-    categories = Category.objects.all()
+    errors = None
+    if request.method == 'POST':
+        try:
+            form = ExpenseForm(data=request.POST)
+            if form.is_valid():
+                form.save()
+                form.full_clean()
+            else:
+                errors = form.errors
+        except ValidationError:
+            errors = form.errors
 
+    (start, end) = current_month_boundaries()
+    # TODO refactor these queries after reading Django docs about annotation
+    # and aggregation
+    categories = Category.objects.all()
     expenses = Expense.objects.filter(spended_date__range=(start, end))
     return render(request, 'expenses.html', {
         'categories': categories,
         'expenses': expenses,
-        'form': ExpenseForm()
+        'form': ExpenseForm(),
+        'errors': errors,
     })
-
-
-@require_http_methods(["POST"])
-def new_expense_page(request):
-    expense = Expense.objects.create(
-        amount=request.POST.get("amount", None),
-        category_id=request.POST.get("category", None),
-        spended_date=request.POST.get("spended_date", None),
-        note=request.POST.get("note", None),
-    )
-    expense.save()
-    expense.full_clean()
-    return redirect('/expenses')
 
 
 @require_http_methods(["POST"])
@@ -108,7 +110,8 @@ def new_monthly_budgets_page(request):
     )
     budget.full_clean()
     budget.save()
-    return redirect('/monthly_budgets')
+    redirect_url = reverse('monthly_budgets')
+    return redirect(redirect_url)
 
 
 @require_http_methods(["GET"])

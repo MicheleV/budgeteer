@@ -10,6 +10,10 @@
   {{ form }}
   <input type="submit" id="id_submit" value="Submit">
 </form>
+  {% if errors %}
+      <div>{{ errors }}</div>
+  {% endif %}
+  {% csrf_token %}
 <hr>
 
 <table id="id_expenses">

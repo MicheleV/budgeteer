@@ -24,19 +24,18 @@ class Expense(models.Model):
         note = self.note
         date = self.spended_date
         return f"{id}: ({text}), {amount}, {note}, {date}"
-    # TODO should we really delete expenses item on Category deletion?
-    # This will remove history!
-    category = models.ForeignKey(Category, default=None,
-                                 on_delete=models.CASCADE)
+
+    category = models.ForeignKey(Category, default=None, null=True,
+                                 on_delete=models.SET_NULL)
     amount = models.IntegerField()
-    note = models.CharField(max_length=150, default='')
+    # Warning: keep in mind this will allow both empty strings AND NULL
+    # https://docs.djangoproject.com/en/2.2/ref/models/fields/#null
+    note = models.CharField(null=True, blank=True, max_length=150, default='')
     spended_date = models.DateField()
 
 
 class MonthlyBudget(models.Model):
-    # TODO should we really delete Monthly Budgets on Category deletion?
-    # This will remove history!
-    category = models.ForeignKey(Category, default=None,
-                                 on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, default=None, null=True,
+                                 on_delete=models.SET_NULL)
     amount = models.IntegerField()
     date = models.DateField()

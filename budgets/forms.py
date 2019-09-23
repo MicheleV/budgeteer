@@ -34,7 +34,6 @@ class ExpenseForm(forms.models.ModelForm):
             'amount': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter the spended amount',
             }),
-            # TODO note field should NOT be mandatory
             'note': forms.fields.TextInput(attrs={
                 'placeholder': 'What did you buy?',
             }),
@@ -43,6 +42,11 @@ class ExpenseForm(forms.models.ModelForm):
             }),
             'category': forms.Select(choices=Category.objects.all())
         }
+
+    # TODO uncomment and use this, as soon as views.py uses ExpenseForm
+    # def save(self, category):
+    #     self.instance.category = category
+    #     return super().save()
 
 
 class MonthlyBudgetForm(forms.models.ModelForm):

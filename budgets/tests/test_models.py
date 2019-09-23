@@ -19,7 +19,7 @@ class ModelsTest(BaseTest):
           note='First month of rent',
           spended_date='2019-08-04'
         )
-        # Storing the string here to fit into 79 chars limit (PEP8) down below
+        # Storing the string here to fit into 79 chars limit (PEP8)
         note_field_2 = 'Second month of rent (discounted) in advance'
         second_expense = self.create_expense(
           category=category,
@@ -94,29 +94,6 @@ class ModelsTest(BaseTest):
                 first_expense.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
-        # note field: None is not allowed
-        with transaction.atomic():
-            with self.assertRaises(ValidationError) as e:
-                first_expense = self.create_expense(
-                  category=category,
-                  amount=5000,
-                  note=None,
-                  spended_date='2019-08-04'
-                )
-                first_expense.full_clean()
-            self.assertEqual(ValidationError, type(e.exception))
-        # note field: Empty strigs are not allowed either
-        with transaction.atomic():
-            with self.assertRaises(ValidationError) as e:
-                first_expense = self.create_expense(
-                  category=category,
-                  amount=5000,
-                  note='',
-                  spended_date='2019-08-04'
-                )
-                first_expense.full_clean()
-            self.assertEqual(ValidationError, type(e.exception))
-
         # spended_date field: None is not allowed
         with transaction.atomic():
             with self.assertRaises(ValidationError) as e:
@@ -128,14 +105,15 @@ class ModelsTest(BaseTest):
                 )
                 first_expense.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
-        # spended_date field: Empty strigs are not allowed either
+
+        # spended_date field: Malformed dates are not allowed
         with transaction.atomic():
             with self.assertRaises(ValidationError) as e:
                 first_expense = self.create_expense(
                   category=category,
                   amount=5000,
-                  note='',
-                  spended_date='2019-08-04'
+                  note='Rent for August 2019',
+                  spended_date='I am a string, not a date!'
                 )
                 first_expense.full_clean()
             self.assertEqual(ValidationError, type(e.exception))

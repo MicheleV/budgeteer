@@ -21,7 +21,9 @@ urlpatterns = [
     path('categories', views.categories_page, name='categories'),
     path('new_category', views.categories_page, name='new_category'),
     path('expenses', views.expenses_page, name='expenses'),
-    path('new_expense', views.new_expense_page, name='new_expense'),
-    path('monthly_budgets', views.monthly_budgets_page, name='monthly_budgets'),
-    path('new_monthly_budget', views.new_monthly_budgets_page, name='new_monthly_budgets'),
+    path('new_expense', views.expenses_page, name='new_expense'),
+    path('monthly_budgets',
+         views.monthly_budgets_page, name='monthly_budgets'),
+    path('new_monthly_budget',
+         views.new_monthly_budgets_page, name='new_monthly_budgets'),
 ]

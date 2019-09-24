@@ -93,18 +93,17 @@ def create_a_monthly_budget(self, category_name, amount, date,
     self.browser.get(f"{self.live_server_url}{url}")
 
     # Frank sees an input box
-    inputbox = self.browser.find_element_by_id(
-                    'id_new_monthly_expenses_amount')
+    inputbox = self.browser.find_element_by_id('id_amount')
     # Frank inputs the price of the expense item
     inputbox.send_keys(amount)
     # Frank sees a dropdown
-    dropdown = Select(self.browser.find_element_by_id('id_budget_category'))
+    dropdown = Select(self.browser.find_element_by_id('id_category'))
     # The dropdown includes the Category Frank wants to set a budget for
     # Frank chooses that category
     dropdown.select_by_visible_text(category_name)
 
     # Frank sees another input box
-    date_inputbox = self.browser.find_element_by_id('id_new_budget_date')
+    date_inputbox = self.browser.find_element_by_id('id_date')
     # Frank enters the date for the budget
     date_inputbox.send_keys(date.strftime("%Y-%m-%d"))
 

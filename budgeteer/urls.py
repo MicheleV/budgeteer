@@ -32,5 +32,5 @@ urlpatterns = [
     re_path(r'monthly_budgets/(?P<date>(19|20)[0-9]{2}-(0[1-9]|1[012]))',
             views.monthly_budgets_page, name='monthly_budgets'),
     path('new_monthly_budget',
-         views.new_monthly_budgets_page, name='new_monthly_budgets'),
+         views.monthly_budgets_page, name='new_monthly_budgets'),
 ]

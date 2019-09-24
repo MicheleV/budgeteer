@@ -100,23 +100,23 @@ def expenses_page(request, date=None):
 @require_http_methods(["GET", "POST"])
 def monthly_budgets_page(request, date=None):
     # TODO: use the date parameter if present to filter
+    errors = None
+    if request.method == 'POST':
+        try:
+            form = MonthlyBudgetForm(data=request.POST)
+            if form.is_valid():
+                form.save()
+                form.full_clean()
+            else:
+                errors = form.errors
+        except ValidationError:
+            errors = form.errors
+
     categories = Category.objects.all()
     monthly_budgets = MonthlyBudget.objects.all()
     return render(request, 'monthly_budgets.html', {
       'categories': categories,
       'monthly_budgets': monthly_budgets,
+      'form': MonthlyBudgetForm(),
+      'errors': errors
     })
-
-
-@require_http_methods(["POST"])
-def new_monthly_budgets_page(request):
-    # TODO Start using Monthly MonthlyBudgetForm
-    budget = MonthlyBudget.objects.create(
-        amount=request.POST.get("budget_amount", None),
-        category_id=request.POST.get("category", None),
-        date=request.POST.get("budget_date", None),
-    )
-    budget.full_clean()
-    budget.save()
-    redirect_url = reverse('monthly_budgets')
-    return redirect(redirect_url)

@@ -4,16 +4,14 @@
 
 {% block content %}
 <form method="POST" action="new_monthly_budget">
-  <select name="category" id="id_budget_category">
-    {% for category in categories %}
-      <option value="{{ category.id }}">{{ category.text }}</option>
-    {% endfor %}
-  </selet>
-  <input name="budget_amount" id="id_new_monthly_expenses_amount" placeholder="Enter a new monthly budget" />
-  <input name="budget_date" id="id_new_budget_date" placeholder="%Y-%m-%d" />
+  {{ form }}
   <input type="submit" id="id_submit" value="Submit">
   {% csrf_token %}
 </form>
+  {% if errors %}
+      <div>{{ errors }}</div>
+  {% endif %}
+  {% csrf_token %}
 <hr>
 
 <table id="id_monthly_budgets">

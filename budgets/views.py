@@ -99,7 +99,6 @@ def expenses_page(request, date=None):
 
 @require_http_methods(["GET", "POST"])
 def monthly_budgets_page(request, date=None):
-    # TODO: use the date parameter if present to filter
     errors = None
     if request.method == 'POST':
         try:
@@ -113,7 +112,11 @@ def monthly_budgets_page(request, date=None):
             errors = form.errors
 
     categories = Category.objects.all()
-    monthly_budgets = MonthlyBudget.objects.all()
+    if date is None:
+        monthly_budgets = MonthlyBudget.objects.all()
+    else:
+        complete_date = f"{date}-01"
+        monthly_budgets = MonthlyBudget.objects.filter(date=complete_date)
     return render(request, 'monthly_budgets.html', {
       'categories': categories,
       'monthly_budgets': monthly_budgets,

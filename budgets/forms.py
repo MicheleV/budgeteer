@@ -1,8 +1,8 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+import datetime
 from django import forms
-
 from budgets.models import Category, Expense, MonthlyBudget
 
 
@@ -63,3 +63,13 @@ class MonthlyBudgetForm(forms.models.ModelForm):
           }),
           'category': forms.Select(choices=Category.objects.all())
         }
+
+    # Make monthlybudgets be on the first day of the month
+    def clean(self):
+        self.cleaned_data = super(MonthlyBudgetForm, self).clean()
+        if 'date' in self.cleaned_data:
+            original_date = self.cleaned_data['date']
+            final_date = original_date.replace(day=1)
+            self.cleaned_data['date'] = final_date
+            self.instance.date = final_date
+        return self.cleaned_data

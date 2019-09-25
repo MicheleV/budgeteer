@@ -4,6 +4,7 @@
 import datetime
 from django import forms
 from budgets.models import Category, Expense, MonthlyBudget
+from budgets.models import IncomeCategory, Income
 
 
 # Docs https://docs.djangoproject.com/en/2.2/ref/forms/
@@ -73,3 +74,35 @@ class MonthlyBudgetForm(forms.models.ModelForm):
             self.cleaned_data['date'] = final_date
             self.instance.date = final_date
         return self.cleaned_data
+
+
+class IncomeCategoryForm(forms.models.ModelForm):
+
+    class Meta:
+        model = Income
+        fields = ('text',)
+        widgets = {
+            'text': forms.fields.TextInput(attrs={
+                'placeholder': 'Enter a new income category',
+                'class': 'form-control input-lg'
+            })
+        }
+
+
+class IncomeForm(forms.models.ModelForm):
+
+    class Meta:
+        model = Income
+        fields = ('amount', 'note', 'spended_date', 'category')
+        widgets = {
+            'amount': forms.fields.TextInput(attrs={
+                'placeholder': 'Enter the earned amount',
+            }),
+            'note': forms.fields.TextInput(attrs={
+                'placeholder': 'Keyword about this entry',
+            }),
+            'spended_date': forms.fields.TextInput(attrs={
+                'placeholder': '%Y-%m-%d format',
+            }),
+            'category': forms.Select(choices=IncomeCategory.objects.all())
+        }

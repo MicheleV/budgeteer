@@ -27,6 +27,7 @@ def current_month_boundaries():
     end = datetime.date(start.year, start.month, last_day_of_month)
     return (start, end)
 
+
 @require_http_methods(["GET"])
 def home_page(request):
     (start, end) = current_month_boundaries()

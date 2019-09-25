@@ -58,9 +58,7 @@ Provisioning and deploying
 
 Install ansible::
 
-    ## Based on your preferences use global pip or do:
-    ## python36 -m venv virtualenv
-    ## source /virtualenv/bin/activate
+    python36 -m venv virtualenv
     pip install ansible
 
 Create your ansible inventory file inside ``tools/inventory.ansible`` ::
@@ -81,7 +79,7 @@ Install the required packages on RHEL like distros::
 
 Usage
 =======
-Run the server::
+Run the development server::
 
     python manage.py runserver
 
@@ -96,7 +94,7 @@ Install the requirements::
 
     pip install -r test-requirements.txt 
 
-`keep option docs <https://docs.djangoproject.com/en/2.2/topics/testing/overview/#the-test-database>`_
+`Note keep option docs <https://docs.djangoproject.com/en/2.2/topics/testing/overview/#the-test-database>`_
 
 Run both function and unit test suite::
 

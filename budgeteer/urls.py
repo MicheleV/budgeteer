@@ -33,4 +33,10 @@ urlpatterns = [
             views.monthly_budgets_page, name='monthly_budgets'),
     path('new_monthly_budget',
          views.monthly_budgets_page, name='new_monthly_budgets'),
+    path('income_categories', views.income_categories_page,
+         name='income_categories'),
+    path('new_income_category', views.income_categories_page,
+         name='new_income_category'),
+    path('incomes', views.incomes_page, name='incomes'),
+    path('new_income', views.incomes_page, name='new_income'),
 ]

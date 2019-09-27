@@ -41,6 +41,8 @@ class MonthlyBudget(models.Model):
     date = models.DateField()
 
 
+# This class is a duplicate of Category
+# TODO think if we can just add a `is_income` flag to category
 class IncomeCategory(models.Model):
     text = models.CharField(max_length=20, default=None)
 
@@ -48,15 +50,16 @@ class IncomeCategory(models.Model):
         return f"{self.text}"
 
 
+# This class is a duplicate of Expense
+# TODO think if we can just add a `is_income` flag to category
 class Income(models.Model):
 
     def __str__(self):
         id = self.category.id
-        text = self.category.text
         amount = self.amount
         note = self.note
         date = self.spended_date
-        return f"{id}: ({text}), {amount}, {note}, {date}"
+        return f"{id}: {amount}, {note}, {date}"
 
     category = models.ForeignKey(IncomeCategory, default=None, null=True,
                                  on_delete=models.SET_NULL)
@@ -64,4 +67,4 @@ class Income(models.Model):
     # Warning: keep in mind this will allow both empty strings AND NULL
     # https://docs.djangoproject.com/en/2.2/ref/models/fields/#null
     note = models.CharField(null=True, blank=True, max_length=150, default='')
-    spended_date = models.DateField()
+    date = models.DateField()

@@ -3,20 +3,20 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.urls import reverse
 from django.test import TestCase
-from budgets.models import Category, Expense, MonthlyBudget
+import budgets.models as m
 
 
 class BaseTest(TestCase):
 
     def create_category(self, text):
-        category = Category()
+        category = m.Category()
         category.text = text
         category.full_clean()
         category.save()
         return category
 
     def create_expense(self, category, amount, note, spended_date):
-        expense = Expense()
+        expense = m.Expense()
         expense.category = category
         expense.amount = amount
         expense.note = note
@@ -26,7 +26,7 @@ class BaseTest(TestCase):
         return expense
 
     def create_monthly_budgets(self, category, amount, date):
-        budget = MonthlyBudget()
+        budget = m.MonthlyBudget()
         budget.category = category
         budget.amount = amount
         budget.date = date
@@ -44,3 +44,20 @@ class BaseTest(TestCase):
             any(text in row for row in rows),
             f"No {text} in rows. Contents were\n{rows}",
         )
+
+    def create_income_category(self, text):
+        category = m.IncomeCategory()
+        category.text = text
+        category.full_clean()
+        category.save()
+        return category
+
+    def create_income(self, category, amount, note, date):
+        expense = m.Income()
+        expense.category = category
+        expense.amount = amount
+        expense.note = note
+        expense.date = date
+        expense.full_clean()
+        expense.save()
+        return expense

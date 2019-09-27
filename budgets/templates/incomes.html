@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Incomes{% endblock %}
+
+{% block content %}
+<h5 id="id_current_month_date">Incomes logged during {% now 'Y-m' %}</h5>
+<hr>
+<form method="POST" action="/new_income">
+  {% csrf_token %}
+  {{ form }}
+  <input type="submit" id="id_submit" value="Submit">
+</form>
+  {% if errors %}
+      <div>{{ errors }}</div>
+  {% endif %}
+  {% csrf_token %}
+<hr>
+
+<table id="id_incomes">
+  <tr>
+    <th>Amount</th>
+    <th>Category</th>
+    <th>Date</th>
+    <th>Note</th>
+  </tr>
+  {% for income in incomes %}
+    <tr>
+      <td>{{ income.amount }}</td>
+      <td>{{ income.category.text }}</td>
+      <td>{{ income.date }}</td>
+      <td>{{ income.note }}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

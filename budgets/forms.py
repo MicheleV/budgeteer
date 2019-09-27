@@ -79,7 +79,7 @@ class MonthlyBudgetForm(forms.models.ModelForm):
 class IncomeCategoryForm(forms.models.ModelForm):
 
     class Meta:
-        model = Income
+        model = IncomeCategory
         fields = ('text',)
         widgets = {
             'text': forms.fields.TextInput(attrs={
@@ -93,7 +93,7 @@ class IncomeForm(forms.models.ModelForm):
 
     class Meta:
         model = Income
-        fields = ('amount', 'note', 'spended_date', 'category')
+        fields = ('amount', 'note', 'date', 'category')
         widgets = {
             'amount': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter the earned amount',
@@ -101,7 +101,7 @@ class IncomeForm(forms.models.ModelForm):
             'note': forms.fields.TextInput(attrs={
                 'placeholder': 'Keyword about this entry',
             }),
-            'spended_date': forms.fields.TextInput(attrs={
+            'date': forms.fields.TextInput(attrs={
                 'placeholder': '%Y-%m-%d format',
             }),
             'category': forms.Select(choices=IncomeCategory.objects.all())

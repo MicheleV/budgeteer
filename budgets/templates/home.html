@@ -29,6 +29,20 @@
     </tr>
   {% endfor %}
 </table>
+{% endif %}
+{% if income_categories %}
+<table id="id_incomes_total">
+  <tr>
+    <th>Category</th>
+    <th>Income amount</th>
+  </tr>
+  {% for inc in income_categories %}
+    <tr>
+      <td>{{ inc.text }}</td>
+      <td>{{ inc.total }}</td>
+    </tr>
+  {% endfor %}
+</table>
 <hr>
 {% endif %}
 

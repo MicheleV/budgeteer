@@ -41,8 +41,20 @@ def home_page(request):
         expenses_sum = sum(ex.amount for ex in expenses)
         cat.total = expenses_sum
         cat.mb = cat.monthlybudget_set.filter(date=start).first()
+
+    # TODO this code is duplicatd from above, let's make a function for this
+    income_categories = m.IncomeCategory.objects.all()
+    for inc_c in income_categories:
+        # TODO refactor these queries after reading Django docs about
+        # annotation and aggregation
+        income = m.Income.objects.filter(category_id=inc_c.id). \
+            filter(date__range=(start, end))
+        income_sum = sum(ex.amount for ex in income)
+        inc_c.total = income_sum
+
     return render(request, 'home.html', {
         'categories': categories,
+        'income_categories': income_categories
     })
 
 
@@ -68,6 +80,7 @@ def categories_page(request):
                   {'categories': categories,
                    'errors': errors,
                    'form': f.CategoryForm()})
+
 
 @require_http_methods(["GET", "POST"])
 def expenses_page(request, date=None):
@@ -166,7 +179,7 @@ def incomes_page(request, date=None):
     # TODO refactor these queries after reading Django docs about annotation
     # and aggregation
     categories = m.IncomeCategory.objects.all()
-    incomes = Income.objects.filter(date__range=(start, end))
+    incomes = m.Income.objects.filter(date__range=(start, end))
     return render(request, 'incomes.html', {
         'categories': categories,
         'incomes': incomes,

@@ -218,3 +218,23 @@ def verify_monthly_expense_was_created(self, category_name, amount, date):
     find_text_inside_table(self, year_month, table)
 
     # Franks visits the home page and sees the budget
+
+
+def check_whether_current_month_date_is_displayed(self):
+    """
+    Current page should display the current date in '%Y-%m' format
+    """
+    today_string = date.today().strftime("%Y-%m")
+    date_container = self.browser.find_element_by_id('id_current_month_date')
+    self.assertIn(today_string, date_container.text)
+
+
+def check_current_month(self, current_month_amount, category_name):
+    """
+    Current page should show only expenses from the current month when
+    acccessed without paramters.
+    """
+    table = self.browser.find_element_by_id('id_expenses_total')
+    find_text_inside_table(self, str(current_month_amount), table)
+    # TODO add two expense in different months (current, past) and confirm
+    # only the expense for the current month is displayed

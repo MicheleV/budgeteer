@@ -23,9 +23,18 @@ def test_expenses_sum_appear_on_home_page(self):
     category_name = 'Rent'
     curr_mont_amount = 500
     next_month_amount = 420
+    first_expense = [
+      curr_mont_amount,
+      'First month of rent'
+    ]
+    second_expense = [
+      next_month_amount,
+      'Second month of rent (discounted)'
+    ]
     total_amount = curr_mont_amount + next_month_amount
-    Helpers.create_category_and_two_expenses(self, curr_mont_amount,
-                                             next_month_amount, category_name)
+
+    Helpers.create_category_and_two_expenses(self, first_expense,
+                                             second_expense, category_name)
 
     # Frank sees the sum of this month expenses on the home page
     url = reverse('home')

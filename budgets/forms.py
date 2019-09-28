@@ -83,7 +83,7 @@ class IncomeCategoryForm(forms.models.ModelForm):
         fields = ('text',)
         widgets = {
             'text': forms.fields.TextInput(attrs={
-                'placeholder': 'Enter a new income category',
+                'placeholder': 'Enter a new category',
                 'class': 'form-control input-lg'
             })
         }

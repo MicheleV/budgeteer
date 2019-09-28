@@ -37,7 +37,7 @@ def home_page(request):
         # TODO refactor these queries after reading Django docs about
         # annotation and aggregation
         expenses = m.Expense.objects.filter(category_id=cat.id). \
-                   filter(spended_date__range=(start, end))
+                   filter(date__range=(start, end))
         expenses_sum = sum(ex.amount for ex in expenses)
         cat.total = expenses_sum
         cat.mb = cat.monthlybudget_set.filter(date=start).first()
@@ -101,7 +101,7 @@ def expenses_page(request, date=None):
     # TODO refactor these queries after reading Django docs about annotation
     # and aggregation
     categories = m.Category.objects.all()
-    expenses = m.Expense.objects.filter(spended_date__range=(start, end))
+    expenses = m.Expense.objects.filter(date__range=(start, end))
     return render(request, 'expenses.html', {
         'categories': categories,
         'expenses': expenses,

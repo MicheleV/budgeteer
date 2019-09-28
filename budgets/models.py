@@ -22,7 +22,7 @@ class Expense(models.Model):
         text = self.category.text
         amount = self.amount
         note = self.note
-        date = self.spended_date
+        date = self.date
         return f"{id}: ({text}), {amount}, {note}, {date}"
 
     category = models.ForeignKey(Category, default=None, null=True,
@@ -31,7 +31,7 @@ class Expense(models.Model):
     # Warning: keep in mind this will allow both empty strings AND NULL
     # https://docs.djangoproject.com/en/2.2/ref/models/fields/#null
     note = models.CharField(null=True, blank=True, max_length=150, default='')
-    spended_date = models.DateField()
+    date = models.DateField()
 
 
 class MonthlyBudget(models.Model):

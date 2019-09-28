@@ -4,21 +4,51 @@
 import functional_tests.helpers as Helpers
 
 
-def test_cant_create_an_empty_category(self):
+def test_cant_create_an_empty_expense_category(self):
     category_text = None
-    Helpers.create_a_category(self, category_text, False)
+    is_income_category = False
+    run_verification = False
+    Helpers.create_a_category(self, category_text,
+                              is_income_category, run_verification)
 
     # Frank notices his browser his forcing him to input something
     Helpers.wait_for_required_input(self, "id_text")
 
     # Frank does not follows the browser instruction, and stares at the screen
-    # in disdain. He thought he could create an empty Category
+    # in disdain. He thought he could create an empty expense Category
     table = self.browser.find_element_by_id('id_categories')
     Helpers.assert_text_is_not_inside_table(self, '1', table)
 
 
-def test_can_create_multiple_categories(self):
+def test_can_create_multiple_expense_categories(self):
     # Frank can create a category to log expenses related to his rent
     Helpers.create_a_category(self, 'Rent')
     # Frank can create a category to log his food expenses
     Helpers.create_a_category(self, 'Food')
+
+
+def test_cant_create_an_empty_income_category(self):
+    category_text = None
+    is_income_category = True
+    run_verification = False
+    Helpers.create_a_category(self, category_text,
+                              is_income_category, run_verification)
+
+    # Frank notices his browser his forcing him to input something
+    Helpers.wait_for_required_input(self, "id_text")
+
+    # Frank does not follows the browser instruction, and stares at the screen
+    # in disdain. He thought he could create an empty income Category
+    table = self.browser.find_element_by_id('id_categories')
+    Helpers.assert_text_is_not_inside_table(self, '1', table)
+
+
+def test_can_create_multiple_income_categories(self):
+    is_income_category = True
+    run_verification = True
+    # Frank can create a category to log his wages
+    Helpers.create_a_category(self, 'Wage',
+                              is_income_category, run_verification)
+    # Frank can create a category to log the money he gets from his money tree
+    Helpers.create_a_category(self, 'MoneyTree',
+                              is_income_category, run_verification)

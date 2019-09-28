@@ -17,7 +17,7 @@ class ModelsTest(BaseTest):
           category=category,
           amount=5000,
           note='First month of rent',
-          spended_date='2019-08-04'
+          date='2019-08-04'
         )
         # Storing the string here to fit into 79 chars limit (PEP8)
         note_field_2 = 'Second month of rent (discounted) in advance'
@@ -25,7 +25,7 @@ class ModelsTest(BaseTest):
           category=category,
           amount=4200,
           note=note_field_2,
-          spended_date='2019-09-04'
+          date='2019-09-04'
         )
 
         saved_category = m.Category.objects.first()
@@ -39,12 +39,12 @@ class ModelsTest(BaseTest):
         self.assertEqual(saved_item_1.category, category)
         self.assertEqual(saved_item_1.amount, 5000)
         self.assertEqual(saved_item_1.note, 'First month of rent')
-        self.assertEqual(str(saved_item_1.spended_date), '2019-08-04')
+        self.assertEqual(str(saved_item_1.date), '2019-08-04')
 
         self.assertEqual(saved_item_2.category, category)
         self.assertEqual(saved_item_2.amount, 4200)
         self.assertEqual(saved_item_2.note, note_field_2)
-        self.assertEqual(str(saved_item_2.spended_date), '2019-09-04')
+        self.assertEqual(str(saved_item_2.date), '2019-09-04')
 
     def test_saving_and_retrieving_income(self):
         category = self.create_income_category('Rent')
@@ -125,49 +125,49 @@ class ModelsTest(BaseTest):
         # No category
         with transaction.atomic():
             with self.assertRaises(ValidationError) as e:
-                first_expense = self.create_expense(
+                expense = self.create_expense(
                   category=None,
                   amount=5000,
                   note='Rent for August 2019',
-                  spended_date='2019-08-04'
+                  date='2019-08-04'
                 )
-                first_expense.full_clean()
+                expense.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
         # amount field: None is not allowed
         with transaction.atomic():
             with self.assertRaises(ValidationError) as e:
-                first_expense = self.create_expense(
+                expense = self.create_expense(
                   category=category,
                   amount=None,
                   note='Rent for August 2019',
-                  spended_date='2019-08-04'
+                  date='2019-08-04'
                 )
-                first_expense.full_clean()
+                expense.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
-        # spended_date field: None is not allowed
+        # date field: None is not allowed
         with transaction.atomic():
             with self.assertRaises(ValidationError) as e:
-                first_expense = self.create_expense(
+                expense = self.create_expense(
                   category=category,
                   amount=5000,
                   note='Rent for August 2019',
-                  spended_date=None
+                  date=None
                 )
-                first_expense.full_clean()
+                expense.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
-        # spended_date field: Malformed dates are not allowed
+        # date field: Malformed dates are not allowed
         with transaction.atomic():
             with self.assertRaises(ValidationError) as e:
-                first_expense = self.create_expense(
+                expense = self.create_expense(
                   category=category,
                   amount=5000,
                   note='Rent for August 2019',
-                  spended_date='I am a string, not a date!'
+                  date='I am a string, not a date!'
                 )
-                first_expense.full_clean()
+                expense.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
     def test_malformed_income_triggers_errors(self):
@@ -176,49 +176,49 @@ class ModelsTest(BaseTest):
         # No category
         with transaction.atomic():
             with self.assertRaises(ValidationError) as e:
-                first_expense = self.create_income(
+                income = self.create_income(
                   category=None,
                   amount=10000,
                   note='Wage for August 2019',
                   date='2019-08-01'
                 )
-                first_expense.full_clean()
+                income.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
         # amount field: None is not allowed
         with transaction.atomic():
             with self.assertRaises(ValidationError) as e:
-                first_expense = self.create_income(
+                income = self.create_income(
                   category=category,
                   amount=None,
                   note='Wage for August 2019',
                   date='2019-08-01'
                 )
-                first_expense.full_clean()
+                income.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
         # date field: None is not allowed
         with transaction.atomic():
             with self.assertRaises(ValidationError) as e:
-                first_expense = self.create_income(
+                income = self.create_income(
                   category=category,
                   amount=10000,
                   note='Wage for August 2019',
                   date=None
                 )
-                first_expense.full_clean()
+                income.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
         # date field: Malformed dates are not allowed
         with transaction.atomic():
             with self.assertRaises(ValidationError) as e:
-                first_expense = self.create_income(
+                income = self.create_income(
                   category=category,
                   amount=10000,
                   note='Rent for August 2019',
                   date='I am a string, not a date!'
                 )
-                first_expense.full_clean()
+                income.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
     def test_saving_and_retrieving_monthly_budgets(self):

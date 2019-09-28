@@ -66,9 +66,15 @@ def find_url_in_home_page(self, url_to_find):
     )
 
 
-def create_a_category(self, category_name, verify_creation=True):
-    # Frank creates a category
+def create_a_category(self, category_name,
+                      is_income=False, verify_creation=True):
     url = reverse('categories')
+
+    if is_income:
+        url = reverse('income_categories')
+        is_income = True
+
+    # Frank creates a category
     self.browser.get(f"{self.live_server_url}{url}")
 
     inputbox = self.browser.find_element_by_id('id_text')
@@ -138,7 +144,7 @@ def create_an_expense(self, amount, category_name, note, expense_date,
     note_inputbox.send_keys(note)
 
     # Frank sees one more input box
-    date_inputbox = self.browser.find_element_by_id('id_spended_date')
+    date_inputbox = self.browser.find_element_by_id('id_date')
     # Frank enters the date of when the expense was made
     date_inputbox.send_keys(expense_date)
 
@@ -162,7 +168,7 @@ def create_category_and_two_expenses(self, first_amount, second_amount,
 
     first_date = date.today().replace(day=1)
     delta = timedelta(weeks=10)
-    second_date = first_date + delta
+    second_date = first_date - delta
 
     # Frank visits the expenses url and enters the expense details
     create_an_expense(
@@ -181,7 +187,7 @@ def create_category_and_two_expenses(self, first_amount, second_amount,
       category_name,
       'Second month of rent (discounted)',
       second_date.strftime("%Y-%m-%d"),
-      # Note False, since this expense is in the future (see comment above)
+      # Note False, since this expense is in the past, it should not appear
       False
     )
 

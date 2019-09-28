@@ -15,12 +15,12 @@ class BaseTest(TestCase):
         category.save()
         return category
 
-    def create_expense(self, category, amount, note, spended_date):
+    def create_expense(self, category, amount, note, date):
         expense = m.Expense()
         expense.category = category
         expense.amount = amount
         expense.note = note
-        expense.spended_date = spended_date
+        expense.date = date
         expense.full_clean()
         expense.save()
         return expense

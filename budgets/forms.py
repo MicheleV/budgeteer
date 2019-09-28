@@ -30,7 +30,7 @@ class ExpenseForm(forms.models.ModelForm):
 
     class Meta:
         model = Expense
-        fields = ('amount', 'note', 'spended_date', 'category')
+        fields = ('amount', 'note', 'date', 'category')
         widgets = {
             'amount': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter the spended amount',
@@ -38,7 +38,7 @@ class ExpenseForm(forms.models.ModelForm):
             'note': forms.fields.TextInput(attrs={
                 'placeholder': 'What did you buy?',
             }),
-            'spended_date': forms.fields.TextInput(attrs={
+            'date': forms.fields.TextInput(attrs={
                 'placeholder': '%Y-%m-%d format',
             }),
             'category': forms.Select(choices=Category.objects.all())

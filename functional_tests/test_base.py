@@ -60,8 +60,8 @@ class FunctionalTest(LiveServerTestCase):
 
     # Actual tests
     def test_categories(self):
-        Categories.test_cant_create_an_empty_category(self)
-        Categories.test_can_create_multiple_categories(self)
+        Categories.test_cant_create_an_empty_expense_category(self)
+        Categories.test_can_create_multiple_expense_categories(self)
 
     def test_expenses(self):
         Expenses.test_cant_create_malformed_expenses(self)

@@ -58,7 +58,7 @@ class Income(models.Model):
         id = self.category.id
         amount = self.amount
         note = self.note
-        date = self.spended_date
+        date = self.date
         return f"{id}: {amount}, {note}, {date}"
 
     category = models.ForeignKey(IncomeCategory, default=None, null=True,

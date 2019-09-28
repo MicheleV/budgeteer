@@ -77,11 +77,8 @@ class FunctionalTest(LiveServerTestCase):
         MBudgets.test_cant_create_multiple_monthly_budgets_for_same_month(self)
 
     def test_access(self):
-        PageAccess.test_can_access_home_page(self)
-        PageAccess.test_can_access_list_categories_page(self)
-        PageAccess.test_can_access_list_expenses_page(self)
-        PageAccess.test_cant_access_admin_page(self)
+        PageAccess.test_access_to_all_pages(self)
 
     def test_views_and_layout(self):
-        ViewAndLayout.test_home_page_has_link_categories_page(self)
+        ViewAndLayout.test_home_page_has_links_in_nav(self)
         ViewAndLayout.test_layout_and_styling(self)

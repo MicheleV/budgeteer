@@ -8,6 +8,8 @@ import functional_tests.helpers as Helpers
 
 def test_cant_create_an_empty_monthly_budget(self):
     # TODO Franks wants to create a budget but being confused,
+    # he enters an empty sum and tries to press 'Submit'...
+    # ...Nothing happens!
     pass
 
 

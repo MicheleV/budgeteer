@@ -129,6 +129,7 @@ References and useful links
 8. `Selenium <https://seleniumhq.github.io/selenium/docs/api/py/api.html>`_
 9. `Ansible <https://docs.ansible.com/>`_
 10. `geckodriver <https://github.com/mozilla/geckodriver>`_
+11. `Executing queries on init (e.g. Models.py populating dropdown) <https://stackoverflow.com/a/39084645/2535658>`_
 
 
 Author

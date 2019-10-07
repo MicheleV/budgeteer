@@ -1,16 +1,35 @@
 - hosts: all
   tasks:
-    - name: ensure git, python 3.6 and nginx are installed
+    - name: ensure git, python 3.6, development tools and nginx are installed
       yum:
         name: "{{ packages }}"
       vars:
         packages:
           - git
           - python36
-          - nginx
-    - name: enable service nginx and ensure it is not masked
-      systemd:
-        name: nginx
-        enabled: yes
-        masked: no
-        state: started
+          - wget
+          - gcc
+          - make
+    #       - nginx
+    # - name: enable service nginx and ensure it is not masked
+    #   systemd:
+    #     name: nginx
+    #     enabled: yes
+    #     masked: no
+    #     state: started
+    - name: ensure latest version of nss, curl and libcurl are installed
+      yum:
+        name: "{{ packages }}"
+        state: latest
+        update_cache: true
+      become: true
+      vars:
+        packages:
+          - nss
+          - curl
+          - libcurl
+    - name: Copy script to update sqlite3 to 3.29 (Django 2.2 requires 3.8.3+)
+      copy: src=update_sqlite3.sh dest=~ mode=0700
+
+    - name: Execute the script
+      shell: ~/update_sqlite3.sh

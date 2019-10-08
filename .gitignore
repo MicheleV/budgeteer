@@ -4,5 +4,5 @@ virtualenv
 geckodriver.log
 db.sqlite3
 /static
-inventory.ansible
 /tools/inventory.ansible
+.env

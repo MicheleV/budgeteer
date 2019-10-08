@@ -8,6 +8,8 @@ import functional_tests.helpers as Helpers
 
 def test_cant_create_an_empty_monthly_budget(self):
     # TODO Franks wants to create a budget but being confused,
+    # he enters an empty sum and tries to press 'Submit'...
+    # ...Nothing happens!
     pass
 
 
@@ -41,7 +43,9 @@ def test_can_create_multiple_monthly_budgets(self):
     wrong_amt = 4000
     note = 'First month of rent'
     rent_date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
-    Helpers.create_an_expense(self, wrong_amt, category_name, note, rent_date)
+    is_income = False
+    Helpers.create_entry(self, wrong_amt, category_name, note,
+                         rent_date, is_income)
 
     # Frank notices that the home page is showing he still has room for
     # spending, in the Rent category
@@ -60,7 +64,9 @@ def test_can_create_multiple_monthly_budgets(self):
     remainder = 5000
     note = 'First month of rent'
     rent_date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
-    Helpers.create_an_expense(self, remainder, category_name, note, rent_date)
+    is_income = False
+    Helpers.create_entry(self, remainder, category_name, note,
+                         rent_date, is_income)
 
     # Frank now notices he is overspending, he should have not moved!
     # TODO, check for "text-success" class

@@ -5,8 +5,8 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from budgets.models import Category, Expense, MonthlyBudget
-from budgets.forms import CategoryForm, ExpenseForm, MonthlyBudgetForm
+import budgets.models as m
+import budgets.forms as f
 
 import datetime
 import calendar
@@ -27,21 +27,34 @@ def current_month_boundaries():
     end = datetime.date(start.year, start.month, last_day_of_month)
     return (start, end)
 
+
 @require_http_methods(["GET"])
 def home_page(request):
     (start, end) = current_month_boundaries()
     # TODO check whether prefetch_related can be used for related models
-    categories = Category.objects.all()
+    categories = m.Category.objects.all()
     for cat in categories:
         # TODO refactor these queries after reading Django docs about
         # annotation and aggregation
-        expenses = Expense.objects.filter(category_id=cat.id). \
-                   filter(spended_date__range=(start, end))
+        expenses = m.Expense.objects.filter(category_id=cat.id). \
+                   filter(date__range=(start, end))
         expenses_sum = sum(ex.amount for ex in expenses)
         cat.total = expenses_sum
         cat.mb = cat.monthlybudget_set.filter(date=start).first()
+
+    # TODO this code is duplicatd from above, let's make a function for this
+    income_categories = m.IncomeCategory.objects.all()
+    for inc_c in income_categories:
+        # TODO refactor these queries after reading Django docs about
+        # annotation and aggregation
+        income = m.Income.objects.filter(category_id=inc_c.id). \
+            filter(date__range=(start, end))
+        income_sum = sum(ex.amount for ex in income)
+        inc_c.total = income_sum
+
     return render(request, 'home.html', {
         'categories': categories,
+        'income_categories': income_categories
     })
 
 
@@ -50,7 +63,7 @@ def categories_page(request):
     errors = None
     if request.method == 'POST':
         try:
-            form = CategoryForm(data=request.POST)
+            form = f.CategoryForm(data=request.POST)
             if form.is_valid():
                 form.save()
                 form.full_clean()
@@ -61,12 +74,12 @@ def categories_page(request):
         except ValidationError:
             errors = form.errors
 
-    categories = Category.objects.all()
+    categories = m.Category.objects.all()
     return render(request,
                   'categories.html',
                   {'categories': categories,
                    'errors': errors,
-                   'form': CategoryForm()})
+                   'form': f.CategoryForm()})
 
 
 @require_http_methods(["GET", "POST"])
@@ -74,7 +87,7 @@ def expenses_page(request, date=None):
     errors = None
     if request.method == 'POST':
         try:
-            form = ExpenseForm(data=request.POST)
+            form = f.ExpenseForm(data=request.POST)
             if form.is_valid():
                 form.save()
                 form.full_clean()
@@ -87,12 +100,12 @@ def expenses_page(request, date=None):
     (start, end) = current_month_boundaries()
     # TODO refactor these queries after reading Django docs about annotation
     # and aggregation
-    categories = Category.objects.all()
-    expenses = Expense.objects.filter(spended_date__range=(start, end))
+    categories = m.Category.objects.all()
+    expenses = m.Expense.objects.filter(date__range=(start, end))
     return render(request, 'expenses.html', {
         'categories': categories,
         'expenses': expenses,
-        'form': ExpenseForm(),
+        'form': f.ExpenseForm(),
         'errors': errors,
     })
 
@@ -102,7 +115,7 @@ def monthly_budgets_page(request, date=None):
     errors = None
     if request.method == 'POST':
         try:
-            form = MonthlyBudgetForm(data=request.POST)
+            form = f.MonthlyBudgetForm(data=request.POST)
             if form.is_valid():
                 form.save()
                 form.full_clean()
@@ -111,15 +124,65 @@ def monthly_budgets_page(request, date=None):
         except ValidationError:
             errors = form.errors
 
-    categories = Category.objects.all()
+    categories = m.Category.objects.all()
     if date is None:
-        monthly_budgets = MonthlyBudget.objects.all()
+        monthly_budgets = m.MonthlyBudget.objects.all()
     else:
         complete_date = f"{date}-01"
-        monthly_budgets = MonthlyBudget.objects.filter(date=complete_date)
+        monthly_budgets = m.MonthlyBudget.objects.filter(date=complete_date)
     return render(request, 'monthly_budgets.html', {
       'categories': categories,
       'monthly_budgets': monthly_budgets,
-      'form': MonthlyBudgetForm(),
+      'form': f.MonthlyBudgetForm(),
       'errors': errors
+    })
+
+@require_http_methods(["GET", "POST"])
+def income_categories_page(request):
+    errors = None
+    if request.method == 'POST':
+        try:
+            form = f.IncomeCategoryForm(data=request.POST)
+            if form.is_valid():
+                form.save()
+                form.full_clean()
+                redirect_url = reverse('income_categories')
+                return redirect(redirect_url)
+            else:
+                errors = form.errors
+        except ValidationError:
+            errors = form.errors
+
+    categories = m.IncomeCategory.objects.all()
+    return render(request,
+                  'income_categories.html',
+                  {'categories': categories,
+                   'errors': errors,
+                   'form': f.IncomeCategoryForm()})
+
+@require_http_methods(["GET", "POST"])
+def incomes_page(request, date=None):
+    errors = None
+    if request.method == 'POST':
+        try:
+            form = f.IncomeForm(data=request.POST)
+            if form.is_valid():
+                form.save()
+                form.full_clean()
+            else:
+                errors = form.errors
+        except ValidationError:
+            errors = form.errors
+
+    # TODO: use the date parameter if present to filter
+    (start, end) = current_month_boundaries()
+    # TODO refactor these queries after reading Django docs about annotation
+    # and aggregation
+    categories = m.IncomeCategory.objects.all()
+    incomes = m.Income.objects.filter(date__range=(start, end))
+    return render(request, 'incomes.html', {
+        'categories': categories,
+        'incomes': incomes,
+        'form': f.IncomeForm(),
+        'errors': errors,
     })

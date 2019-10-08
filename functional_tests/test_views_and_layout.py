@@ -5,7 +5,7 @@ from django.urls import reverse
 import functional_tests.helpers as Helpers
 
 
-def test_home_page_has_link_categories_page(self):
+def test_home_page_has_links_in_nav(self):
     url = reverse('home')
     self.browser.get(f"{self.live_server_url}{url}")
 
@@ -13,11 +13,15 @@ def test_home_page_has_link_categories_page(self):
     second_url_to_find = reverse('categories')
     third_url_to_find = reverse('expenses')
     fourth_url_to_find = reverse('monthly_budgets')
+    fifth_url_to_find = reverse('income_categories')
+    sixth_url_to_find = reverse('incomes')
 
     Helpers.find_url_in_home_page(self, first_url_to_find)
     Helpers.find_url_in_home_page(self, second_url_to_find)
     Helpers.find_url_in_home_page(self, third_url_to_find)
     Helpers.find_url_in_home_page(self, fourth_url_to_find)
+    Helpers.find_url_in_home_page(self, fifth_url_to_find)
+    Helpers.find_url_in_home_page(self, sixth_url_to_find)
 
 
 # Credits http://www.obeythetestinggoat.com/book/

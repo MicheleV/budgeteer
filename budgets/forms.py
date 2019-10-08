@@ -4,6 +4,7 @@
 import datetime
 from django import forms
 from budgets.models import Category, Expense, MonthlyBudget
+from budgets.models import IncomeCategory, Income
 
 
 # Docs https://docs.djangoproject.com/en/2.2/ref/forms/
@@ -28,8 +29,17 @@ class CategoryForm(forms.models.ModelForm):
 class ExpenseForm(forms.models.ModelForm):
 
     class Meta:
+        def get_choices():
+            return Category.objects.all()
+
+        def __init__(self, *args, **kwargs):
+            super(ExpenseForm, self).__init__(*args, **kwargs)
+            self.widgets['category'] = forms.Select(
+              choices=Category.objects.all()
+            )
+
         model = Expense
-        fields = ('amount', 'note', 'spended_date', 'category')
+        fields = ('amount', 'note', 'date', 'category')
         widgets = {
             'amount': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter the spended amount',
@@ -37,21 +47,21 @@ class ExpenseForm(forms.models.ModelForm):
             'note': forms.fields.TextInput(attrs={
                 'placeholder': 'What did you buy?',
             }),
-            'spended_date': forms.fields.TextInput(attrs={
+            'date': forms.fields.TextInput(attrs={
                 'placeholder': '%Y-%m-%d format',
             }),
-            'category': forms.Select(choices=Category.objects.all())
         }
-
-    # TODO uncomment and use this, as soon as views.py uses ExpenseForm
-    # def save(self, category):
-    #     self.instance.category = category
-    #     return super().save()
 
 
 class MonthlyBudgetForm(forms.models.ModelForm):
 
     class Meta:
+        def get_choices():
+            choices = []
+            for choice in Category.objects.all():
+                choices.append(choice)
+            return Category.objects.all()
+
         model = MonthlyBudget
         fields = ('category', 'amount', 'date')
         widgets = {
@@ -61,7 +71,6 @@ class MonthlyBudgetForm(forms.models.ModelForm):
           'date': forms.fields.TextInput(attrs={
               'placeholder': '%Y-%m-%d format',
           }),
-          'category': forms.Select(choices=Category.objects.all())
         }
 
     # Make monthlybudgets be on the first day of the month
@@ -73,3 +82,34 @@ class MonthlyBudgetForm(forms.models.ModelForm):
             self.cleaned_data['date'] = final_date
             self.instance.date = final_date
         return self.cleaned_data
+
+
+class IncomeCategoryForm(forms.models.ModelForm):
+
+    class Meta:
+        model = IncomeCategory
+        fields = ('text',)
+        widgets = {
+            'text': forms.fields.TextInput(attrs={
+                'placeholder': 'Enter a new category',
+                'class': 'form-control input-lg'
+            })
+        }
+
+
+class IncomeForm(forms.models.ModelForm):
+
+    class Meta:
+        model = Income
+        fields = ('amount', 'note', 'date', 'category')
+        widgets = {
+            'amount': forms.fields.TextInput(attrs={
+                'placeholder': 'Enter the earned amount',
+            }),
+            'note': forms.fields.TextInput(attrs={
+                'placeholder': 'Keyword about this entry',
+            }),
+            'date': forms.fields.TextInput(attrs={
+                'placeholder': '%Y-%m-%d format',
+            }),
+        }

@@ -66,9 +66,15 @@ def find_url_in_home_page(self, url_to_find):
     )
 
 
-def create_a_category(self, category_name, verify_creation=True):
-    # Frank creates a category
+def create_a_category(self, category_name,
+                      is_income=False, verify_creation=True):
     url = reverse('categories')
+
+    if is_income:
+        url = reverse('income_categories')
+        is_income = True
+
+    # Frank creates a category
     self.browser.get(f"{self.live_server_url}{url}")
 
     inputbox = self.browser.find_element_by_id('id_text')
@@ -116,10 +122,13 @@ def create_a_monthly_budget(self, category_name, amount, date,
         verify_monthly_expense_was_created(self, category_name, amount, date)
 
 
-def create_an_expense(self, amount, category_name, note, expense_date,
-                      verify_creation=True):
+def create_entry(self, amount, category_name, note, expense_date,
+                 is_income=False, verify_creation=True):
     # Frank visits the expenses page
     url = reverse('expenses')
+    if is_income:
+        url = reverse('incomes')
+
     self.browser.get(f"{self.live_server_url}{url}")
     # Frank sees an input box
     inputbox = self.browser.find_element_by_id('id_amount')
@@ -138,7 +147,7 @@ def create_an_expense(self, amount, category_name, note, expense_date,
     note_inputbox.send_keys(note)
 
     # Frank sees one more input box
-    date_inputbox = self.browser.find_element_by_id('id_spended_date')
+    date_inputbox = self.browser.find_element_by_id('id_date')
     # Frank enters the date of when the expense was made
     date_inputbox.send_keys(expense_date)
 
@@ -156,32 +165,37 @@ def create_an_expense(self, amount, category_name, note, expense_date,
     # wait_for_page_to_reload(self)
 
 
-def create_category_and_two_expenses(self, first_amount, second_amount,
-                                     category_name):
-    create_a_category(self, category_name)
+def create_category_and_two_expenses(self, first_item, second_item,
+                                     category_name, is_income=False):
+    create_a_category(self, category_name, is_income)
 
     first_date = date.today().replace(day=1)
     delta = timedelta(weeks=10)
-    second_date = first_date + delta
-
+    second_date = first_date - delta
+    if is_income:
+        method = create_entry
+    else:
+        method = create_entry
     # Frank visits the expenses url and enters the expense details
-    create_an_expense(
+    method(
       self,
-      first_amount,
+      first_item[0],
       category_name,
-      'First month of rent',
-      first_date.strftime("%Y-%m-%d")
+      first_item[1],
+      first_date.strftime("%Y-%m-%d"),
+      is_income
     )
 
     # Frank visits the expenses url again and enters a second expense with its
     # details
-    create_an_expense(
+    method(
       self,
-      second_amount,
+      second_item[0],
       category_name,
-      'Second month of rent (discounted)',
+      second_item[1],
       second_date.strftime("%Y-%m-%d"),
-      # Note False, since this expense is in the future (see comment above)
+      is_income,
+      # Note False, since this expense is in the past, it should not appear
       False
     )
 
@@ -212,3 +226,23 @@ def verify_monthly_expense_was_created(self, category_name, amount, date):
     find_text_inside_table(self, year_month, table)
 
     # Franks visits the home page and sees the budget
+
+
+def check_whether_current_month_date_is_displayed(self):
+    """
+    Current page should display the current date in '%Y-%m' format
+    """
+    today_string = date.today().strftime("%Y-%m")
+    date_container = self.browser.find_element_by_id('id_current_month_date')
+    self.assertIn(today_string, date_container.text)
+
+
+def check_current_month(self, current_month_amount, category_name):
+    """
+    Current page should show only expenses from the current month when
+    acccessed without paramters.
+    """
+    table = self.browser.find_element_by_id('id_expenses_total')
+    find_text_inside_table(self, str(current_month_amount), table)
+    # TODO add two expense in different months (current, past) and confirm
+    # only the expense for the current month is displayed

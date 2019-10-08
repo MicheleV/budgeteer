@@ -43,7 +43,7 @@ class ExpenseFormTest(BaseTest):
         form = ExpenseForm(data={
             'category': None,
             'amount': 5000,
-            'spended_date': '2019-09-23'
+            'date': '2019-09-23'
         })
         self.assertFalse(form.is_valid())
         self.assertIn(
@@ -60,7 +60,7 @@ class ExpenseFormTest(BaseTest):
         form = ExpenseForm(data={
             'category': category.id,
             'amount': None,
-            'spended_date': '2019-09-23'
+            'date': '2019-09-23'
         })
         self.assertFalse(form.is_valid())
         self.assertIn(
@@ -72,17 +72,17 @@ class ExpenseFormTest(BaseTest):
           form.errors.as_text(),
         )
 
-    def test_form_validation_spended_date_field(self):
+    def test_form_validation_date_field(self):
         category = self.create_category('Rent')
         # Case None
         form = ExpenseForm(data={
             'category': category.id,
             'amount': 5000,
-            'spended_date': None
+            'date': None
         })
         self.assertFalse(form.is_valid())
         self.assertIn(
-          'spended_date',
+          'date',
           form.errors.as_text(),
         )
         self.assertIn(
@@ -93,11 +93,11 @@ class ExpenseFormTest(BaseTest):
         form = ExpenseForm(data={
             'category': category.id,
             'amount': 5000,
-            'spended_date': ''
+            'date': ''
         })
         self.assertFalse(form.is_valid())
         self.assertIn(
-          'spended_date',
+          'date',
           form.errors.as_text(),
         )
         self.assertIn(
@@ -108,11 +108,11 @@ class ExpenseFormTest(BaseTest):
         form = ExpenseForm(data={
             'category': category.id,
             'amount': 5000,
-            'spended_date': 'I am a string, not a valid date'
+            'date': 'I am a string, not a valid date'
         })
         self.assertFalse(form.is_valid())
         self.assertIn(
-          'spended_date',
+          'date',
           form.errors.as_text(),
         )
         self.assertIn(
@@ -161,7 +161,7 @@ class MonthlyBudgetFormTest(BaseTest):
           form.errors.as_text(),
         )
 
-    def test_form_validation_spended_date_field(self):
+    def test_form_validation_date_field(self):
         category = self.create_category('Rent')
         # Case None
         form = MonthlyBudgetForm(data={

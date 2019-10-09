@@ -1,6 +1,7 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+import os
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
@@ -13,6 +14,7 @@ import functional_tests.test_expenses as Expenses
 import functional_tests.test_monthly_budgets as MBudgets
 import functional_tests.test_page_access as PageAccess
 import functional_tests.test_views_and_layout as ViewAndLayout
+
 
 # Docs at https://docs.djangoproject.com/en/2.2/topics/testing/
 # tools/#django.test.TransactionTestCase
@@ -52,6 +54,10 @@ class FunctionalTest(LiveServerTestCase):
                 # options.add_argument('--no-sandbox')
             options.binary_location = "/usr/bin/chromium-browser"
             self.browser = webdriver.Chrome(chrome_options=options)
+
+        test_target = os.environ.get('TEST_TARGET')
+        if test_target:
+            self.live_server_url = f"http://{test_target}"
 
     @classmethod
     def tearDownClass(self):

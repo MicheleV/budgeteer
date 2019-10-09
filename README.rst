@@ -92,25 +92,25 @@ Confirm geckodriver is your $PATH::
 
 Install the requirements::
 
-    pip install -r test-requirements.txt 
+    pip install -r test-requirements.txt
 
 `Note keep option docs <https://docs.djangoproject.com/en/2.2/topics/testing/overview/#the-test-database>`_
 
 Run both function and unit test suite::
 
-    python manage.py test --keep
+    [TEST_TARGET=localhost ] python manage.py test --keep
 
 Run the functional test suite::
 
-    python manage.py test functional_tests --keep
+    [TEST_TARGET=localhost ] python manage.py test functional_tests --keep
 
 Run a single functional test::
 
-    python manage.py test functional_tests.<file_name_without_py>.<class_name>.<method_name> --keep
+    [TEST_TARGET=localhost ] python manage.py test functional_tests.<file_name_without_py>.<class_name>.<method_name> --keep
 
 Run the unit test suite::
 
-    python manage.py test budgets --keep
+    [TEST_TARGET=localhost ] python manage.py test budgets --keep
 
 
 References and useful links

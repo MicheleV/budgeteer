@@ -1,5 +1,18 @@
 - hosts: all
+
+  vars:
+    epelReleaseMajorVersion: 7
+
   tasks:
+    - name: add epel repo
+      yum_repository:
+        name: epel_repo
+        description: EPEL YUM repo
+        baseurl:  http://dl.fedoraproject.org/pub/epel/{{epelReleaseMajorVersion}}/x86_64/
+        gpgcheck: yes
+        gpgkey: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+        enabled: yes
+
     - name: ensure git, python 3.6, development tools and nginx are installed
       yum:
         name: "{{ packages }}"
@@ -10,7 +23,7 @@
           - wget
           - gcc
           - make
-    #       - nginx
+          - nginx
     # - name: enable service nginx and ensure it is not masked
     #   systemd:
     #     name: nginx
@@ -28,8 +41,27 @@
           - nss
           - curl
           - libcurl
+
     - name: Copy script to update sqlite3 to 3.29 (Django 2.2 requires 3.8.3+)
       copy: src=update_sqlite3.sh dest=~ mode=0700
 
     - name: Execute the script
       shell: ~/update_sqlite3.sh
+
+    - name: set selinux flags
+      seboolean:
+        name: httpd_can_network_connect
+        state: yes
+        persistent: yes
+
+    - name: create serving directory
+      file:
+        path: /home/ec2-user/budgeteer/static
+        state: directory
+        mode: '0755'
+
+    - name: set facl permissions
+      acl:
+        path: /home/ec2-user/budgeteer/static
+        entry: user:nginx:rwx
+        state: present

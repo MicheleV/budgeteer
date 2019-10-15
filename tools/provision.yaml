@@ -24,12 +24,15 @@
           - gcc
           - make
           - nginx
-    # - name: enable service nginx and ensure it is not masked
-    #   systemd:
-    #     name: nginx
-    #     enabled: yes
-    #     masked: no
-    #     state: started
+
+    - name: enable service nginx and ensure it is not masked
+      systemd:
+        name: nginx
+        enabled: yes
+        masked: no
+
+    # TODO install firewalld and open port 8000
+
     - name: ensure latest version of nss, curl and libcurl are installed
       yum:
         name: "{{ packages }}"
@@ -46,7 +49,7 @@
       copy: src=update_sqlite3.sh dest=~ mode=0700
 
     - name: Execute the script
-      shell: ~/update_sqlite3.sh
+      shell: ~/update_sqlite3.sh {{ ansible_ssh_user }}
 
     - name: set selinux flags
       seboolean:
@@ -56,12 +59,12 @@
 
     - name: create serving directory
       file:
-        path: /home/ec2-user/budgeteer/static
+        path: /home/{{ ansible_ssh_user }}/budgeteer/static
         state: directory
         mode: '0755'
 
     - name: set facl permissions
       acl:
-        path: /home/ec2-user/budgeteer/static
+        path: /home/{{ ansible_ssh_user }}/budgeteer/static
         entry: user:nginx:rwx
         state: present

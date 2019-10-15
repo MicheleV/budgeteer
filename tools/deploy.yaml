@@ -1,0 +1,24 @@
+- hosts: all
+
+  vars:
+    domain_name: {{ host }}
+
+  tasks:
+    - name: Forcefully checkout master branch from repo
+      git:
+        repo: https://github.com/MicheleV/budgeteer.git
+        dest: /home/ec2-user/budgeteer
+        version: master
+        force: yes
+        update: true
+
+    # TODO start django
+
+    - name: Put nginx config file in place
+      template: src=./nginx.conf.j2 dest=/etc/nginx/conf.d/budgeteer.conf
+      notify:
+        - restart nginx
+
+  handlers:
+      - name: restart nginx
+        service:name=nginx state=restarted

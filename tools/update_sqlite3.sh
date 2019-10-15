@@ -9,17 +9,15 @@ if [ $current_version == 7 ]; then
   wget https://www.sqlite.org/2019/sqlite-autoconf-3290000.tar.gz
   tar zxvf ./sqlite-autoconf-3290000.tar.gz
   cd ./sqlite-autoconf-3290000
-  # TODO remove this hardcoded path and make it dynamic
-  ./configure --prefix=/home/ec2-user/opt/sqlite
+  ./configure --prefix=/home/$@/opt/sqlite
   make
   make install
   cd ..
   rm -rf ./sqlite-autoconf-3290000 ./sqlite-autoconf-3290000.tar.gz
   sudo mv /usr/bin/sqlite3 /usr/bin/sqlite3_old
-  # TODO remove these hardcoded path and make it dynamic
-  echo 'export PATH=/home/ec2-user/opt/sqlite/bin:$PATH' >> /home/ec2-user/.bashrc
-  echo 'export LD_LIBRARY_PATH="/home/ec2-user/opt/sqlite/lib"' >> /home/ec2-user/.bashrc
-  echo 'export LD_RUN_PATH="/home/ec2-user/opt/sqlite/lib"' >> /home/ec2-user/.bashrc
+  echo 'export PATH=/home/$@/opt/sqlite/bin:$PATH' >> /home/$@/.bashrc
+  echo 'export LD_LIBRARY_PATH="/home/$@/opt/sqlite/lib"' >> /home/$@/.bashrc
+  echo 'export LD_RUN_PATH="/home/$@/opt/sqlite/lib"' >> /home/$@/.bashrc
 else
   echo "Do nothing"
 fi

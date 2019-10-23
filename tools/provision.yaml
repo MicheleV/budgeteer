@@ -30,6 +30,11 @@
           - make
           - nginx
 
+    - name: Install virtualenv via pip
+      pip:
+        name: virtualenv
+        executable: pip3
+
     - name: Enable service nginx and ensure it is not masked
       systemd:
         name: nginx
@@ -61,6 +66,8 @@
       shell: /home/{{ ansible_ssh_user }}/update_sqlite3.sh {{ ansible_ssh_user }}
       become_user: "{{ ansible_ssh_user }}"
       register: out
+      register: execute_sqlite_update
+      changed_when: '"Install sqlite3" not in execute_sqlite_update.stdout'
 
     - debug: var=out.stdout_lines
 

@@ -1,31 +1,108 @@
 - hosts: all
 
+  vars:
+    app_dir: "/home/{{ ansible_ssh_user }}/budgeteer"
+    static_dir : "{{app_dir}}/static"
+    venv_dir: "/home/{{ ansible_ssh_user }}/budgeteer/virtualenv"
+    virtualenv_python: "{{ venv_dir}}/bin/python"
+
   tasks:
-    - name: Forcefully checkout master branch from repo
+    - name: Forcefully checkout deployment branch from repo
       git:
         repo: https://github.com/MicheleV/budgeteer.git
-        dest: /home/{{ ansible_ssh_user }}/budgeteer
+        dest: "{{ app_dir }}"
         version: deployment
         force: yes
 
+    - name: Set main directory permissions
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: "{{ ansible_ssh_user }}"
+        mode: 0750
+        recurse: yes
+
+    # TODO: Implement me when moving out of development
+    - name: Generate secret key and .env file if missing
+      copy: 
+        src: ../.env.sample
+        dest: "{{ app_dir}}/.env"
+        mode: 0700
+        owner: "{{ ansible_ssh_user }}"
+        group: "{{ ansible_ssh_user }}"
+
+
     - name: Create serving directory
       file:
-        path: /home/{{ ansible_ssh_user }}/budgeteer/static
+        path: "{{ static_dir }}"
         state: directory
-        mode: 0755
+        owner: "{{ ansible_ssh_user }}"
+        group: "{{ ansible_ssh_user }}"
+        mode: 0750
+        recurse: yes
 
     - name: Set facl permissions
       acl:
-        path: /home/{{ ansible_ssh_user }}/budgeteer/static
+        path: "/home/{{ ansible_ssh_user }}"
         entry: user:nginx:rwx
         state: present
+        default: yes
 
-    # TODO start django
+
+    - name: Make virtualenv
+      shell: "source /home/{{ ansible_ssh_user }}/.bash_profile &&
+              cd {{ app_dir }} &&
+              python3.6 -m venv virtualenv"
+      args:
+        executable: /bin/bash
+        creates: "{{ venv_dir }}"
+      register: mkvirtualenv
+      failed_when: 'mkvirtualenv.changed and "New python executable" not in mkvirtualenv.stdout'
+
+    - debug:
+        msg: System {{ app_dir }} {{ venv_dir }} {{ virtualenv_python }}
+
+    - name: Install dependencies
+      pip:    requirements={{ app_dir }}/requirements.txt
+              virtualenv="{{ venv_dir }}"
+              virtualenv_python={{ virtualenv_python }}
+
+    - name: Set virtualenv directory permissions
+      file:
+        path: " {{ venv_dir }}"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: "{{ ansible_ssh_user }}"
+        mode: 0750
+        recurse: yes
+
+    - name: Set Django manage.py path
+      set_fact: manage_py="{{ venv_dir }}/bin/python {{ app_dir }}/manage.py"
+
+    - name: Run migrations
+      shell: "{{ manage_py }} migrate"
+      register: migrate_result
+      changed_when: '"No migrations to apply." not in migrate_result.stdout'
+      become_user: "{{ ansible_ssh_user }}"
+
+    - name: Run budgets migrations
+      shell: "{{ manage_py }} migrate budgets"
+      register: migrate_budetgets_result
+      changed_when: '"No migrations to apply." not in migrate_budetgets_result.stdout'
+      become_user: "{{ ansible_ssh_user }}"
+
+    - name: django collectstatic
+      shell: "{{ manage_py }} collectstatic --noinput"
+      become_user: "{{ ansible_ssh_user }}"
+
+      # TODO start django/unicorn
 
     - name: Put nginx config file in place
       template: src=./nginx.conf.j2 dest=/etc/nginx/conf.d/budgeteer.conf
       notify:
         - restart nginx
+
 
   handlers:
       - name: restart nginx

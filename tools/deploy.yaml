@@ -1,16 +1,24 @@
 - hosts: all
 
-  vars:
-    domain_name: {{ host }}
-
   tasks:
     - name: Forcefully checkout master branch from repo
       git:
         repo: https://github.com/MicheleV/budgeteer.git
-        dest: /home/ec2-user/budgeteer
-        version: master
+        dest: /home/{{ ansible_ssh_user }}/budgeteer
+        version: deployment
         force: yes
-        update: true
+
+    - name: Create serving directory
+      file:
+        path: /home/{{ ansible_ssh_user }}/budgeteer/static
+        state: directory
+        mode: 0755
+
+    - name: Set facl permissions
+      acl:
+        path: /home/{{ ansible_ssh_user }}/budgeteer/static
+        entry: user:nginx:rwx
+        state: present
 
     # TODO start django
 
@@ -21,4 +29,6 @@
 
   handlers:
       - name: restart nginx
-        service:name=nginx state=restarted
+        service:
+          name: nginx
+          state: restarted

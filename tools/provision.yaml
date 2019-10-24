@@ -4,7 +4,12 @@
     epelReleaseMajorVersion: 7
 
   tasks:
-    - name: add epel repo
+
+    - name: Update hostname
+      hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: Add epel repo
       yum_repository:
         name: epel_repo
         description: EPEL YUM repo
@@ -13,7 +18,7 @@
         gpgkey: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
         enabled: yes
 
-    - name: ensure git, python 3.6, development tools and nginx are installed
+    - name: Ensure git, python 3.6, development tools and nginx are installed
       yum:
         name: "{{ packages }}"
       vars:
@@ -25,7 +30,7 @@
           - make
           - nginx
 
-    - name: enable service nginx and ensure it is not masked
+    - name: Enable service nginx and ensure it is not masked
       systemd:
         name: nginx
         enabled: yes
@@ -33,7 +38,7 @@
 
     # TODO install firewalld and open port 8000
 
-    - name: ensure latest version of nss, curl and libcurl are installed
+    - name: Ensure latest version of nss, curl and libcurl are installed
       yum:
         name: "{{ packages }}"
         state: latest
@@ -69,15 +74,3 @@
         name: httpd_can_network_connect
         state: yes
         persistent: yes
-
-    - name: create serving directory
-      file:
-        path: /home/{{ ansible_ssh_user }}/budgeteer/static
-        state: directory
-        mode: 0755
-
-    - name: set facl permissions
-      acl:
-        path: /home/{{ ansible_ssh_user }}/budgeteer/static
-        entry: user:nginx:rwx
-        state: present

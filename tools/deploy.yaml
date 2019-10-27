@@ -1,9 +1,10 @@
 - hosts: all
 
   vars:
-    app_dir: "/home/{{ ansible_ssh_user }}/budgeteer"
+    base_dir: "/srv/{{ ansible_ssh_user }}"
+    app_dir: "{{ base_dir }}/budgeteer"
     static_dir : "{{app_dir}}/static"
-    venv_dir: "/home/{{ ansible_ssh_user }}/budgeteer/virtualenv"
+    venv_dir: "{{ app_dir }}/virtualenv"
     virtualenv_python: "{{ venv_dir}}/bin/python"
 
   tasks:
@@ -14,41 +15,81 @@
         version: deployment
         force: yes
 
+    # TODO: Edit so that this is executed only if necessary
+    - name: Allow nginx to read the base dir (posix permission)
+      file:
+        path: "{{ base_dir }}"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: "nginx"
+        mode: 0750
+        recurse: yes
+
     - name: Set main directory permissions
       file:
         path: "{{ app_dir }}"
         state: directory
         owner: "{{ ansible_ssh_user }}"
-        group: "{{ ansible_ssh_user }}"
+        group: "nginx"
         mode: 0750
         recurse: yes
+
+    - name: "Determine if the git is ignoring file permissions on `diff`"
+      register: validategitfilemode
+      shell: "cd {{ app_dir }} &&
+              grep -i 'fileMode' .git/config"
+      changed_when: False
+
+    - name: Ignore permission diff when checking out git repo
+      shell: cd {{ app_dir }} && git config core.fileMode false
+      become_user: "{{ ansible_ssh_user }}"
+      when: "'true' in validategitfilemode.stdout"
 
     # TODO: Implement me when moving out of development
     - name: Generate secret key and .env file if missing
       copy: 
         src: ../.env.sample
         dest: "{{ app_dir}}/.env"
-        mode: 0700
+        mode: 0750
         owner: "{{ ansible_ssh_user }}"
-        group: "{{ ansible_ssh_user }}"
-
+        group: "nginx"
 
     - name: Create serving directory
       file:
         path: "{{ static_dir }}"
         state: directory
         owner: "{{ ansible_ssh_user }}"
-        group: "{{ ansible_ssh_user }}"
+        group: "nginx"
         mode: 0750
         recurse: yes
 
-    - name: Set facl permissions
-      acl:
-        path: "/home/{{ ansible_ssh_user }}"
-        entry: user:nginx:rwx
-        state: present
-        default: yes
+    - name: "Determine if selinux is allowing nginx"
+      register: selinuxsyscontent
+      shell: "semanage fcontext -l | grep {{ base_dir }}"
+      changed_when: False
 
+    - name: Allow nginx to read static files (selinux)
+      sefcontext:
+        target: '{{ static_dir}}(/.*)?'
+        setype: httpd_sys_content_t
+        state: present
+      when: 
+         ("'/srv/cloud-user/budgeteer/static(/.*)?' not in selinuxsyscontent.stdout" and
+         "'system_u:object_r:httpd_sys_content_t:s0' not in selinuxsyscontent.stdout")
+
+
+    - name: Apply new SELinux file context to filesystem
+      command: restorecon -irv {{ static_dir}}
+      register: restorecon
+      changed_when: restorecon.stdout != ""
+
+    # TODO: find out why facl was not enough/ we need dir ownership instead
+    # - name: Set facl permissions
+    #   acl:
+    #     path: "{{ base_dir }}"
+    #     entry: group:nginx:rwx
+    #     state: present
+    #     default: yes
 
     - name: Make virtualenv
       shell: "source /home/{{ ansible_ssh_user }}/.bash_profile &&
@@ -58,10 +99,7 @@
         executable: /bin/bash
         creates: "{{ venv_dir }}"
       register: mkvirtualenv
-      failed_when: 'mkvirtualenv.changed and "New python executable" not in mkvirtualenv.stdout'
-
-    - debug:
-        msg: System {{ app_dir }} {{ venv_dir }} {{ virtualenv_python }}
+      changed_when: 'mkvirtualenv.changed and "New python executable" not in mkvirtualenv.stdout'
 
     - name: Install dependencies
       pip:    requirements={{ app_dir }}/requirements.txt
@@ -82,19 +120,21 @@
 
     - name: Run migrations
       shell: "{{ manage_py }} migrate"
-      register: migrate_result
-      changed_when: '"No migrations to apply." not in migrate_result.stdout'
+      register: migrateresult
+      changed_when: '"No migrations to apply." not in migrateresult.stdout'
       become_user: "{{ ansible_ssh_user }}"
 
     - name: Run budgets migrations
       shell: "{{ manage_py }} migrate budgets"
-      register: migrate_budetgets_result
-      changed_when: '"No migrations to apply." not in migrate_budetgets_result.stdout'
+      register: migratebudetgetsresult
+      changed_when: '"No migrations to apply." not in migratebudetgetsresult.stdout'
       become_user: "{{ ansible_ssh_user }}"
 
     - name: django collectstatic
       shell: "{{ manage_py }} collectstatic --noinput"
       become_user: "{{ ansible_ssh_user }}"
+      register: collectstatic
+      changed_when: '"0 static files copied to" not in collectstatic.stdout'
 
       # TODO start django/unicorn
 
@@ -102,7 +142,6 @@
       template: src=./nginx.conf.j2 dest=/etc/nginx/conf.d/budgeteer.conf
       notify:
         - restart nginx
-
 
   handlers:
       - name: restart nginx

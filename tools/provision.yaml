@@ -61,20 +61,19 @@
         dest: /home/{{ ansible_ssh_user }}/
         mode: 0700
         owner: "{{ ansible_ssh_user }}"
+      changed_when: False
 
     - name: Execute the script
       shell: /home/{{ ansible_ssh_user }}/update_sqlite3.sh {{ ansible_ssh_user }}
       become_user: "{{ ansible_ssh_user }}"
-      register: out
       register: execute_sqlite_update
-      changed_when: '"Install sqlite3" not in execute_sqlite_update.stdout'
-
-    - debug: var=out.stdout_lines
+      changed_when: '"Install sqlite3" in execute_sqlite_update.stdout'
 
     - name: Remove the script to update sqlite3
       file:
         path: /home/{{ ansible_ssh_user }}/update_sqlite3.sh
         state: absent
+      changed_when: False
 
     - name: set selinux flags
       seboolean:

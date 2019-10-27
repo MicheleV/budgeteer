@@ -8,6 +8,6 @@ server {
     }
 
     location /static {
-        alias /home/{{ ansible_ssh_user }}/budgeteer/static;
+        alias /srv/{{ ansible_ssh_user }}/budgeteer/static;
     }
 }

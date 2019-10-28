@@ -1,7 +1,7 @@
 - hosts: all
 
   vars:
-    base_dir: "/srv/{{ ansible_ssh_user }}"
+    base_dir: "/srv/{{ ansible_user }}"
     app_dir: "{{ base_dir }}/budgeteer"
     static_dir : "{{app_dir}}/static"
     venv_dir: "{{ app_dir }}/virtualenv"
@@ -20,7 +20,7 @@
       file:
         path: "{{ base_dir }}"
         state: directory
-        owner: "{{ ansible_ssh_user }}"
+        owner: "{{ ansible_user }}"
         group: "nginx"
         mode: 0750
         recurse: yes
@@ -29,7 +29,7 @@
       file:
         path: "{{ app_dir }}"
         state: directory
-        owner: "{{ ansible_ssh_user }}"
+        owner: "{{ ansible_user }}"
         group: "nginx"
         mode: 0750
         recurse: yes
@@ -42,7 +42,7 @@
 
     - name: Ignore permission diff when checking out git repo
       shell: cd {{ app_dir }} && git config core.fileMode false
-      become_user: "{{ ansible_ssh_user }}"
+      become_user: "{{ ansible_user }}"
       when: "'true' in validategitfilemode.stdout"
 
     # TODO: Implement me when moving out of development
@@ -51,14 +51,14 @@
         src: ../.env.sample
         dest: "{{ app_dir}}/.env"
         mode: 0750
-        owner: "{{ ansible_ssh_user }}"
+        owner: "{{ ansible_user }}"
         group: "nginx"
 
     - name: Create serving directory
       file:
         path: "{{ static_dir }}"
         state: directory
-        owner: "{{ ansible_ssh_user }}"
+        owner: "{{ ansible_user }}"
         group: "nginx"
         mode: 0750
         recurse: yes
@@ -74,9 +74,8 @@
         setype: httpd_sys_content_t
         state: present
       when: 
-         ("'/srv/cloud-user/budgeteer/static(/.*)?' not in selinuxsyscontent.stdout" and
+         ("'/srv/ansible_user/budgeteer/static(/.*)?' not in selinuxsyscontent.stdout" and
          "'system_u:object_r:httpd_sys_content_t:s0' not in selinuxsyscontent.stdout")
-
 
     - name: Apply new SELinux file context to filesystem
       command: restorecon -irv {{ static_dir}}
@@ -92,7 +91,7 @@
     #     default: yes
 
     - name: Make virtualenv
-      shell: "source /home/{{ ansible_ssh_user }}/.bash_profile &&
+      shell: "source /home/{{ ansible_user }}/.bash_profile &&
               cd {{ app_dir }} &&
               python3.6 -m venv virtualenv"
       args:
@@ -110,8 +109,8 @@
       file:
         path: " {{ venv_dir }}"
         state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: "{{ ansible_ssh_user }}"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
         mode: 0750
         recurse: yes
 
@@ -122,17 +121,17 @@
       shell: "{{ manage_py }} migrate"
       register: migrateresult
       changed_when: '"No migrations to apply." not in migrateresult.stdout'
-      become_user: "{{ ansible_ssh_user }}"
+      become_user: "{{ ansible_user }}"
 
     - name: Run budgets migrations
       shell: "{{ manage_py }} migrate budgets"
       register: migratebudetgetsresult
       changed_when: '"No migrations to apply." not in migratebudetgetsresult.stdout'
-      become_user: "{{ ansible_ssh_user }}"
+      become_user: "{{ ansible_user }}"
 
     - name: django collectstatic
       shell: "{{ manage_py }} collectstatic --noinput"
-      become_user: "{{ ansible_ssh_user }}"
+      become_user: "{{ ansible_user }}"
       register: collectstatic
       changed_when: '"0 static files copied to" not in collectstatic.stdout'
 

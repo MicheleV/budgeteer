@@ -58,20 +58,20 @@
     - name: Copy script to update sqlite3 to 3.29 (Django 2.2 requires 3.8.3+)
       copy: 
         src: update_sqlite3.sh
-        dest: /home/{{ ansible_ssh_user }}/
+        dest: /home/{{ ansible_user }}/
         mode: 0700
-        owner: "{{ ansible_ssh_user }}"
+        owner: "{{ ansible_user }}"
       changed_when: False
 
     - name: Execute the script
-      shell: /home/{{ ansible_ssh_user }}/update_sqlite3.sh {{ ansible_ssh_user }}
-      become_user: "{{ ansible_ssh_user }}"
+      shell: /home/{{ ansible_user }}/update_sqlite3.sh {{ ansible_user }}
+      become_user: "{{ ansible_user }}"
       register: execute_sqlite_update
       changed_when: '"Install sqlite3" in execute_sqlite_update.stdout'
 
     - name: Remove the script to update sqlite3
       file:
-        path: /home/{{ ansible_ssh_user }}/update_sqlite3.sh
+        path: /home/{{ ansible_user }}/update_sqlite3.sh
         state: absent
       changed_when: False
 

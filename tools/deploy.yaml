@@ -53,6 +53,7 @@
         mode: 0750
         owner: "{{ ansible_user }}"
         group: "nginx"
+        force: no
 
     - name: Create serving directory
       file:
@@ -91,7 +92,7 @@
     #     state: present
     #     default: yes
 
-    - name: Make virtualenv
+    - name: Create the virtualenv
       shell: "source /home/{{ ansible_user }}/.bash_profile &&
               cd {{ app_dir }} &&
               python3.6 -m venv virtualenv"

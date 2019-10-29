@@ -65,7 +65,8 @@
 
     - name: "Determine if selinux is allowing nginx"
       register: selinuxsyscontent
-      shell: "semanage fcontext -l | grep {{ base_dir }}"
+      # Note: using `|| true` to prevent grep from exiting with code 1
+      shell: "semanage fcontext -l | grep {{ base_dir }} || true"
       changed_when: False
 
     - name: Allow nginx to read static files (selinux)
@@ -78,7 +79,7 @@
          "'system_u:object_r:httpd_sys_content_t:s0' not in selinuxsyscontent.stdout")
 
     - name: Apply new SELinux file context to filesystem
-      command: restorecon -irv {{ static_dir}}
+      command: restorecon -irv {{ static_dir }}
       register: restorecon
       changed_when: restorecon.stdout != ""
 

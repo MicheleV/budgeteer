@@ -24,6 +24,7 @@
       vars:
         packages:
           - git
+          - policycoreutils-python
           - python36
           - wget
           - gcc
@@ -63,7 +64,7 @@
         owner: "{{ ansible_user }}"
       changed_when: False
 
-    - name: Execute the script
+    - name: Compiling sqlite3 (this task will take a while!)
       shell: /home/{{ ansible_user }}/update_sqlite3.sh {{ ansible_user }}
       become_user: "{{ ansible_user }}"
       register: execute_sqlite_update

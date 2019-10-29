@@ -17,9 +17,9 @@ current_version=$(sqlite3 --version | cut -d. -f1,2)
   cd ..
   rm -rf ./sqlite-autoconf-3290000 ./sqlite-autoconf-3290000.tar.gz
   sudo mv /usr/bin/sqlite3 /usr/bin/sqlite3_old
-  echo "export PATH='/home/$@/opt/sqlite/bin:$PATH'" >> /home/$@/.bashrc
-  echo "export LD_LIBRARY_PATH='/home/$@/opt/sqlite/lib'"  >> /home/$@/.bashrc
-  echo "export LD_RUN_PATH='/home/$@/opt/sqlite/lib'" >> /home/$@/.bashrc
+  echo "export PATH='$PATH:/home/$@/opt/sqlite/bin'" >> /home/$@/.bashrc
+  echo "export LD_LIBRARY_PATH=/home/$@/opt/sqlite/lib" >> /home/$@/.bashrc
+  echo "export LD_RUN_PATH=/home/$@/opt/sqlite/lib" >> /home/$@/.bashrc
   
   source /home/$@/.bashrc
   new_version=$(sqlite3 --version | cut -d. -f1,2)

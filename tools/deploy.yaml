@@ -136,7 +136,10 @@
       register: collectstatic
       changed_when: '"0 static files copied to" not in collectstatic.stdout'
 
-      # TODO start django/unicorn
+    - name: Put gunicorn config file in place
+      template: src=./gunicorn-systemd.service.j2 dest=/etc/systemd/system/gunicorn.service
+      notify:
+        - restart gunicorn
 
     - name: Put nginx config file in place
       template: src=./nginx.conf.j2 dest=/etc/nginx/conf.d/budgeteer.conf
@@ -144,6 +147,11 @@
         - restart nginx
 
   handlers:
+      - name: restart gunicorn
+        service:
+          name: gunicorn
+          state: restarted
+
       - name: restart nginx
         service:
           name: nginx

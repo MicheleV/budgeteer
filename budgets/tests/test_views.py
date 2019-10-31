@@ -10,17 +10,12 @@ from .base import BaseTest
 
 class HomePageTest(BaseTest):
 
-    # TODO, move this to a base PageTest class
     def test_title_is_displayed(self):
-        url = reverse('home')
-        response = self.client.get(url)
-        self.assertContains(response, 'Budgeteer')
+        self.check_if_title_is_displayed('home', 'Budgeteer')
 
     # TODO, move this to a base PageTest class
     def test_uses_home_view(self):
-        url = reverse('home')
-        found = resolve(url)
-        self.assertEqual(found.func, home_page)
+        self.check_if_correct_view('home', home_page)
 
     # TODO, move this to a base PageTest class
     def test_uses_home_template(self):
@@ -56,13 +51,10 @@ class HomePageTest(BaseTest):
 class CategoriesPageTest(BaseTest):
 
     def test_title_is_displayed(self):
-        response = self.get_response_from_named_url('categories')
-        self.assertContains(response, 'Categories')
+        self.check_if_title_is_displayed('categories', 'Categories')
 
     def test_uses_categories_view(self):
-        url = reverse('categories')
-        found = resolve(url)
-        self.assertEqual(found.func, categories_page)
+        self.check_if_correct_view('categories', categories_page)
 
     def test_uses_categories_template(self):
         response = self.get_response_from_named_url('categories')
@@ -99,13 +91,10 @@ class CategoriesPageTest(BaseTest):
 class ExpensesPageTest(BaseTest):
 
     def test_title_is_displayed(self):
-        response = self.get_response_from_named_url('expenses')
-        self.assertContains(response, 'Expenses')
+        self.check_if_title_is_displayed('expenses', 'Expenses')
 
     def test_uses_categories_view(self):
-        url = reverse('expenses')
-        found = resolve(url)
-        self.assertEqual(found.func, expenses_page)
+        self.check_if_correct_view('expenses', expenses_page)
 
     def test_uses_categories_template(self):
         response = self.get_response_from_named_url('expenses')

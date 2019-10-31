@@ -19,11 +19,10 @@ class Expense(models.Model):
     def __str__(self):
         # Shortening params to fit into 79 chars (PEP8)
         id = self.category.id
-        text = self.category.text
         amount = self.amount
         note = self.note
         date = self.date
-        return f"{id}: ({text}), {amount}, {note}, {date}"
+        return f"{id}: ({note}), {amount}, {date}"
 
     category = models.ForeignKey(Category, default=None, null=True,
                                  on_delete=models.SET_NULL)

@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn server for budgeteer
+
+[Service]
+Restart=on-failure
+User={{ ansible_user }}
+WorkingDirectory=/srv/{{ ansible_user }}/budgeteer/
+EnvironmentFile=/srv/{{ ansible_user }}/budgeteer/.env
+
+ExecStart=/srv/{{ ansible_user }}/budgeteer/virtualenv/bin/gunicorn budgeteer.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

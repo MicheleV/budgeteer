@@ -75,13 +75,23 @@ Create your ansible inventory file inside ``tools/inventory.ansible`` ::
 Install the required packages on RHEL like distros::
 
     cd tools
-    ansible-playbook -i inventory.ansible provision.yaml [--limit=<env-name>] --ask-become-pass
+    ansible-playbook -i inventory.ansible provision.yaml [--limit=<env-name>] [--ask-become-pass]
+
+Deploy
+
+    cd tools
+    ansible-playbook -i inventory.ansible deploy.yaml [--limit=<env-name>] [--ask-become-pass]
 
 Usage
 =======
 Run the development server::
 
-    python manage.py runserver
+    (virtualenv) $ python manage.py runserver [0.0.0.0:80]
+
+Run gunicorn::
+
+    (virtualenv) $ gunicorn budgeteer.wsgi:application
+
 
 Testing
 =======

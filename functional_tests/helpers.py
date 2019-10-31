@@ -38,6 +38,7 @@ def wait_for_required_input(self, elem_id):
     self.assertEqual(len(invalid), 1)
 
 
+# TODO merge the two functions below
 def find_text_inside_table(self, text, table):
     rows = table.find_elements_by_tag_name('td')
     self.assertTrue(

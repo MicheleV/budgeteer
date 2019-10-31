@@ -27,6 +27,16 @@ def test_can_create_multiple_expense_categories(self):
     Helpers.create_a_category(self, 'Food')
 
 
+def test_cant_create_duplicate_expense_categories(self):
+    # Frank can create a category to log expenses related to his rent
+    Helpers.create_a_category(self, 'Rent')
+
+    # Frank is not paying attention to what he is doing, and he tries
+    # to create the same category
+    Helpers.create_a_category(self, 'Rent')
+    Helpers.find_error(self, 'Category with this Text already exists')
+
+
 def test_cant_create_an_empty_income_category(self):
     category_text = None
     is_income_category = True
@@ -52,3 +62,15 @@ def test_can_create_multiple_income_categories(self):
     # Frank can create a category to log the money he gets from his money tree
     Helpers.create_a_category(self, 'MoneyTree',
                               is_income_category, run_verification)
+
+
+def test_cant_create_duplicate_income_categories(self):
+    is_income_category = True
+
+    # Frank can create a category to log expenses related to his rent
+    Helpers.create_a_category(self, 'Rent', is_income_category)
+
+    # Frank is not paying attention to what he is doing, and he tries
+    # to create the same category
+    Helpers.create_a_category(self, 'Rent', is_income_category)
+    Helpers.find_erroor(self, 'Category with this Text already exists')

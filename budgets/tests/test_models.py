@@ -99,6 +99,11 @@ class ModelsTest(BaseTest):
                   '----------------text longer than constraints--------------')
             self.assertEqual(ValidationError, type(e.exception))
 
+    def test_duplicates_categories_triggers_errors(self):
+        category = self.create_category('Rent')
+        with self.assertRaises(ValidationError) as e:
+            category = self.create_category('Rent')
+
     def test_malformed_income_categories_triggers_errors(self):
         # None is not allowed
         with transaction.atomic():
@@ -119,6 +124,11 @@ class ModelsTest(BaseTest):
                   '----------------text longer than constraints--------------')
             self.assertEqual(ValidationError, type(e.exception))
 
+    def test_duplicates_income_categories_triggers_errors(self):
+        category = self.create_income_category('Wage')
+        with self.assertRaises(ValidationError) as e:
+            category = self.create_income_category('Wage')
+
     def test_malformed_expenses_triggers_errors(self):
         category = self.create_category('Rent')
 
@@ -131,7 +141,6 @@ class ModelsTest(BaseTest):
                   note='Rent for August 2019',
                   date='2019-08-04'
                 )
-                expense.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
         # amount field: None is not allowed
@@ -143,7 +152,6 @@ class ModelsTest(BaseTest):
                   note='Rent for August 2019',
                   date='2019-08-04'
                 )
-                expense.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
         # date field: None is not allowed
@@ -155,7 +163,6 @@ class ModelsTest(BaseTest):
                   note='Rent for August 2019',
                   date=None
                 )
-                expense.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
         # date field: Malformed dates are not allowed
@@ -167,7 +174,6 @@ class ModelsTest(BaseTest):
                   note='Rent for August 2019',
                   date='I am a string, not a date!'
                 )
-                expense.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
     def test_malformed_income_triggers_errors(self):
@@ -182,7 +188,6 @@ class ModelsTest(BaseTest):
                   note='Wage for August 2019',
                   date='2019-08-01'
                 )
-                income.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
         # amount field: None is not allowed
@@ -194,7 +199,6 @@ class ModelsTest(BaseTest):
                   note='Wage for August 2019',
                   date='2019-08-01'
                 )
-                income.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
         # date field: None is not allowed
@@ -206,7 +210,6 @@ class ModelsTest(BaseTest):
                   note='Wage for August 2019',
                   date=None
                 )
-                income.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
         # date field: Malformed dates are not allowed
@@ -218,7 +221,6 @@ class ModelsTest(BaseTest):
                   note='Rent for August 2019',
                   date='I am a string, not a date!'
                 )
-                income.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
     def test_saving_and_retrieving_monthly_budgets(self):
@@ -262,7 +264,6 @@ class ModelsTest(BaseTest):
                   amount=4200,
                   date='2019-09-01'
                 )
-                budget.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
         # amount field: None is not allowed
@@ -273,7 +274,6 @@ class ModelsTest(BaseTest):
                   amount=None,
                   date='2019-09-01'
                 )
-                budget.full_clean()
             self.assertEqual(ValidationError, type(e.exception))
 
         # date field: None is not allowed
@@ -284,5 +284,23 @@ class ModelsTest(BaseTest):
                   amount=5000,
                   date=None,
                 )
-                budget.full_clean()
+            self.assertEqual(ValidationError, type(e.exception))
+
+    def test_duplicates_monthly_budget_triggers_errors(self):
+        category = self.create_category('Rent')
+
+        monthly_budget = self.create_monthly_budgets(
+          category=category,
+          amount=4200,
+          date='2019-09-01'
+        )
+
+        # Duplicate
+        with transaction.atomic():
+            with self.assertRaises(ValidationError) as e:
+                monthly_budget = self.create_monthly_budgets(
+                  category=category,
+                  amount=4200,
+                  date='2019-09-01'
+                )
             self.assertEqual(ValidationError, type(e.exception))

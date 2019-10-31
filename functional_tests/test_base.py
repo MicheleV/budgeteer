@@ -42,7 +42,7 @@ class FunctionalTest(LiveServerTestCase):
             if headless:
                 options.add_argument('-headless')
             self.browser = webdriver.Firefox(options=options)
-        # self.browser.set_window_size(1024, 768)
+        # Uses chromium if not Firefox
         else:
             options = webdriver.ChromeOptions()
             options.add_argument('--ignore-certificate-errors')
@@ -68,6 +68,7 @@ class FunctionalTest(LiveServerTestCase):
     def test_categories(self):
         Categories.test_cant_create_an_empty_expense_category(self)
         Categories.test_can_create_multiple_expense_categories(self)
+        Categories.test_cant_create_duplicate_expense_categories(self)
 
     def test_expenses(self):
         Expenses.test_cant_create_malformed_expenses(self)

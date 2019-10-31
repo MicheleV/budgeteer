@@ -13,20 +13,17 @@ class HomePageTest(BaseTest):
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('home', 'Budgeteer')
 
-    # TODO, move this to a base PageTest class
     def test_uses_home_view(self):
         self.check_if_correct_view('home', home_page)
+        response = self.get_response_from_named_url('expenses')
 
-    # TODO, move this to a base PageTest class
     def test_uses_home_template(self):
-        url = reverse('home')
-        response = self.client.get(url)
+        response = self.get_response_from_named_url('home')
         self.assertTemplateUsed(response, 'home.html')
 
-    # TODO, move this to a base PageTest class
     def test_redirect_on_POST(self):
         url = reverse('categories')
-        response = self.client.post(url,  data={'text': 'Rent'})
+        response = self.client.post(url, data={'text': 'Rent'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], url)
 

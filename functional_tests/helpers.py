@@ -67,6 +67,20 @@ def find_url_in_home_page(self, url_to_find):
     )
 
 
+def find_error(self, errorText, printErrors=False):
+    error_container = self.browser.find_element_by_class_name('errorlist')
+    errors = error_container.find_elements_by_tag_name('li')
+
+    if printErrors:
+        for error in errors:
+            print(error.text)
+
+    self.assertTrue(
+        any(errorText in error.text for error in errors),
+        f"{errorText} was not present. Contents were\n{errors}",
+    )
+
+
 def create_a_category(self, category_name,
                       is_income=False, verify_creation=True):
     url = reverse('categories')

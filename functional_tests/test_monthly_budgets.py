@@ -80,5 +80,19 @@ def test_can_create_multiple_monthly_budgets(self):
 
 
 def test_cant_create_multiple_monthly_budgets_for_same_month(self):
-    # TODO Franks wants to update the budget amount
-    pass
+    # Frank creates a category to log expenses related his rent
+    category_name = 'Rent'
+    Helpers.create_a_category(self, category_name)
+
+    # Frank knows he also has to create a budget for the current month
+    # so he proceed to create one
+    budget_date = datetime.date.today().replace(day=1)
+    amount = 7000
+    Helpers.create_a_monthly_budget(self, category_name, amount, budget_date)
+
+    # Frank however has been up till very late the day before, and is quite
+    # distracted. Accidentally he repeats the same procedure again
+    Helpers.create_a_monthly_budget(self, category_name, amount, budget_date)
+
+    # However an error promtply notifies him that this is not allowed
+    Helpers.find_error(self, 'Monthly budget with this Category and Date already exists.')

@@ -65,8 +65,8 @@ def categories_page(request):
         try:
             form = f.CategoryForm(data=request.POST)
             if form.is_valid():
-                form.save()
                 form.full_clean()
+                form.save()
                 redirect_url = reverse('categories')
                 return redirect(redirect_url)
             else:
@@ -89,8 +89,8 @@ def expenses_page(request, date=None):
         try:
             form = f.ExpenseForm(data=request.POST)
             if form.is_valid():
-                form.save()
                 form.full_clean()
+                form.save()
             else:
                 errors = form.errors
         except ValidationError:
@@ -117,8 +117,8 @@ def monthly_budgets_page(request, date=None):
         try:
             form = f.MonthlyBudgetForm(data=request.POST)
             if form.is_valid():
-                form.save()
                 form.full_clean()
+                form.save()
             else:
                 errors = form.errors
         except ValidationError:
@@ -144,8 +144,8 @@ def income_categories_page(request):
         try:
             form = f.IncomeCategoryForm(data=request.POST)
             if form.is_valid():
-                form.save()
                 form.full_clean()
+                form.save()
                 redirect_url = reverse('income_categories')
                 return redirect(redirect_url)
             else:
@@ -167,8 +167,8 @@ def incomes_page(request, date=None):
         try:
             form = f.IncomeForm(data=request.POST)
             if form.is_valid():
-                form.save()
                 form.full_clean()
+                form.save()
             else:
                 errors = form.errors
         except ValidationError:

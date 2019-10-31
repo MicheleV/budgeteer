@@ -30,6 +30,7 @@
           - gcc
           - make
           - nginx
+          - firewalld
 
     - name: Install virtualenv via pip
       pip:
@@ -41,8 +42,6 @@
         name: nginx
         enabled: yes
         masked: no
-
-    # TODO install firewalld and open port 8000
 
     - name: Ensure latest version of nss, curl and libcurl are installed
       yum:
@@ -76,7 +75,30 @@
         state: absent
       changed_when: False
 
-    - name: set selinux flags
+    - name: Enable firewalld
+      service:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Edit firewalld to allow httpd
+      firewalld:
+        service: http
+        permanent: yes
+        state: enabled
+
+    - name: Edit firewalld to allow ssh
+      firewalld:
+        service: ssh
+        permanent: yes
+        state: enabled
+
+    - name: Restart service firewalld
+      service:
+        name: firewalld
+        state: restarted
+
+    - name: Allows reverse proxy for nginx
       seboolean:
         name: httpd_can_network_connect
         state: yes

@@ -25,6 +25,14 @@
         mode: 0750
         recurse: yes
 
+    # TODO: find out why facl was not enough and why do we need dir ownership
+    # - name: Set facl permissions
+    #   acl:
+    #     path: "{{ base_dir }}"
+    #     entry: group:nginx:rwx
+    #     state: present
+    #     default: yes
+
     - name: Set main directory permissions
       file:
         path: "{{ app_dir }}"
@@ -45,7 +53,7 @@
       become_user: "{{ ansible_user }}"
       when: "'true' in validategitfilemode.stdout"
 
-    # TODO: Implement me when moving out of development
+    # TODO: Implement me when moving out of development env
     - name: Generate secret key and .env file if missing
       copy: 
         src: ../.env.sample
@@ -66,7 +74,7 @@
 
     - name: "Determine if selinux is allowing nginx"
       register: selinuxsyscontent
-      # Note: using `|| true` to prevent grep from exiting with code 1
+      # Note: using `|| true` to prevent exit code 1 when grep does not find the rule
       shell: "semanage fcontext -l | grep {{ base_dir }} || true"
       changed_when: False
 
@@ -83,14 +91,6 @@
       command: restorecon -irv {{ static_dir }}
       register: restorecon
       changed_when: restorecon.stdout != ""
-
-    # TODO: find out why facl was not enough/ we need dir ownership instead
-    # - name: Set facl permissions
-    #   acl:
-    #     path: "{{ base_dir }}"
-    #     entry: group:nginx:rwx
-    #     state: present
-    #     default: yes
 
     - name: Create the virtualenv
       shell: "source /home/{{ ansible_user }}/.bash_profile &&

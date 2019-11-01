@@ -12,6 +12,28 @@ import datetime
 import calendar
 
 
+def get_month_boundaries(date):
+    """
+    Return a tuple composed of the first and the last day
+    of month passed as parameter, as datetime objects
+
+    Note: set timezone when providing! Otherwise efault timezone will be UTC
+    If th server is actually in a different time zone, beware off-by-one
+    month errors when using this function
+    """
+    if not date:
+        start = datetime.date.today().replace(day=1)
+    else:
+        complete_date = f"{date}-01"
+        format_str = '%Y-%m-%d'
+        start = datetime.datetime.strptime(complete_date, format_str).date()
+
+    month_range = calendar.monthrange(start.year, start.month)
+    last_day_of_month = month_range[1]
+    end = datetime.date(start.year, start.month, last_day_of_month)
+    return (start, end)
+
+
 def current_month_boundaries():
     """
     Return a tuple composed of the first and the last day
@@ -96,8 +118,7 @@ def expenses_page(request, date=None):
         except ValidationError:
             errors = form.errors
 
-    # TODO: use the date parameter if present to filter
-    (start, end) = current_month_boundaries()
+    (start, end) = get_month_boundaries(date)
     # TODO refactor these queries after reading Django docs about annotation
     # and aggregation
     categories = m.Category.objects.all()
@@ -107,6 +128,7 @@ def expenses_page(request, date=None):
         'expenses': expenses,
         'form': f.ExpenseForm(),
         'errors': errors,
+        'month': start.strftime("%Y-%m")
     })
 
 

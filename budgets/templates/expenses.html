@@ -3,7 +3,7 @@
 {% block title %}Expenses{% endblock %}
 
 {% block content %}
-<h5 id="id_current_month_date">Expenses logged during {% now 'Y-m' %}</h5>
+<h5 id="id_current_month_date">Expenses logged during {{ month }}</h5>
 <hr>
 <form method="POST" action="/new_expense">
   {% csrf_token %}

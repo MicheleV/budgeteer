@@ -69,19 +69,17 @@ def test_expenses_page_can_show_old_expenses(self):
     first_rent_date_ym = first_rent_date.strftime("%Y-%m")
     first_rent_date_ymd = first_rent_date.strftime("%Y-%m-%d")
     verify_creation = False
-    expense_url = reverse('expenses')
-    url = f"{self.live_server_url}{expense_url}/{first_rent_date_ym}"
-
     Helpers.create_entry(self, amount, category_name, note,
                          first_rent_date_ymd, is_income, verify_creation)
+
     # Frank visit the expenses page using a parameter
     # (Frank manually changes the URL as he can not find any dropdown yet)
-    self.browser.get(f"{self.live_server_url}{expense_url}")
-    print(url)
-    print(self.browser.find_element_by_tag_name('html').text)
-    Helpers.verify_expense_was_created(self, amount, category_name, note)
+    expense_url = reverse('expenses')
+    url = f"{self.live_server_url}{expense_url}/{first_rent_date_ym}"
+    self.browser.get(url)
 
-    self.fail("Write me!")
+    # Frank notices that this URL does not show entries from other months
+    Helpers.verify_expense_was_created(self, amount, category_name, note)
 
 
 def test_expenses_wont_show_expenses_in_the_future(self):

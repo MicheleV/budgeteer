@@ -89,3 +89,4 @@ class FunctionalTest(LiveServerTestCase):
     def test_views_and_layout(self):
         ViewAndLayout.test_home_page_has_links_in_nav(self)
         ViewAndLayout.test_layout_and_styling(self)
+        ViewAndLayout.check_autofocus(self)

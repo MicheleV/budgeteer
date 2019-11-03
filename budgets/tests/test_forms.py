@@ -1,7 +1,7 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from budgets.forms import CategoryForm, ExpenseForm, MonthlyBudgetForm
+import budgets.forms as f
 from .base import BaseTest
 
 
@@ -9,12 +9,12 @@ from .base import BaseTest
 class CategoryFormTest(BaseTest):
 
     def test_form_renders_correctly(self):
-        form = CategoryForm()
+        form = f.CategoryForm()
         self.assertIn('placeholder="Enter a new category"', form.as_p())
         self.assertIn('class="form-control input-lg"', form.as_p())
 
     def test_form_validation_for_blank_items(self):
-        form = CategoryForm(data={'text': ''})
+        form = f.CategoryForm(data={'text': ''})
         self.assertFalse(form.is_valid())
         self.assertEqual(
           form.errors['text'],
@@ -23,24 +23,62 @@ class CategoryFormTest(BaseTest):
 
     def test_form_validation_length(self):
         text = '----------------text longer than constraints--------------'
-        form = CategoryForm(data={'text': text})
+        form = f.CategoryForm(data={'text': text})
         self.assertFalse(form.is_valid())
         self.assertIn(
           'Ensure this value has at most 20 characters',
           form.errors['text'].as_text(),
         )
 
+    def test_autofocus(self):
+        form = f.CategoryForm()
+        self.assertTrue('autofocus' in str(form))
+
+
+class IncomeCategoryFormTest(BaseTest):
+
+    def test_form_renders_correctly(self):
+        form = f.CategoryForm()
+        self.assertIn('placeholder="Enter a new category"', form.as_p())
+        self.assertIn('class="form-control input-lg"', form.as_p())
+
+    def test_form_validation_for_blank_items(self):
+        form = f.CategoryForm(data={'text': ''})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+          form.errors['text'],
+          ['This field is required.']
+        )
+
+    def test_form_validation_length(self):
+        text = '----------------text longer than constraints--------------'
+        form = f.CategoryForm(data={'text': text})
+        self.assertFalse(form.is_valid())
+        self.assertIn(
+          'Ensure this value has at most 20 characters',
+          form.errors['text'].as_text(),
+        )
+
+    def test_autofocus(self):
+        form = f.IncomeCategoryForm()
+        self.assertTrue('autofocus' in str(form))
+
+
+# TODO: Write me!
+class IncomeFormTest(BaseTest):
+    pass
+
 
 class ExpenseFormTest(BaseTest):
 
     def test_form_renders_correctly(self):
-        form = ExpenseForm()
+        form = f.ExpenseForm()
         self.assertIn('placeholder="Enter the spended amount"', form.as_p())
         self.assertIn('placeholder="What did you buy?"', form.as_p())
         self.assertIn('placeholder="%Y-%m-%d format"', form.as_p())
 
     def test_form_validation_category_field(self):
-        form = ExpenseForm(data={
+        form = f.ExpenseForm(data={
             'category': None,
             'amount': 5000,
             'date': '2019-09-23'
@@ -57,7 +95,7 @@ class ExpenseFormTest(BaseTest):
 
     def test_form_validation_amount_field(self):
         category = self.create_category('Rent')
-        form = ExpenseForm(data={
+        form = f.ExpenseForm(data={
             'category': category.id,
             'amount': None,
             'date': '2019-09-23'
@@ -75,7 +113,7 @@ class ExpenseFormTest(BaseTest):
     def test_form_validation_date_field(self):
         category = self.create_category('Rent')
         # Case None
-        form = ExpenseForm(data={
+        form = f.ExpenseForm(data={
             'category': category.id,
             'amount': 5000,
             'date': None
@@ -90,7 +128,7 @@ class ExpenseFormTest(BaseTest):
           form.errors.as_text(),
         )
         # Case empty string
-        form = ExpenseForm(data={
+        form = f.ExpenseForm(data={
             'category': category.id,
             'amount': 5000,
             'date': ''
@@ -105,7 +143,7 @@ class ExpenseFormTest(BaseTest):
           form.errors.as_text(),
         )
         # Case invalid string
-        form = ExpenseForm(data={
+        form = f.ExpenseForm(data={
             'category': category.id,
             'amount': 5000,
             'date': 'I am a string, not a valid date'
@@ -124,12 +162,12 @@ class ExpenseFormTest(BaseTest):
 class MonthlyBudgetFormTest(BaseTest):
 
     def test_form_renders_correctly(self):
-        form = MonthlyBudgetForm()
+        form = f.MonthlyBudgetForm()
         self.assertIn('placeholder="Enter the budget amount"', form.as_p())
         self.assertIn('placeholder="%Y-%m-%d format"', form.as_p())
 
     def test_form_validation_category_field(self):
-        form = MonthlyBudgetForm(data={
+        form = f.MonthlyBudgetForm(data={
             'category': None,
             'amount': 5000,
             'date': '2019-09-23'
@@ -146,7 +184,7 @@ class MonthlyBudgetFormTest(BaseTest):
 
     def test_form_validation_amount_field(self):
         category = self.create_category('Rent')
-        form = MonthlyBudgetForm(data={
+        form = f.MonthlyBudgetForm(data={
             'category': category.id,
             'amount': None,
             'date': '2019-09-23'
@@ -164,7 +202,7 @@ class MonthlyBudgetFormTest(BaseTest):
     def test_form_validation_date_field(self):
         category = self.create_category('Rent')
         # Case None
-        form = MonthlyBudgetForm(data={
+        form = f.MonthlyBudgetForm(data={
             'category': category.id,
             'amount': 5000,
             'date': None
@@ -179,7 +217,7 @@ class MonthlyBudgetFormTest(BaseTest):
           form.errors.as_text(),
         )
         # Case empty string
-        form = MonthlyBudgetForm(data={
+        form = f.MonthlyBudgetForm(data={
             'category': category.id,
             'amount': 5000,
             'date': ''
@@ -194,7 +232,7 @@ class MonthlyBudgetFormTest(BaseTest):
           form.errors.as_text(),
         )
         # Case invalid string
-        form = MonthlyBudgetForm(data={
+        form = f.MonthlyBudgetForm(data={
             'category': category.id,
             'amount': 5000,
             'date': 'I am a string, not a valid date'

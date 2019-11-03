@@ -9,19 +9,17 @@ def test_home_page_has_links_in_nav(self):
     url = reverse('home')
     self.browser.get(f"{self.live_server_url}{url}")
 
-    first_url_to_find = reverse('home')
-    second_url_to_find = reverse('categories')
-    third_url_to_find = reverse('expenses')
-    fourth_url_to_find = reverse('monthly_budgets')
-    fifth_url_to_find = reverse('income_categories')
-    sixth_url_to_find = reverse('incomes')
+    urls = [
+     reverse('home'),
+     reverse('categories'),
+     reverse('expenses'),
+     reverse('monthly_budgets'),
+     reverse('income_categories'),
+     reverse('incomes'),
+    ]
 
-    Helpers.find_url_in_home_page(self, first_url_to_find)
-    Helpers.find_url_in_home_page(self, second_url_to_find)
-    Helpers.find_url_in_home_page(self, third_url_to_find)
-    Helpers.find_url_in_home_page(self, fourth_url_to_find)
-    Helpers.find_url_in_home_page(self, fifth_url_to_find)
-    Helpers.find_url_in_home_page(self, sixth_url_to_find)
+    for url in urls:
+        Helpers.find_url_in_home_page(self, url)
 
 
 # Credits http://www.obeythetestinggoat.com/book/
@@ -40,3 +38,16 @@ def test_layout_and_styling(self):
             512,
             delta=10
     )
+
+
+def check_autofocus(self):
+
+    urls = [
+     reverse('categories'),
+     reverse('income_categories'),
+    ]
+
+    for url in urls:
+        self.browser.get(f"{self.live_server_url}{url}")
+        inputbox = self.browser.find_element_by_id('id_text')
+        self.assertTrue(inputbox.get_attribute("autofocus"))

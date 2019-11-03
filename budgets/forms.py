@@ -21,7 +21,8 @@ class CategoryForm(forms.models.ModelForm):
         widgets = {
             'text': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter a new category',
-                'class': 'form-control input-lg'
+                'class': 'form-control input-lg',
+                'autofocus': 'autofocus',
             })
         }
 
@@ -92,7 +93,8 @@ class IncomeCategoryForm(forms.models.ModelForm):
         widgets = {
             'text': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter a new category',
-                'class': 'form-control input-lg'
+                'class': 'form-control input-lg',
+                'autofocus': 'autofocus',
             })
         }
 

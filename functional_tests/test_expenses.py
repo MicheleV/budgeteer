@@ -1,7 +1,8 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from django.urls import reverse
+from datetime import date, timedelta
+from django.urls import reverse, resolve
 from datetime import date, timedelta
 import functional_tests.helpers as Helpers
 
@@ -50,8 +51,35 @@ def test_expenses_sum_appear_on_home_page(self):
 
 
 def test_expenses_page_can_show_old_expenses(self):
-    # TODO: implement a get parameter and a dropdown to jump there
-    pass
+    category_name = 'Rent'
+    Helpers.create_a_category(self, category_name)
+
+    amount = 4000
+    note = 'Second month of rent'
+    second_date = date.today().replace(day=1)
+    second_date_ymd = second_date.strftime("%Y-%m-%d")
+    is_income = False
+    Helpers.create_entry(self, amount, category_name, note,
+                         second_date_ymd, is_income)
+
+    # Frank visits the expenses page
+    note = 'First month of rent'
+    delta = timedelta(weeks=10)
+    first_rent_date = second_date - delta
+    first_rent_date_ym = first_rent_date.strftime("%Y-%m")
+    first_rent_date_ymd = first_rent_date.strftime("%Y-%m-%d")
+    verify_creation = False
+    Helpers.create_entry(self, amount, category_name, note,
+                         first_rent_date_ymd, is_income, verify_creation)
+
+    # Frank visit the expenses page using a parameter
+    # (Frank manually changes the URL as he can not find any dropdown yet)
+    expense_url = reverse('expenses')
+    url = f"{self.live_server_url}{expense_url}/{first_rent_date_ym}"
+    self.browser.get(url)
+
+    # Frank notices that this URL does not show entries from other months
+    Helpers.verify_expense_was_created(self, amount, category_name, note)
 
 
 def test_expenses_wont_show_expenses_in_the_future(self):

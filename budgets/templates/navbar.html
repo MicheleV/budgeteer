@@ -1,23 +1,28 @@
 {% block navbar %}
-<ul class="nav">
-  <li class="nav-item">
-    <a class="nav-link active" href="{% url 'home' %}">Home</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link active" href="{% url 'categories' %}">Categories</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="{% url 'monthly_budgets' %}">Monthly Budgets</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="{% url 'expenses' %}">Expenses</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="{% url 'income_categories' %}">Income Categories</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="{% url 'incomes' %}">Income </a>
-  </li>
+<header class="navbar navbar-expand  flex-column flex-md-row bd-navbar">
 
-</ul>
+  <div class="navbar-nav-scroll">
+    <ul class="navbar-nav bd-navbar-nav flex-row">
+      <li class="nav-item">
+        <a class="nav-link active" href="{% url 'home' %}">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="{% url 'categories' %}">Categories</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'monthly_budgets' %}">Monthly Budgets</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'expenses' %}">Expenses</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'income_categories' %}">Income Categories</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'incomes' %}">Income </a>
+      </li>
+    </ul>
+  </div>
+
+</header>
 {% endblock %}

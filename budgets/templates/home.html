@@ -7,43 +7,48 @@
 
 {% if categories %}
 <h5 id="id_current_month_date">Summary for {% now 'Y-m' %}</h5>
-<table id="id_expenses_total">
-  <tr>
-    <th>Category</th>
-    <th>Spended amount</th>
-    <th>Budgeted amount</th>
-    <th>Status</th>
-  </tr>
-  {% for cat in categories %}
+  <div class="table-responsive-md">
+      <table class="table" id="id_expenses_total">
     <tr>
-      <td>{{ cat.text }}</td>
-      <td>{{ cat.total }}</td>
-      <td>{{ cat.mb.amount|default:"No monthly budget for this month" }}</td>
-      {% if cat.mb.amount %}
-      <td class="{% if cat.mb.amount|sub:cat.total < 0 %}text-danger{% else %}text-success{% endif %}">
-        {{ cat.mb.amount|sub:cat.total }}
-      </td>
-      {% else %}
-      <td> {{ "N/A" }} </td>
-      {% endif %}
+      <th>Category</th>
+      <th>Spended amount</th>
+      <th>Budgeted amount</th>
+      <th>Status</th>
     </tr>
-  {% endfor %}
-</table>
+    {% for cat in categories %}
+      <tr>
+        <td>{{ cat.text }}</td>
+        <td>{{ cat.total }}</td>
+        <td>{{ cat.mb.amount|default:"No monthly budget for this month" }}</td>
+        {% if cat.mb.amount %}
+        <td class="{% if cat.mb.amount|sub:cat.total < 0 %}text-danger{% else %}text-success{% endif %}">
+          {{ cat.mb.amount|sub:cat.total }}
+        </td>
+        {% else %}
+        <td> {{ "N/A" }} </td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+  </table>
+</div>
 {% endif %}
+
 {% if income_categories %}
-<table id="id_incomes_total">
-  <tr>
-    <th>Category</th>
-    <th>Income amount</th>
-  </tr>
-  {% for inc in income_categories %}
+<div class="table-responsive-md">
+    <table class="table" id="id_incomes_total">
     <tr>
-      <td>{{ inc.text }}</td>
-      <td>{{ inc.total }}</td>
+      <th>Category</th>
+      <th>Income amount</th>
     </tr>
-  {% endfor %}
-</table>
-<hr>
+    {% for inc in income_categories %}
+      <tr>
+        <td>{{ inc.text }}</td>
+        <td>{{ inc.total }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+
+</div>
 {% endif %}
 
 {% endblock %}

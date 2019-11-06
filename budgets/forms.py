@@ -40,7 +40,7 @@ class ExpenseForm(forms.models.ModelForm):
             )
 
         model = Expense
-        fields = ('amount', 'note', 'date', 'category')
+        fields = ('date', 'amount', 'note', 'category')
         widgets = {
             'amount': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter the spended amount',

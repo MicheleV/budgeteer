@@ -17,7 +17,8 @@
           {% csrf_token %}
         </form>
 
-        <table id="id_categories">
+      <div class="table-responsive-md">
+        <table class="table" id="id_categories">
           <tr>
             <th>Category ID</th>
             <th>Category name</th>
@@ -30,8 +31,10 @@
           {% endfor %}
         </table>
       </div>
+
     </div>
   </div>
+</div>
 </div>
 
 {% endblock %}

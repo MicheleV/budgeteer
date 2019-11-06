@@ -14,22 +14,23 @@
       <div>{{ errors }}</div>
   {% endif %}
   {% csrf_token %}
-<hr>
 
-<table id="id_incomes">
-  <tr>
-    <th>Amount</th>
-    <th>Category</th>
-    <th>Date</th>
-    <th>Note</th>
-  </tr>
-  {% for income in incomes %}
+ <div class="table-responsive-md">
+  <table class="table" id="id_incomes">
     <tr>
-      <td>{{ income.amount }}</td>
-      <td>{{ income.category.text }}</td>
-      <td>{{ income.date }}</td>
-      <td>{{ income.note }}</td>
+      <th>Amount</th>
+      <th>Category</th>
+      <th>Date</th>
+      <th>Note</th>
     </tr>
-  {% endfor %}
-</table>
+    {% for income in incomes %}
+      <tr>
+        <td>{{ income.amount }}</td>
+        <td>{{ income.category.text }}</td>
+        <td>{{ income.date }}</td>
+        <td>{{ income.note }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
 {% endblock %}

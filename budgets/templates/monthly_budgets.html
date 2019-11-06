@@ -3,29 +3,31 @@
 {% block title %}Monthly budgets{% endblock %}
 
 {% block content %}
-<form method="POST" action="/new_monthly_budget">
-  {{ form }}
-  <input type="submit" id="id_submit" value="Submit">
-  {% csrf_token %}
-</form>
+  <form method="POST" action="/new_monthly_budget">
+    {{ form }}
+    <input type="submit" id="id_submit" value="Submit">
+    {% csrf_token %}
+  </form>
+
   {% if errors %}
       <div>{{ errors }}</div>
   {% endif %}
   {% csrf_token %}
-<hr>
 
-<table id="id_monthly_budgets">
-  <tr>
-    <th>Amount</th>
-    <th>Category</th>
-    <th>Budget date</th>
-  </tr>
-  {% for monthly_budget in monthly_budgets %}
-    <tr>
-      <td>{{ monthly_budget.amount }}</td>
-      <td>{{ monthly_budget.category.text }}</td>
-      <td>{{ monthly_budget.date |date:'Y-m' }}</td>
-    </tr>
-  {% endfor %}
-</table>
+   <div class="table-responsive-md">
+    <table class="table" id="id_monthly_budgets">
+      <tr>
+        <th>Amount</th>
+        <th>Category</th>
+        <th>Budget date</th>
+      </tr>
+      {% for monthly_budget in monthly_budgets %}
+        <tr>
+          <td>{{ monthly_budget.amount }}</td>
+          <td>{{ monthly_budget.category.text }}</td>
+          <td>{{ monthly_budget.date |date:'Y-m' }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
 {% endblock %}

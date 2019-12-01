@@ -39,4 +39,5 @@ urlpatterns = [
          name='new_income_category'),
     path('incomes', views.incomes_page, name='incomes'),
     path('new_income', views.incomes_page, name='new_income'),
+    path('api/', views.api_categories)
 ]

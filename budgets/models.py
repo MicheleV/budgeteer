@@ -67,3 +67,9 @@ class Income(models.Model):
     # https://docs.djangoproject.com/en/2.2/ref/models/fields/#null
     note = models.CharField(null=True, blank=True, max_length=150, default='')
     date = models.DateField()
+
+
+class MonthlyBalance(models.Model):
+    amount = models.IntegerField()
+    date = models.DateField(unique=True)
+    pass

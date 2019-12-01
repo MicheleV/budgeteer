@@ -5,8 +5,12 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ValidationError
 from django.urls import reverse
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 import budgets.models as m
 import budgets.forms as f
+
+from budgets.serializers import CategorySerializer
 
 import datetime
 import calendar
@@ -208,3 +212,15 @@ def incomes_page(request, date=None):
         'form': f.IncomeForm(),
         'errors': errors,
     })
+
+
+@api_view(['GET'])
+# @renderer_classes([JSONRenderer])
+def api_categories(request):
+    # return Response({"message": "Hello, world!"})
+    """
+    List all categories
+    """
+    categories = m.Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)

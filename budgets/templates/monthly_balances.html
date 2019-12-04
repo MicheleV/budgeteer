@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Monthly Balances{% endblock %}
+
+{% block content %}
+  <form method="POST" action="{% url 'new_monthly_balance' %}">
+    {{ form }}
+    <input type="submit" id="id_submit" value="Submit">
+    {% csrf_token %}
+  </form>
+
+  {% if errors %}
+      <div>{{ errors }}</div>
+  {% endif %}
+  {% csrf_token %}
+
+   <div class="table-responsive-md">
+    <table class="table" id="id_monthly_balances">
+      <tr>
+        <th>Category</th>
+        <th>Amount</th>
+        <th>Date</th>
+      </tr>
+      {% for monthly_balance in monthly_balance %}
+        <tr>
+          <td>{{ monthly_balance.category.text }}</td>
+          <td>{{ monthly_balance.amount }}</td>
+          <td>{{ monthly_balance.date |date:'Y-m' }}</td>
+        </tr>
+      {% endfor %}
+      {% if total > 0 %}
+        <tr>
+          <td>Total</td>
+          <td>{{ total }}</td>
+          <td> - </td>
+        </tr>
+      {% endif %}
+    </table>
+  </div>
+{% endblock %}

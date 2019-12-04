@@ -113,3 +113,16 @@ class ExpensesPageTest(BaseTest):
         # NOTE: Atm we do use `on_delete=models.CASCADE` on Expense model,
         # but this test will be necessary in case we do change that
         pass
+
+
+class MonthlyBudgetPageTest(BaseTest):
+    def test_redirect_on_POST(self):
+        first_category = self.create_category('Rent')
+
+        url = reverse('monthly_budgets')
+        response = self.client.post(url, data={
+          'category': 1,
+          'amount': 42,
+          'date': '2019-12-01'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], url)

@@ -41,7 +41,7 @@ class MonthlyBudget(models.Model):
 
 
 # This class is a duplicate of Category
-# TODO a `type` field to Category
+# TODO add a `type` field to Category
 class IncomeCategory(models.Model):
     text = models.CharField(max_length=20, default=None, unique=True)
 
@@ -69,7 +69,24 @@ class Income(models.Model):
     date = models.DateField()
 
 
+# This class is a duplicate of Category
+# TODO add a `type` field to Category
+class MonthlyBalanceCategory(models.Model):
+    text = models.CharField(max_length=20, default=None, unique=True)
+
+    def __str__(self):
+        return f"{self.text}"
+
+
 class MonthlyBalance(models.Model):
+    def __str__(self):
+        id = self.category.id
+        amount = self.amount
+        date = self.date
+        return f"{id}: {amount}, {date}"
+
+    category = models.ForeignKey(MonthlyBalanceCategory, default=None,
+                                 null=True, on_delete=models.SET_NULL)
     amount = models.IntegerField()
     date = models.DateField(unique=True)
     pass

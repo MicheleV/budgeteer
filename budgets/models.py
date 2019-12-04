@@ -41,7 +41,7 @@ class MonthlyBudget(models.Model):
 
 
 # This class is a duplicate of Category
-# TODO think if we can just add a `is_income` flag to category
+# TODO a `type` field to Category
 class IncomeCategory(models.Model):
     text = models.CharField(max_length=20, default=None, unique=True)
 

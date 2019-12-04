@@ -4,7 +4,7 @@
 import datetime
 from django import forms
 from budgets.models import Category, Expense, MonthlyBudget
-from budgets.models import IncomeCategory, Income
+from budgets.models import IncomeCategory, Income, MonthlyBalanceCategory
 
 
 # Docs https://docs.djangoproject.com/en/2.2/ref/forms/
@@ -33,12 +33,6 @@ class ExpenseForm(forms.models.ModelForm):
         def get_choices():
             return Category.objects.all()
 
-        def __init__(self, *args, **kwargs):
-            super(ExpenseForm, self).__init__(*args, **kwargs)
-            self.widgets['category'] = forms.Select(
-              choices=Category.objects.all()
-            )
-
         model = Expense
         fields = ('date', 'amount', 'note', 'category')
         widgets = {
@@ -58,9 +52,6 @@ class MonthlyBudgetForm(forms.models.ModelForm):
 
     class Meta:
         def get_choices():
-            choices = []
-            for choice in Category.objects.all():
-                choices.append(choice)
             return Category.objects.all()
 
         model = MonthlyBudget

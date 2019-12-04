@@ -48,7 +48,8 @@ urlpatterns = [
          name='monthly_balance_categories'),
     path('new_monthly_balance_category', views.monthly_balance_categories_page,
          name='new_monthly_balance_category'),
-    path('monthly_balances', views.monthly_balances_page, name='monthly_balances'),
+    path('monthly_balances', views.monthly_balances_page,
+         name='monthly_balances'),
     path('new_monthly_balance', views.monthly_balances_page,
          name='new_monthly_balance'),
     path('api/', views.api_categories)

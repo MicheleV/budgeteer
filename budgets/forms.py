@@ -4,7 +4,7 @@
 import datetime
 from django import forms
 from budgets.models import Category, Expense, MonthlyBudget
-from budgets.models import IncomeCategory, Income
+import budgets.models as m
 
 
 # Docs https://docs.djangoproject.com/en/2.2/ref/forms/
@@ -16,7 +16,7 @@ from budgets.models import IncomeCategory, Income
 class CategoryForm(forms.models.ModelForm):
 
     class Meta:
-        model = Category
+        model = m.Category
         fields = ('text',)
         widgets = {
             'text': forms.fields.TextInput(attrs={
@@ -31,15 +31,9 @@ class ExpenseForm(forms.models.ModelForm):
 
     class Meta:
         def get_choices():
-            return Category.objects.all()
+            return m.Category.objects.all()
 
-        def __init__(self, *args, **kwargs):
-            super(ExpenseForm, self).__init__(*args, **kwargs)
-            self.widgets['category'] = forms.Select(
-              choices=Category.objects.all()
-            )
-
-        model = Expense
+        model = m.Expense
         fields = ('date', 'amount', 'note', 'category')
         widgets = {
             'amount': forms.fields.TextInput(attrs={
@@ -58,12 +52,9 @@ class MonthlyBudgetForm(forms.models.ModelForm):
 
     class Meta:
         def get_choices():
-            choices = []
-            for choice in Category.objects.all():
-                choices.append(choice)
-            return Category.objects.all()
+            return m.Category.objects.all()
 
-        model = MonthlyBudget
+        model = m.MonthlyBudget
         fields = ('category', 'amount', 'date')
         widgets = {
           'amount': forms.fields.TextInput(attrs={
@@ -88,7 +79,7 @@ class MonthlyBudgetForm(forms.models.ModelForm):
 class IncomeCategoryForm(forms.models.ModelForm):
 
     class Meta:
-        model = IncomeCategory
+        model = m.IncomeCategory
         fields = ('text',)
         widgets = {
             'text': forms.fields.TextInput(attrs={
@@ -102,7 +93,7 @@ class IncomeCategoryForm(forms.models.ModelForm):
 class IncomeForm(forms.models.ModelForm):
 
     class Meta:
-        model = Income
+        model = m.Income
         fields = ('amount', 'note', 'date', 'category')
         widgets = {
             'amount': forms.fields.TextInput(attrs={
@@ -110,6 +101,38 @@ class IncomeForm(forms.models.ModelForm):
             }),
             'note': forms.fields.TextInput(attrs={
                 'placeholder': 'Keyword about this entry',
+            }),
+            'date': forms.fields.TextInput(attrs={
+                'placeholder': '%Y-%m-%d format',
+            }),
+        }
+
+
+class MonthlyBalanceCategoryForm(forms.models.ModelForm):
+
+    class Meta:
+        model = m.MonthlyBalanceCategory
+        fields = ('text',)
+        widgets = {
+            'text': forms.fields.TextInput(attrs={
+                'placeholder': 'Enter a new category of balance (i.e. savings, cash)',
+                'class': 'form-control input-lg',
+                'autofocus': 'autofocus',
+            })
+        }
+
+
+class MonthlyBalanceForm(forms.models.ModelForm):
+
+    class Meta:
+        def get_choices():
+            return m.MonthlyBalanceCategory.objects.all()
+
+        model = m.MonthlyBalance
+        fields = ('category', 'amount', 'date')
+        widgets = {
+            'amount': forms.fields.TextInput(attrs={
+                'placeholder': 'Enter the balance',
             }),
             'date': forms.fields.TextInput(attrs={
                 'placeholder': '%Y-%m-%d format',

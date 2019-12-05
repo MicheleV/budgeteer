@@ -5,7 +5,7 @@
 {% block content %}
 <h5 id="id_current_month_date">Incomes logged during {% now 'Y-m' %}</h5>
 <hr>
-<form method="POST" action="/new_income">
+<form method="POST" action="{% url 'new_income' %}">
   {% csrf_token %}
   {{ form }}
   <input type="submit" id="id_submit" value="Submit">

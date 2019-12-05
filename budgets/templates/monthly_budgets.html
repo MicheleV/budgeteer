@@ -3,7 +3,7 @@
 {% block title %}Monthly budgets{% endblock %}
 
 {% block content %}
-  <form method="POST" action="/new_monthly_budget">
+  <form method="POST" action="{% url 'new_monthly_budget' %}">
     {{ form }}
     <input type="submit" id="id_submit" value="Submit">
     {% csrf_token %}

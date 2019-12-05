@@ -1,40 +1,5 @@
-{% extends 'base.html' %}
+{% extends 'category_common.html' %}
 
 {% block title %}Income Categories{% endblock %}
 
-{% block content %}
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-md-12">
-      <div>
-        <form method="POST" action="/new_income_category">
-          <div class="form-group">
-            {{ form.text }}
-          </div>
-          {% if errors %}
-              <div>{{ errors }}</div>
-          {% endif %}
-          {% csrf_token %}
-        </form>
-
-      <div class="table-responsive-md">
-        <table class="table" id="id_categories">
-          <tr>
-            <th>Category ID</th>
-            <th>Category name</th>
-          </tr>
-          {% for category in categories %}
-            <tr>
-              <td>{{ forloop.counter }}</td>
-              <td>{{ category.text }}</td>
-            </tr>
-          {% endfor %}
-        </table>
-      </div>
-
-    </div>
-    </div>
-  </div>
-</div>
-
-{% endblock %}
+{% block action %}{% url 'new_income_category' %}{% endblock %}

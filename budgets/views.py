@@ -1,12 +1,17 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ValidationError
 from django.urls import reverse
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 import budgets.models as m
 import budgets.forms as f
+
+from budgets.serializers import CategorySerializer
 
 import datetime
 import calendar
@@ -52,15 +57,18 @@ def current_month_boundaries():
 
 @require_http_methods(["GET"])
 def home_page(request):
+    """
+    Display the home page
+    """
     (start, end) = current_month_boundaries()
     # TODO check whether prefetch_related can be used for related models
     categories = m.Category.objects.all()
     for cat in categories:
-        # TODO refactor these queries after reading Django docs about
-        # annotation and aggregation
         expenses = m.Expense.objects.filter(category_id=cat.id). \
                    filter(date__range=(start, end))
         expenses_sum = sum(ex.amount for ex in expenses)
+        # TODO refactor the line above using aggrefate(Sum())
+        # expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
         cat.total = expenses_sum
         cat.mb = cat.monthlybudget_set.filter(date=start).first()
 
@@ -82,6 +90,9 @@ def home_page(request):
 
 @require_http_methods(["GET", "POST"])
 def categories_page(request):
+    """
+    Display the categories page
+    """
     errors = None
     if request.method == 'POST':
         try:
@@ -106,6 +117,9 @@ def categories_page(request):
 
 @require_http_methods(["GET", "POST"])
 def expenses_page(request, date=None):
+    """
+    Display the expenses page
+    """
     errors = None
     if request.method == 'POST':
         try:
@@ -134,6 +148,9 @@ def expenses_page(request, date=None):
 
 @require_http_methods(["GET", "POST"])
 def monthly_budgets_page(request, date=None):
+    """
+    Display the mohtly budgets page
+    """
     errors = None
     if request.method == 'POST':
         try:
@@ -141,6 +158,8 @@ def monthly_budgets_page(request, date=None):
             if form.is_valid():
                 form.full_clean()
                 form.save()
+                redirect_url = reverse('monthly_budgets')
+                return redirect(redirect_url)
             else:
                 errors = form.errors
         except ValidationError:
@@ -161,6 +180,9 @@ def monthly_budgets_page(request, date=None):
 
 @require_http_methods(["GET", "POST"])
 def income_categories_page(request):
+    """
+    Display the income categories page
+    """
     errors = None
     if request.method == 'POST':
         try:
@@ -184,6 +206,9 @@ def income_categories_page(request):
 
 @require_http_methods(["GET", "POST"])
 def incomes_page(request, date=None):
+    """
+    Display the incomes page
+    """
     errors = None
     if request.method == 'POST':
         try:
@@ -208,3 +233,78 @@ def incomes_page(request, date=None):
         'form': f.IncomeForm(),
         'errors': errors,
     })
+
+
+@require_http_methods(["GET", "POST"])
+def monthly_balance_categories_page(request):
+    """
+    Display the mohtly balance category page
+    """
+    errors = None
+    if request.method == 'POST':
+        try:
+            form = f.MonthlyBalanceCategoryForm(data=request.POST)
+            if form.is_valid():
+                form.full_clean()
+                form.save()
+                redirect_url = reverse('monthly_balance_categories')
+                return redirect(redirect_url)
+            else:
+                errors = form.errors
+        except ValidationError:
+            errors = form.errors
+
+    categories = m.MonthlyBalanceCategory.objects.all()
+    return render(request,
+                  'monthly_balance_categories.html',
+                  {'categories': categories,
+                   'errors': errors,
+                   'form': f.MonthlyBalanceCategoryForm()})
+
+
+@require_http_methods(["GET", "POST"])
+def monthly_balances_page(request, date=None):
+    """
+    Display the monthly balance page
+    """
+    errors = None
+    if request.method == 'POST':
+        try:
+            form = f.MonthlyBalanceForm(data=request.POST)
+            if form.is_valid():
+                form.full_clean()
+                form.save()
+                redirect_url = reverse('monthly_balances')
+                return redirect(redirect_url)
+            else:
+                errors = form.errors
+        except ValidationError:
+            errors = form.errors
+
+    categories = m.MonthlyBalanceCategory.objects.all()
+    total = None
+    if date is None:
+        monthly_balance = m.MonthlyBalance.objects.all()
+    else:
+        complete_date = f"{date}-01"
+        monthly_balance = m.MonthlyBalance.objects.filter(date=complete_date)
+        total = monthly_balance.aggregate(Sum('amount'))['amount__sum']
+    return render(request, 'monthly_balances.html', {
+      'categories': categories,
+      'monthly_balance': monthly_balance,
+      'form': f.MonthlyBalanceForm(),
+      'total': total,
+      'errors': errors
+    })
+
+
+@api_view(['GET'])
+# @renderer_classes([JSONRenderer])
+def api_categories(request):
+    # return Response({"message": "Hello, world!"})
+    """
+    List all categories
+    """
+    categories = m.Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)

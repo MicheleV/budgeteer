@@ -57,6 +57,9 @@ def current_month_boundaries():
 
 @require_http_methods(["GET"])
 def home_page(request):
+    """
+    Display the home page
+    """
     (start, end) = current_month_boundaries()
     # TODO check whether prefetch_related can be used for related models
     categories = m.Category.objects.all()
@@ -87,6 +90,9 @@ def home_page(request):
 
 @require_http_methods(["GET", "POST"])
 def categories_page(request):
+    """
+    Display the categories page
+    """
     errors = None
     if request.method == 'POST':
         try:
@@ -111,6 +117,9 @@ def categories_page(request):
 
 @require_http_methods(["GET", "POST"])
 def expenses_page(request, date=None):
+    """
+    Display the expenses page
+    """
     errors = None
     if request.method == 'POST':
         try:
@@ -139,6 +148,9 @@ def expenses_page(request, date=None):
 
 @require_http_methods(["GET", "POST"])
 def monthly_budgets_page(request, date=None):
+    """
+    Display the mohtly budgets page
+    """
     errors = None
     if request.method == 'POST':
         try:
@@ -168,6 +180,9 @@ def monthly_budgets_page(request, date=None):
 
 @require_http_methods(["GET", "POST"])
 def income_categories_page(request):
+    """
+    Display the income categories page
+    """
     errors = None
     if request.method == 'POST':
         try:
@@ -191,6 +206,9 @@ def income_categories_page(request):
 
 @require_http_methods(["GET", "POST"])
 def incomes_page(request, date=None):
+    """
+    Display the incomes page
+    """
     errors = None
     if request.method == 'POST':
         try:
@@ -219,6 +237,9 @@ def incomes_page(request, date=None):
 
 @require_http_methods(["GET", "POST"])
 def monthly_balance_categories_page(request):
+    """
+    Display the mohtly balance category page
+    """
     errors = None
     if request.method == 'POST':
         try:
@@ -243,6 +264,9 @@ def monthly_balance_categories_page(request):
 
 @require_http_methods(["GET", "POST"])
 def monthly_balances_page(request, date=None):
+    """
+    Display the monthly balance page
+    """
     errors = None
     if request.method == 'POST':
         try:
@@ -272,7 +296,6 @@ def monthly_balances_page(request, date=None):
       'total': total,
       'errors': errors
     })
-
 
 
 @api_view(['GET'])

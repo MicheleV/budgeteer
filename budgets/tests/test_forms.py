@@ -69,6 +69,16 @@ class IncomeFormTest(BaseTest):
     pass
 
 
+# TODO: Write me!
+class MonthlyBalanceCategoryFormTest(BaseTest):
+    pass
+
+
+# TODO: Write me!
+class MonthlyBalanceFormTest(BaseTest):
+    pass
+
+
 class ExpenseFormTest(BaseTest):
 
     def test_form_renders_correctly(self):

@@ -1,5 +1,6 @@
 #
 # Only imports and save expense categories and expenses for now
+# NOTE: This tool is not unit tested
 #
 
 import csv
@@ -9,12 +10,17 @@ from sqlalchemy import Column, String, Integer, Date, ForeignKey
 from sqlalchemy import select, create_engine
 from sqlalchemy.orm import relationship, backref, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import exc
 
+# TODO: move this away from the global namespace
 Base = declarative_base()
 
 
-# NOTE: this Model not synced with the models
-#       Any migration involving Categories might break this
+# NOTE: these Models are not automatically synced
+#       with the one from the budgets module
+# Tool valid as per migration `0005_auto_20191204_0821.py`
+# Any following migration might break this script
+
 class Category(Base):
     __tablename__ = 'budgets_category'
     id = Column(Integer, primary_key=True)
@@ -22,6 +28,9 @@ class Category(Base):
 
 
 class Expense(Base):
+    """
+    Mirror Category model from budgets module
+    """
     __tablename__ = 'budgets_expense'
     id = Column(Integer, primary_key=True)
     amount = Column(Integer)
@@ -32,12 +41,18 @@ class Expense(Base):
 
 
 class IncomeCategory(Base):
+    """
+    Mirror IncomeCategory model from budgets module
+    """
     __tablename__ = 'budgets_incomecategory'
     id = Column(Integer, primary_key=True)
     text = Column(String(20))
 
 
 class Income(Base):
+    """
+    Mirror Income model from budgets module
+    """
     __tablename__ = 'budgets_income'
     id = Column(Integer, primary_key=True)
     amount = Column(Integer)
@@ -46,18 +61,98 @@ class Income(Base):
     # Note: not definig the "ON DELETE" behaviour
     category_id = Column(Integer, ForeignKey("budgets_incomecategory.id"))
 
+    class Usage(Exception):
+        """
+        Dummy exception
+        """
+        pass
 
-class DBManager():
+
+class Utils():
+    """
+    Parse, sanitize data and handle the database interactions
+    """
 
     def __init__(self):
         engine = create_engine('sqlite:///../../db.sqlite3')
         Base.metadata.bind = engine
-
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
+
+        # NOTE: assuming "," as thousand separator and no decimals
+        self.CURRENCY_SYMBOL = '€'
+        self.EXPENSE = 'EXPENSE'
+        self.INCOME = 'INCOME'
+
         self.session = session
+        self.cats = self.selectCategories()
+        self.inc_cats = self.selectIncomeCategories()
+        # Handle the case in which the first entry date is malformed
+        self.last_date = '1970/01/01'
+        self.last_income_date = '1970/01/01'
+
+    def filterPrice(self, price):
+        """
+        Filter out white space and CURRENCY SYMBOL
+        """
+        return list(filter(lambda char: char not in f" {self.CURRENCY_SYMBOL},", price))
+
+    def sanitizePrice(self, price):
+        """
+        Sanitize the price
+        Return the sanitized price
+        Return false on failure
+        """
+        price_chars = self.filterPrice(price)
+        sanitized_price = "".join(price_chars)
+        # TODO: can remove white space from here since we check in the helper
+        if sanitized_price in ['Amount', ''] or not sanitized_price.isdigit():
+            return False
+        return sanitized_price
+
+    def sanitizeDate(self, date, model_type):
+        """
+        Try to parse the date:
+        On success, cache and return it
+        On failure use the cached one or fall back to the default value
+        """
+        is_correct_format = False
+        try:
+            sanitized_date = datetime.strptime(date, '%Y/%m/%d')
+            is_correct_format = True
+        except ValueError as e:
+            pass
+
+        if date in [None, ''] or not is_correct_format:
+            if model_type == self.EXPENSE:
+                date = self.last_date
+            else:
+                date = self.last_income_date
+        else:
+            if model_type == self.EXPENSE:
+                self.last_date = date
+            else:
+                self.last_income_date = date
+
+        sanitized_date = datetime.strptime(date, '%Y/%m/%d')
+        return sanitized_date
+
+    def isHeader(self, category, category_type):
+        """
+        Check whether this row is an header or not
+        Retrieve or Create a (Income)Category if the data is properly formatted
+        Return the (Income)Category id
+        Return false if this row was a header or on retrieve/creation failure
+        """
+        # Skip headers
+        if category in ['Category', '', None]:
+            return False
+        return self.getOrCreateCategory(category, category_type)
 
     def selectCategories(self):
+        """
+        Select all Categories from the database
+        """
         cats = self.session.query(Category).all()
         res = {}
         for cat in cats:
@@ -66,21 +161,30 @@ class DBManager():
         return res
 
     def selectIncomeCategories(self):
-        cats = self.session.query(IncomeCategory).all()
+        """
+        Select all Income Categories from the database
+        """
+        inc_cats = self.session.query(IncomeCategory).all()
         res = {}
-        for cat in cats:
+        for cat in inc_cats:
             c = cat.__dict__
             res[c['text']] = c['id']
         return res
 
-    def insertCategory(self, text):
+    def createCategory(self, text):
+        """
+        Insert a Category entry into the db
+        """
         new_category = Category(text=text.capitalize())
         self.session.add(new_category)
         self.session.flush()
         self.session.commit()
         return new_category
 
-    def insertExpense(self, amount, note, date, cat):
+    def createExpense(self, amount, note, date, cat):
+        """
+        Insert an Expense entry into the db
+        """
         expense = Expense(amount=amount, note=note, date=date,
                           category_id=cat)
         self.session.add(expense)
@@ -88,87 +192,144 @@ class DBManager():
         self.session.commit()
         return expense
 
-    def InsertIncome(self, amount, note, date, cat):
-        expense = Expense(amount=amount, note=note, date=date,
-                          category_id=cat)
-        self.session.add(expense)
+    def createIncomeCategory(self, text):
+        """
+        Insert an Income Category entry into the db
+        """
+        new_inc_category = IncomeCategory(text=text.capitalize())
+        self.session.add(new_inc_category)
         self.session.flush()
         self.session.commit()
-        return expense
+        return new_inc_category
 
-    def getCategory(self, cats, name):
-        if name is None:
-            print('error', name)
-            pass
-        res = cats.get(name.capitalize(), None)
+    def CreateIncome(self, amount, note, date, cat):
+        """
+        Insert an Income entry into the db
+        """
+        income = Income(amount=amount, note=note, date=date,
+                        category_id=cat)
+        self.session.add(income)
+        self.session.flush()
+        self.session.commit()
+        return income
+
+    def getOrCreateCategory(self, name, category_type):
+        """
+        Return the existing Category from cache
+        Create and return Categoty and update the cache
+        """
+        createFunc = self.createCategory
+        if category_type == self.INCOME:
+            createFunc = self.createIncomeCategory
+
+        if category_type == self.EXPENSE:
+            res = self.cats.get(name.capitalize(), None)
+        else:
+            res = self.inc_cats.get(name.capitalize(), None)
 
         if res is None:
-            cat = self.insertCategory(name)
-            cats[cat.text] = cat.id
+            cat = createFunc(name)
+            if category_type == self.EXPENSE:
+                self.cats[cat.text] = cat.id
+            else:
+                self.inc_cats[cat.text] = cat.id
             res = cat.id
         return res
 
+    def readExpenseData(self, row):
+        """
+        Determine whether the row contains Expense data or not
+        Return a tuple with the data if it does
+        Return False otherwise
+        """
+        if len(row) < 4:
+            print("Csv file needs to have at least 4 colums")
+            return False
 
-class Usage(Exception):
-    pass
+        date = row[1]
+        price = row[2]
+        note = row[3]
+        category = row[4]
 
+        return self.prepareData(category, price, date, note, self.EXPENSE)
 
-def ExpenseOrIncome(row):
-    pass
+    def readIncomeData(self, row):
+        """
+        Determine whether the row contains Income data or not
+        Return a tuple with the data if it does
+        Return False otherwise
+        """
+        if len(row) < 9:
+            print("Csv file needs to have at least 9 colums")
+            return
+
+        date = row[6]
+        amount = row[7]
+        note = row[8]
+        category = row[9]
+        return self.prepareData(category, amount, date, note, self.INCOME)
+
+    def prepareData(self, category, price, date, note, model_type):
+        """
+        Sanitize the data and retrieve or create the (Income)Category
+        Return the sanitized data on success
+        Return false on failure
+        """
+        cat_id = self.isHeader(category, model_type)
+        if not cat_id:
+            return False
+
+        sanitized_price = self.sanitizePrice(price)
+        if not sanitized_price:
+            return False
+
+        sanitized_date = self.sanitizeDate(date, model_type)
+        return (cat_id, sanitized_price, note, sanitized_date)
+
+    def prepareCreateEntry(self, data, category_type):
+        """
+        Unpack the data and insert an Expense or Income entry into the database
+        Does not return anything on both success and failure
+        """
+        createFunc = self.createExpense
+        if category_type == self.INCOME:
+            createFunc = self.CreateIncome
+
+        cat_id = data[0]
+        sanitized_price = data[1]
+        note = data[2]
+        safe_date = data[3]
+        return createFunc(sanitized_price, note, safe_date, cat_id)
 
 
 def main(argv):
-    dbm = DBManager()
+    utils = Utils()
     try:
         if len(argv) != 2:
             raise Usage
     except Usage:
         print("Usage: csv_parser.py <csv-file-path>", file=sys.stderr)
         return 1
+
     csv_file = argv[1]
-
-    cats = dbm.selectCategories()
-    inc_cats = dbm.selectIncomeCategories()
-    filename = csv_file
-    with open(filename) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        # Handle the case in which the first entry date is malformed
-        last_date = '1970/01/01'
+    expenses = 0
+    income = 0
+    with open(csv_file) as file:
+        csv_reader = csv.reader(file, delimiter=',')
         for row in csv_reader:
-            # Expense
-            date = row[1]
-            price = row[2]
-            note = row[3]
-            cat_text = row[4]
+            expense_data = utils.readExpenseData(row)
+            if expense_data:
+                res = utils.prepareCreateEntry(expense_data, utils.EXPENSE)
+                if res:
+                    expenses += 1
 
-            # Income
-            date = row[6]
-            amout = row[7]
-            description = row[8]
-            category = row[9]
+            income_data = utils.readIncomeData(row)
+            if income_data:
+                res = utils.prepareCreateEntry(income_data, utils.INCOME)
+                if res:
+                    income += 1
 
-            # Skip headers
-            if cat_text in ['Category', '']:
-                continue
-            cat_id = dbm.getCategory(cats, cat_text)
-
-            price_chars = list(filter(lambda char: char not in " ¥,", price))
-            price_safe = "".join(price_chars)
-            # Skip headers and lines without prices
-            if price_safe in ['Amount', ''] or not price_safe.isdigit():
-                continue
-
-            # Save the last non-malfomed date if the entry has no date
-            if date in [None, '']:
-                date = last_date
-            else:
-                last_date = date
-            safe_date = datetime.strptime(date, '%Y/%m/%d')
-
-            try:
-                dbm.insertExpense(price_safe, note, safe_date, cat_id)
-            except:
-                print(f'INSERT INTO "budget_expenses" VALUES ({price_safe},"{note}","{date}",{cat_id})')
+    print(f"Created {expenses} expenses and {income} income entries")
 
 
 if __name__ == "__main__":

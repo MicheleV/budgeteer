@@ -1,0 +1,21 @@
+,Change or add categories by updating the Expenses and Income tables in the Summary sheet.,,,,,,,,
+,Expenses,,,,,Income,,,
+,,,,,,,,,
+,Date,Amount,Description,Category,,Date,Amount,Description,Category
+,2018/12/10,€200,,Credit Card,,2018/12/01,€4200,December wage,Paycheck
+,2018/12/10,€120,Water bill,Water,,,€420,,Freelance income
+,2018/12/10,€100,Electricity bill,Electricity,,2018/12/01,€42,Random note,Other
+,2018/12/10,€2000,December rent,Rent,,,,,
+,2018/12/10,€50,December insurance,Insurance,,,,,
+,Random string,€10,Note about food,Food,,,,,
+,2018/12/17,€22,,Other,,,,,
+,12/17/2018,,,,,,,,
+,17/12/18,€80,Restaurant,Food,,,,,
+,,€6,Note for item with not capitalized category,other,,,,,
+,2018/12/17,"€29,790",,Leisure,,,,,
+,2018/12/18,"€2,662",,Leisure,,,,,
+,2018/12/19,"€7,598",,Go out,,,,,
+,2018/12/20,"€1,827",None,Food,,,,,
+,2018/12/21,"€1,490",,Food,,,,,
+,2018/12/22,"€2,742",,Food,,,,,
+,2018/12/23,"€1,404",,Food,,,,,

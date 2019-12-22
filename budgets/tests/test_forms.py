@@ -6,77 +6,116 @@ from .base import BaseTest
 
 
 # Credits http://www.obeythetestinggoat.com/book/chapter_simple_form.html
-class CategoryFormTest(BaseTest):
-
-    def test_form_renders_correctly(self):
-        form = f.CategoryForm()
-        self.assertIn('placeholder="Enter a new category"', form.as_p())
-        self.assertIn('class="form-control input-lg"', form.as_p())
-
-    def test_form_validation_for_blank_items(self):
-        form = f.CategoryForm(data={'text': ''})
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-          form.errors['text'],
-          ['This field is required.']
-        )
-
-    def test_form_validation_length(self):
-        text = '----------------text longer than constraints--------------'
-        form = f.CategoryForm(data={'text': text})
-        self.assertFalse(form.is_valid())
-        self.assertIn(
-          'Ensure this value has at most 20 characters',
-          form.errors['text'].as_text(),
-        )
+class CategoriesTest(BaseTest):
+    """
+    Categories forms are almost identical, hence we test them all together
+    NOTE: when we merge all categories into one model these will break
+    """
 
     def test_autofocus(self):
-        form = f.CategoryForm()
-        self.assertTrue('autofocus' in str(form))
+        """
+        Check whether any field has autofocus or not
+        """
+        forms = [
+          f.CategoryForm,
+          f.IncomeCategoryForm,
+          f.MonthlyBalanceCategoryForm
+        ]
 
-
-class IncomeCategoryFormTest(BaseTest):
-
-    def test_form_renders_correctly(self):
-        form = f.CategoryForm()
-        self.assertIn('placeholder="Enter a new category"', form.as_p())
-        self.assertIn('class="form-control input-lg"', form.as_p())
-
-    def test_form_validation_for_blank_items(self):
-        form = f.CategoryForm(data={'text': ''})
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-          form.errors['text'],
-          ['This field is required.']
-        )
+        for form in forms:
+            self.assertTrue('autofocus' in str(form()))
 
     def test_form_validation_length(self):
+        forms = [
+          f.CategoryForm,
+          f.IncomeCategoryForm,
+          f.MonthlyBalanceCategoryForm
+        ]
         text = '----------------text longer than constraints--------------'
-        form = f.CategoryForm(data={'text': text})
-        self.assertFalse(form.is_valid())
-        self.assertIn(
-          'Ensure this value has at most 20 characters',
-          form.errors['text'].as_text(),
-        )
 
-    def test_autofocus(self):
-        form = f.IncomeCategoryForm()
-        self.assertTrue('autofocus' in str(form))
+        for form in forms:
+            filled_form = form(data={'text': text})
+            self.assertFalse(filled_form.is_valid())
+            self.assertIn(
+              'Ensure this value has at most 20 characters',
+              filled_form.errors['text'].as_text(),
+            )
+
+    # NOTE: we only check for '' string, as users can not input None
+    def test_form_validation_for_blank_items(self):
+        forms = [
+          f.CategoryForm,
+          f.IncomeCategoryForm,
+          f.MonthlyBalanceCategoryForm
+        ]
+
+        for form in forms:
+            filled_form = form(data={'text': ''})
+            self.assertFalse(filled_form.is_valid())
+            self.assertEqual(
+              filled_form.errors['text'],
+              ['This field is required.']
+            )
+
+    def test_form_renders_correctly(self):
+        forms = [
+          f.CategoryForm,
+          f.IncomeCategoryForm,
+          # NOTE: MonthlyBalanceCategoryForm has a different placeholder
+          #       hence we test it separately below
+        ]
+
+        for item in forms:
+            form = item()
+            self.assertIn('placeholder="Enter a new category"', form.as_p())
+            self.assertIn('class="form-control input-lg"', form.as_p())
+
+
+class MonthlyBalanceCategoryFormTest(BaseTest):
+
+    def test_form_renders_correctly(self):
+        form = f.MonthlyBalanceCategoryForm()
+        t = 'placeholder="Enter a new category of balance (i.e. savings, cash)'
+        self.assertIn(t, form.as_p())
+        self.assertIn('class="form-control input-lg"', form.as_p())
+
+# ------------------ end of Categories tests ------------------
 
 
 # TODO: Write me!
 class IncomeFormTest(BaseTest):
-    pass
+    def test_form_renders_correctly(self):
+        form = f.IncomeForm()
+        self.assertIn('placeholder="Enter the earned amount"', form.as_p())
+        self.assertIn('placeholder="Keyword about this entry"', form.as_p())
+        self.assertIn('placeholder="%Y-%m-%d format"', form.as_p())
+
+    # TODO: write me
+    def test_form_validation_amount_field(self):
+        pass
+
+    # TODO: write me
+    def test_form_validation_note_field(self):
+        pass
+
+    # TODO: write me
+    def test_form_validation_date_field(self):
+        pass
+
+    # TODO: write me
+    def test_form_validation_category_field(self):
+        pass
 
 
-# TODO: Write me!
-class MonthlyBalanceCategoryFormTest(BaseTest):
-    pass
-
-
-# TODO: Write me!
 class MonthlyBalanceFormTest(BaseTest):
-    pass
+    def test_form_renders_correctly(self):
+        form = f.MonthlyBalanceForm()
+        self.assertIn('placeholder="Enter the balance"', form.as_p())
+        self.assertIn('placeholder="%Y-%m-%d format"', form.as_p())
+
+    # TODO: write me
+    def test_form_validation_text_field(self):
+        pass
 
 
 class ExpenseFormTest(BaseTest):

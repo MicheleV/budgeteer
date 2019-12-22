@@ -70,3 +70,19 @@ class BaseTest(TestCase):
         expense.full_clean()
         expense.save()
         return expense
+
+    def create_monthly_balance_category(self, text):
+        mbc = m.MonthlyBalanceCategory()
+        mbc.text = text
+        mbc.full_clean()
+        mbc.save()
+        return mbc
+
+    def create_monthly_balance(self, category, amount, date):
+        mb = m.MonthlyBalance()
+        mb.category = category
+        mb.amount = amount
+        mb.date = date
+        mb.full_clean()
+        mb.save()
+        return mb

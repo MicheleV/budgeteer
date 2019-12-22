@@ -10,6 +10,7 @@ import budgets.models as m
 # Docs https://docs.djangoproject.com/en/2.2/ref/forms/
 #      fields/#built-in-field-classes
 # TODO Look into [1] or [2] to avoid widgets
+# TODO: do we need to trim the input?
 # Credits http://www.obeythetestinggoat.com
 # [1] https://django-crispy-forms.readthedocs.org/
 # [2] https://django-floppyforms.readthedocs.io/en/latest/

@@ -47,7 +47,7 @@ def check_autofocus(self):
     urls = [
      reverse('categories'),
      reverse('income_categories'),
-     # TODO: add autofocus to other views as well
+     reverse('monthly_balance_categories'),
     ]
 
     for url in urls:

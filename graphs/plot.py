@@ -26,7 +26,7 @@ def prepareGraphData(x, y):
 
     # Create 1 figure
     ax = plt.subplot(111)
-    ax.bar(x, y, width=1)
+    ax.bar(x, y, width=5)
     ax.xaxis_date()
 
     # Set the figure title and the axis labels

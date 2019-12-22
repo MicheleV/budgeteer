@@ -38,8 +38,11 @@
     </table>
   </div>
 
-  <div>
-    <!-- NOTE: this image is overwritten on each request -->
-    <img src="{% static 'images/graph.png' %}">
-  </div>
+  {% if monthly_balance %}
+    <div>
+      <!-- NOTE: this image is overwritten on each request -->
+      <img src="{% static 'images/graph.png' %}">
+    </div>
+  {% endif %}
+
 {% endblock %}

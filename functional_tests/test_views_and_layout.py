@@ -16,6 +16,8 @@ def test_home_page_has_links_in_nav(self):
      reverse('monthly_budgets'),
      reverse('income_categories'),
      reverse('incomes'),
+     reverse('monthly_balance_categories'),
+     reverse('monthly_balances'),
     ]
 
     for url in urls:
@@ -45,6 +47,7 @@ def check_autofocus(self):
     urls = [
      reverse('categories'),
      reverse('income_categories'),
+     # TODO: add autofocus to other views as well
     ]
 
     for url in urls:

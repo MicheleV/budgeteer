@@ -289,15 +289,18 @@ def monthly_balances_page(request, date=None):
         monthly_balance = m.MonthlyBalance.objects.filter(date=complete_date)
         total = monthly_balance.aggregate(Sum('amount'))['amount__sum']
 
-    # Write graph to file.
-    # NOTE: this is syncrous!
-    # NOTE: require static/images folder to exist, have privileges, etc
-    dates = []
-    amounts = []
-    for val in monthly_balance:
-        amounts.append(val.amount)
-        dates.append(val.date)
-    plot.generateGraph(dates, amounts)
+    # Generate the graph only if we have some data
+    if len(monthly_balance) > 1:
+        # Write graph to file.
+        # NOTE: this is syncrous!
+        # NOTE: require static/images folder to exist, have privileges, etc
+        dates = []
+        amounts = []
+        for val in monthly_balance:
+            amounts.append(val.amount)
+            dates.append(val.date)
+
+        plot.generateGraph(dates, amounts)
 
     return render(request, 'monthly_balances.html', {
       'categories': categories,

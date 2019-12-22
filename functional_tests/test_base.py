@@ -14,7 +14,7 @@ import functional_tests.test_expenses as Expenses
 import functional_tests.test_monthly_budgets as MBudgets
 import functional_tests.test_page_access as PageAccess
 import functional_tests.test_views_and_layout as ViewAndLayout
-
+import functional_tests.test_monthly_balances as MonthlyBalances
 
 # Docs at https://docs.djangoproject.com/en/2.2/topics/testing/
 # tools/#django.test.TransactionTestCase
@@ -82,6 +82,10 @@ class FunctionalTest(LiveServerTestCase):
         MBudgets.test_cant_create_an_empty_monthly_budget(self)
         MBudgets.test_can_create_multiple_monthly_budgets(self)
         MBudgets.test_cant_create_multiple_monthly_budgets_for_same_month(self)
+
+    def test_monthly_balances(self):
+        MonthlyBalances.test_image_is_not_displayed_without_data(self)
+        MonthlyBalances.test_image_is_displayed_with_data(self)
 
     def test_access(self):
         PageAccess.test_access_to_all_pages(self)

@@ -63,6 +63,9 @@
         group: "nginx"
         force: no
 
+    # TODO: Verify whether this task is needed or not
+    #- name: Update gunicorn env inside .venv file
+
     - name: Create serving directory
       file:
         path: "{{ static_dir }}"

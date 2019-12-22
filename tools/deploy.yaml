@@ -9,11 +9,11 @@
     virtualenv_python: "{{ venv_dir}}/bin/python"
 
   tasks:
-    - name: Forcefully checkout feature/graph branch from repo
+    - name: Forcefully checkout master branch from repo
       git:
         repo: https://github.com/MicheleV/budgeteer.git
         dest: "{{ app_dir }}"
-        version: feature/graphs
+        version: master
         force: yes
 
     # TODO: Edit so that this is executed only if necessary

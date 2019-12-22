@@ -177,6 +177,7 @@ def monthly_budgets_page(request, date=None):
       'errors': errors
     })
 
+
 @require_http_methods(["GET", "POST"])
 def income_categories_page(request):
     """
@@ -202,6 +203,7 @@ def income_categories_page(request):
                   {'categories': categories,
                    'errors': errors,
                    'form': f.IncomeCategoryForm()})
+
 
 @require_http_methods(["GET", "POST"])
 def incomes_page(request, date=None):
@@ -283,20 +285,21 @@ def monthly_balances_page(request, date=None):
     categories = m.MonthlyBalanceCategory.objects.all()
     total = None
     if date is None:
-        monthly_balance = m.MonthlyBalance.objects.all()
+        mb = m.MonthlyBalance.objects.all().order_by('date')
     else:
         complete_date = f"{date}-01"
-        monthly_balance = m.MonthlyBalance.objects.filter(date=complete_date)
-        total = monthly_balance.aggregate(Sum('amount'))['amount__sum']
+        mb = m.MonthlyBalance.objects.filter(date=complete_date).order_by('date')
+
+        total = mb.aggregate(Sum('amount'))['amount__sum']
 
     # Generate the graph only if we have some data
-    if len(monthly_balance) > 1:
+    if len(mb) > 1:
         # Write graph to file.
         # NOTE: this is syncrous!
         # NOTE: require static/images folder to exist, have privileges, etc
         dates = []
         amounts = []
-        for val in monthly_balance:
+        for val in mb:
             amounts.append(val.amount)
             dates.append(val.date)
 
@@ -304,7 +307,7 @@ def monthly_balances_page(request, date=None):
 
     return render(request, 'monthly_balances.html', {
       'categories': categories,
-      'monthly_balance': monthly_balance,
+      'monthly_balance': mb,
       'form': f.MonthlyBalanceForm(),
       'total': total,
       'errors': errors

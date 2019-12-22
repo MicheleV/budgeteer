@@ -4,6 +4,7 @@
     base_dir: "/srv/{{ ansible_user }}"
     app_dir: "{{ base_dir }}/budgeteer"
     static_dir : "{{app_dir}}/static"
+    graphs_dir: "{{static_dir}}/images"
     venv_dir: "{{ app_dir }}/virtualenv"
     virtualenv_python: "{{ venv_dir}}/bin/python"
 
@@ -74,6 +75,14 @@
         group: "nginx"
         mode: 0750
         recurse: yes
+
+    - name: Create graphs directory
+      file:
+        path: "{{ graphs_dir }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "nginx"
+        mode: 0750
 
     - name: "Determine if selinux is allowing nginx"
       register: selinuxsyscontent

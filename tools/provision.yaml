@@ -9,6 +9,10 @@
       hostname:
         name: "{{ inventory_hostname }}"
 
+    - name: Set timezone to Asia/Tokyo
+      timezone:
+        name: Asia/Tokyo
+
     - name: Add epel repo
       yum_repository:
         name: epel_repo

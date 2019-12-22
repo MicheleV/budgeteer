@@ -2,9 +2,9 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.urls import resolve, reverse
-from budgets.views import home_page, categories_page, expenses_page
+import budgets.views as v
 from budgets.models import Category
-from budgets.forms import CategoryForm
+import budgets.forms as f
 from .base import BaseTest
 
 
@@ -13,11 +13,11 @@ class HomePageTest(BaseTest):
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('home', 'Budgeteer')
 
-    def test_uses_home_view(self):
-        self.check_if_correct_view('home', home_page)
+    def test_uses_correct_view(self):
+        self.check_if_correct_view('home', v.home_page)
         response = self.get_response_from_named_url('expenses')
 
-    def test_uses_home_template(self):
+    def test_uses_correct_template(self):
         response = self.get_response_from_named_url('home')
         self.assertTemplateUsed(response, 'home.html')
 
@@ -50,16 +50,16 @@ class CategoriesPageTest(BaseTest):
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('categories', 'Categories')
 
-    def test_uses_categories_view(self):
-        self.check_if_correct_view('categories', categories_page)
+    def test_uses_correct_view(self):
+        self.check_if_correct_view('categories', v.categories_page)
 
-    def test_uses_categories_template(self):
+    def test_uses_correct_template(self):
         response = self.get_response_from_named_url('categories')
         self.assertTemplateUsed(response, 'categories.html')
 
     def test_uses_category_form(self):
         response = self.get_response_from_named_url('categories')
-        self.assertIsInstance(response.context['form'], CategoryForm)
+        self.assertIsInstance(response.context['form'], f.CategoryForm)
 
     def test_save_and_retrieve_categories(self):
         first_category = self.create_category('Rent')
@@ -74,15 +74,40 @@ class CategoriesPageTest(BaseTest):
         self.assertEqual(second_saved_category.text, 'Food')
 
     def test_create_malformed_categories(self):
-        form = CategoryForm(data={'text': ''})
+        form = f.CategoryForm(data={'text': ''})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['text'], ['This field is required.'])
 
-        form = CategoryForm(
+        form = f.CategoryForm(
           data={'text': 'text longer than constraints!!!!!!!!!!!!!!!!!!!!!!!'})
         self.assertFalse(form.is_valid())
         self.check_if_error_matches('Ensure this value has at most',
                                     form.errors['text'])
+
+
+class MonthlyBudgetPageTest(BaseTest):
+
+    def test_title_is_displayed(self):
+        self.check_if_title_is_displayed('monthly_budgets', 'Monthly budgets')
+
+    def test_uses_correct_view(self):
+        self.check_if_correct_view('monthly_budgets', v.monthly_budgets_page)
+
+    def test_uses_correct_template(self):
+        response = self.get_response_from_named_url('monthly_budgets')
+        self.assertTemplateUsed(response, 'monthly_budgets.html')
+
+    def test_uses_category_form(self):
+        response = self.get_response_from_named_url('monthly_budgets')
+        self.assertIsInstance(response.context['form'], f.MonthlyBudgetForm)
+
+    # TODO: write me
+    def test_save_and_retrieve_monthly_budget(self):
+        pass
+
+    # TODO: write me
+    def test_redirect_on_POST(self):
+        pass
 
 
 class ExpensesPageTest(BaseTest):
@@ -90,10 +115,10 @@ class ExpensesPageTest(BaseTest):
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('expenses', 'Expenses')
 
-    def test_uses_categories_view(self):
-        self.check_if_correct_view('expenses', expenses_page)
+    def test_uses_correct_view(self):
+        self.check_if_correct_view('expenses', v.expenses_page)
 
-    def test_uses_categories_template(self):
+    def test_uses_correct_template(self):
         response = self.get_response_from_named_url('expenses')
         self.assertTemplateUsed(response, 'expenses.html')
 
@@ -115,14 +140,69 @@ class ExpensesPageTest(BaseTest):
         pass
 
 
-class MonthlyBudgetPageTest(BaseTest):
+class IncomeCategoriesPageTest(BaseTest):
+    # TODO: write me
     def test_redirect_on_POST(self):
-        first_category = self.create_category('Rent')
+        pass
 
-        url = reverse('monthly_budgets')
-        response = self.client.post(url, data={
-          'category': 1,
-          'amount': 42,
-          'date': '2019-12-01'})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], url)
+    def test_title_is_displayed(self):
+        self.check_if_title_is_displayed('income_categories', 'Income Categories')
+
+    def test_uses_correct_view(self):
+        self.check_if_correct_view('income_categories', v.income_categories_page)
+        response = self.get_response_from_named_url('income_categories')
+
+    def test_uses_correct_template(self):
+        response = self.get_response_from_named_url('income_categories')
+        self.assertTemplateUsed(response, 'income_categories.html')
+
+
+class IncomePageTest(BaseTest):
+    # TODO: write me
+    def test_redirect_on_POST(self):
+        pass
+
+    def test_title_is_displayed(self):
+        self.check_if_title_is_displayed('incomes', 'Incomes')
+
+    def test_uses_correct_view(self):
+        self.check_if_correct_view('incomes', v.incomes_page)
+        response = self.get_response_from_named_url('incomes')
+
+    def test_uses_correct_template(self):
+        response = self.get_response_from_named_url('incomes')
+        self.assertTemplateUsed(response, 'incomes.html')
+
+
+class MonthlyBalanceCategoriesTest(BaseTest):
+    # TODO: write me
+    def test_redirect_on_POST(self):
+        pass
+
+    def test_title_is_displayed(self):
+        self.check_if_title_is_displayed('monthly_balance_categories', 'Monthly Balance Categories')
+
+    def test_uses_correct_view(self):
+        self.check_if_correct_view('monthly_balance_categories', v.monthly_balance_categories_page)
+        response = self.get_response_from_named_url('monthly_balance_categories')
+
+    def test_uses_correct_template(self):
+        response = self.get_response_from_named_url('monthly_balance_categories')
+        self.assertTemplateUsed(response, 'monthly_balance_categories.html')
+
+
+class MonthlyBalanceTest(BaseTest):
+    # TODO: write me
+    def data_is_ordered_by_date_ascending(self):
+        pass
+
+    def test_title_is_displayed(self):
+        self.check_if_title_is_displayed('monthly_balances', 'Monthly Balances')
+
+    def test_uses_correct_view(self):
+        self.check_if_correct_view('monthly_balances', v.monthly_balances_page)
+        response = self.get_response_from_named_url('monthly_balances')
+
+    def test_uses_correct_template(self):
+        response = self.get_response_from_named_url('monthly_balances')
+        self.assertTemplateUsed(response, 'monthly_balances.html')

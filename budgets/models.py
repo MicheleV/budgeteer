@@ -89,4 +89,3 @@ class MonthlyBalance(models.Model):
                                  null=True, on_delete=models.SET_NULL)
     amount = models.IntegerField()
     date = models.DateField(unique=True)
-    pass

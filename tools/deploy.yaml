@@ -4,15 +4,16 @@
     base_dir: "/srv/{{ ansible_user }}"
     app_dir: "{{ base_dir }}/budgeteer"
     static_dir : "{{app_dir}}/static"
+    graphs_dir: "{{static_dir}}/images"
     venv_dir: "{{ app_dir }}/virtualenv"
     virtualenv_python: "{{ venv_dir}}/bin/python"
 
   tasks:
-    - name: Forcefully checkout master branch from repo
+    - name: Forcefully checkout feature/graph branch from repo
       git:
         repo: https://github.com/MicheleV/budgeteer.git
         dest: "{{ app_dir }}"
-        version: master
+        version: feature/graphs
         force: yes
 
     # TODO: Edit so that this is executed only if necessary
@@ -63,6 +64,9 @@
         group: "nginx"
         force: no
 
+    # TODO: Verify whether this task is needed or not
+    #- name: Update gunicorn env inside .venv file
+
     - name: Create serving directory
       file:
         path: "{{ static_dir }}"
@@ -71,6 +75,14 @@
         group: "nginx"
         mode: 0750
         recurse: yes
+
+    - name: Create graphs directory
+      file:
+        path: "{{ graphs_dir }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "nginx"
+        mode: 0750
 
     - name: "Determine if selinux is allowing nginx"
       register: selinuxsyscontent

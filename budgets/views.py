@@ -10,9 +10,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import budgets.models as m
 import budgets.forms as f
-
 from budgets.serializers import CategorySerializer
-
+from graphs import plot
 import datetime
 import calendar
 
@@ -289,6 +288,17 @@ def monthly_balances_page(request, date=None):
         complete_date = f"{date}-01"
         monthly_balance = m.MonthlyBalance.objects.filter(date=complete_date)
         total = monthly_balance.aggregate(Sum('amount'))['amount__sum']
+
+    # Write graph to file.
+    # NOTE: this is syncrous!
+    # NOTE: require static/images folder to exist, have privileges, etc
+    dates = []
+    amounts = []
+    for val in monthly_balance:
+        amounts.append(val.amount)
+        dates.append(val.date)
+    plot.generateGraph(dates, amounts)
+
     return render(request, 'monthly_balances.html', {
       'categories': categories,
       'monthly_balance': monthly_balance,

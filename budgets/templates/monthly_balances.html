@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load staticfiles %}
 {% block title %}Monthly Balances{% endblock %}
 
 {% block content %}
@@ -14,7 +14,7 @@
   {% endif %}
   {% csrf_token %}
 
-   <div class="table-responsive-md">
+  <div class="table-responsive-md">
     <table class="table" id="id_monthly_balances">
       <tr>
         <th>Category</th>
@@ -36,5 +36,10 @@
         </tr>
       {% endif %}
     </table>
+  </div>
+
+  <div>
+    <!-- NOTE: this image is overwritten on each request -->
+    <img src="{% static 'images/graph.png' %}">
   </div>
 {% endblock %}

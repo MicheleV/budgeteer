@@ -1,6 +1,8 @@
 - hosts: all
 
   vars:
+    # Note: `setsebool httpd_read_user_content -P on` is needed if you serve the app
+    # from the home directory
     base_dir: "/srv/{{ ansible_user }}"
     app_dir: "{{ base_dir }}/budgeteer"
     static_dir : "{{app_dir}}/static"

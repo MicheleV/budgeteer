@@ -88,4 +88,7 @@ class MonthlyBalance(models.Model):
     category = models.ForeignKey(MonthlyBalanceCategory, default=None,
                                  null=True, on_delete=models.SET_NULL)
     amount = models.IntegerField()
-    date = models.DateField(unique=True)
+    date = models.DateField()
+
+    class Meta:
+        unique_together = ('category', 'date')

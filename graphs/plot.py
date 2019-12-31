@@ -4,6 +4,10 @@ from matplotlib.pyplot import xticks
 import datetime
 import numpy as np
 import pandas as pd
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def generateDummyData():
@@ -20,24 +24,26 @@ def prepareGraphData(x, y):
     """
     Prepare the data for the graph
     """
-
-    # TODO: move this to app level settings
-    currency = '€'
+    # TODO: matplot lib has problem with 4 bytes characters
+    currency = os.getenv("currency")
+    # Blue used in examples on matplotsite
+    # https://github.com/matplotlib/matplotlib/blob/v3.1.2/lib/matplotlib/_color_data.py#L17
+    base_color = '#1f77b4'
 
     # Create 1 figure
     ax = plt.subplot(111)
-    ax.bar(x, y, width=10, color=(0.2, 0.4, 0.6, 0.6))
+    ax.bar(x, y, width=10, color=base_color)
     ax.xaxis_date()
 
     # Set the figure title and the axis labels
     ax.set(xlabel='time (months)', ylabel=f'Amount ({currency})',
            title='Monthly balances')
-    ax.grid()
+    ax.grid(True, which='major')
 
     # Turns the date labels by 90 degrees, so they do not overlap
     plt.setp(plt.gca().get_xticklabels(), rotation=90, horizontalalignment='right')
 
-    # Set x labels (i.e. prevents in between dates labels)
+    # Force all dates labels to be displayed on the x axis
     xticks(((x)))
 
     # Make sure the x axis is not showing after or before the values we do have

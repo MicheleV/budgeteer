@@ -285,12 +285,12 @@ def monthly_balances_page(request, date=None):
     categories = m.MonthlyBalanceCategory.objects.all()
     total = None
     if date is None:
-        mb = m.MonthlyBalance.objects.all().order_by('date')
+        mb = m.MonthlyBalance.objects.values('date').order_by('date').annotate(amount=Sum('amount'))
     else:
         complete_date = f"{date}-01"
-        mb = m.MonthlyBalance.objects.filter(date=complete_date).order_by('date')
+        mb = m.MonthlyBalance.objects.values('date').filter(date=complete_date).order_by('date').annotate(amount=Sum('amount'))
 
-        total = mb.aggregate(Sum('amount'))['amount__sum']
+    total = mb.aggregate(Sum('amount'))['amount__sum']
 
     # Generate the graph only if we have some data
     if len(mb) > 1:
@@ -300,8 +300,8 @@ def monthly_balances_page(request, date=None):
         dates = []
         amounts = []
         for val in mb:
-            amounts.append(val.amount)
-            dates.append(val.date)
+            amounts.append(val['amount'])
+            dates.append(val['date'])
 
         plot.generateGraph(dates, amounts)
 

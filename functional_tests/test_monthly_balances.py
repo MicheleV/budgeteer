@@ -19,3 +19,8 @@ def test_image_is_displayed_with_data(self):
     # Frank enters some data (he wants to get his hands on the new graphs asap)
     # Frank finally opens the monthly balances page and see a shiny graph
     pass
+
+
+# TODO:write me
+def test_check_whether_image_contains_correct_currency(self):
+    pass

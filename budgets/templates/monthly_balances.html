@@ -14,6 +14,13 @@
   {% endif %}
   {% csrf_token %}
 
+  {% if monthly_balance %}
+    <div>
+      <!-- NOTE: this image is overwritten on each request -->
+      <img src="{% static 'images/graph.png' %}">
+    </div>
+  {% endif %}
+  
   <div class="table-responsive-md">
     <table class="table" id="id_monthly_balances">
       <tr>
@@ -38,11 +45,6 @@
     </table>
   </div>
 
-  {% if monthly_balance %}
-    <div>
-      <!-- NOTE: this image is overwritten on each request -->
-      <img src="{% static 'images/graph.png' %}">
-    </div>
-  {% endif %}
+
 
 {% endblock %}

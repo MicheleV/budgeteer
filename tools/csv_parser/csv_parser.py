@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # Only imports and save expense categories and expenses for now
 # NOTE: This tool is not unit tested

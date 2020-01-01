@@ -53,7 +53,8 @@ def test_can_create_multiple_monthly_budgets(self):
     self.browser.get(f"{self.live_server_url}{url}")
     remainder = amount - wrong_amt
     table = self.browser.find_element_by_id('id_expenses_total')
-    Helpers.find_text_inside_table(self, str(remainder), table)
+    formatted_amount = f'{remainder:n}'
+    Helpers.find_text_inside_table(self, str(formatted_amount), table)
 
     # Frank also notices the amount is green, meaning he still has room for
     # spending!

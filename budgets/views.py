@@ -282,32 +282,31 @@ def monthly_balances_page(request, date=None):
         except ValidationError:
             errors = form.errors
 
-    categories = m.MonthlyBalanceCategory.objects.all()
     total = None
+    show_graph = False
     if date is None:
         mb = m.MonthlyBalance.objects.values('date').order_by('date').annotate(amount=Sum('amount'))
+        if len(mb) > 1:
+            # Write graph to file
+            # NOTE: this is syncrous!
+            # NOTE: require static/images folder to exist, have privileges, etc
+            dates = []
+            amounts = []
+            for val in mb:
+                amounts.append(val['amount'])
+                dates.append(val['date'])
+            plot.generateGraph(dates, amounts)
+            show_graph = True
     else:
         complete_date = f"{date}-01"
-        mb = m.MonthlyBalance.objects.values('date').filter(date=complete_date).order_by('date').annotate(amount=Sum('amount'))
+        mb = m.MonthlyBalance.objects.select_related('category').filter(date=complete_date).order_by('date')
 
     total = mb.aggregate(Sum('amount'))['amount__sum']
 
-    # Generate the graph only if we have some data
-    if len(mb) > 1:
-        # Write graph to file.
-        # NOTE: this is syncrous!
-        # NOTE: require static/images folder to exist, have privileges, etc
-        dates = []
-        amounts = []
-        for val in mb:
-            amounts.append(val['amount'])
-            dates.append(val['date'])
-
-        plot.generateGraph(dates, amounts)
-
     return render(request, 'monthly_balances.html', {
-      'categories': categories,
       'monthly_balance': mb,
+      # TODO: improve variable naming
+      'show_graph': show_graph,
       'form': f.MonthlyBalanceForm(),
       'total': total,
       'errors': errors

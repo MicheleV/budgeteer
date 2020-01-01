@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
+{% load humanize %}
 {% block title %}Monthly Balances{% endblock %}
 
 {% block content %}
@@ -14,7 +15,7 @@
   {% endif %}
   {% csrf_token %}
 
-  {% if monthly_balance %}
+  {% if show_graph %}
     <div>
       <!-- NOTE: this image is overwritten on each request -->
       <img src="{% static 'images/graph.png' %}">
@@ -24,18 +25,18 @@
   <div class="table-responsive-md">
     <table class="table" id="id_monthly_balances">
       <tr>
-        <th>Category</th>
-        <th>Amount</th>
         <th>Date</th>
+        <th>Amount</th>
+        {% if not show_graph %}<th>Category</th> {% endif %}
       </tr>
-      {% for monthly_balance in monthly_balance %}
+      {% for monthly_balance in monthly_balance reversed%}
         <tr>
-          <td>{{ monthly_balance.category.text }}</td>
-          <td>{{ monthly_balance.amount }}</td>
-          <td>{{ monthly_balance.date |date:'Y-m' }}</td>
+          <td>{{ monthly_balance.date | date:'Y-m' }}</td>
+          <td>{{ monthly_balance.amount | intcomma }}</td>
+          {% if not show_graph %}<td>{{ monthly_balance.category.text }}</td> {% endif %}
         </tr>
       {% endfor %}
-      {% if total > 0 %}
+      {% if total > 0 and not show_graph%}
         <tr>
           <td>Total</td>
           <td>{{ total }}</td>

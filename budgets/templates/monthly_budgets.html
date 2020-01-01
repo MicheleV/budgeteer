@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block title %}Monthly budgets{% endblock %}
 
@@ -23,7 +24,7 @@
       </tr>
       {% for monthly_budget in monthly_budgets %}
         <tr>
-          <td>{{ monthly_budget.amount }}</td>
+          <td>{{ monthly_budget.amount | intcomma }}</td>
           <td>{{ monthly_budget.category.text }}</td>
           <td>{{ monthly_budget.date |date:'Y-m' }}</td>
         </tr>

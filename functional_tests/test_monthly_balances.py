@@ -22,5 +22,20 @@ def test_image_is_displayed_with_data(self):
 
 
 # TODO:write me
+def test_all_data_table_is_ordered_date_desc(self):
+    pass
+
+
+# TODO:write me
+def test_specific_month_data_shows_no_graph(self):
+    pass
+
+
+# TODO:write me
+def test_specific_month_data_shows_total(self):
+    pass
+
+
+# TODO:write me
 def test_check_whether_image_contains_correct_currency(self):
     pass

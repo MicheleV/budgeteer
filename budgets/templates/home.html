@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load budgets_tags %}
+{% load humanize %}
 
 {% block title %}Budgeteer{% endblock %}
 
@@ -18,11 +19,11 @@
     {% for cat in categories %}
       <tr>
         <td>{{ cat.text }}</td>
-        <td>{{ cat.total }}</td>
+        <td>{{ cat.total | intcomma }}</td>
         <td>{{ cat.mb.amount|default:"No monthly budget for this month" }}</td>
         {% if cat.mb.amount %}
         <td class="{% if cat.mb.amount|sub:cat.total < 0 %}text-danger{% else %}text-success{% endif %}">
-          {{ cat.mb.amount|sub:cat.total }}
+          {{ cat.mb.amount|sub:cat.total | intcomma }}
         </td>
         {% else %}
         <td> {{ "N/A" }} </td>
@@ -43,7 +44,7 @@
     {% for inc in income_categories %}
       <tr>
         <td>{{ inc.text }}</td>
-        <td>{{ inc.total }}</td>
+        <td>{{ inc.total | intcomma }}</td>
       </tr>
     {% endfor %}
   </table>

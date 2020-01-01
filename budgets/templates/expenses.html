@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block title %}Expenses{% endblock %}
 
@@ -26,7 +27,7 @@
   {% for expense in expenses %}
     <tr>
       <td>{{ expense.date }}</td>
-      <td>{{ expense.amount }}</td>
+      <td>{{ expense.amount | intcomma }}</td>
       <td>{{ expense.category.text }}</td>
       <td>{{ expense.note }}</td>
     </tr>

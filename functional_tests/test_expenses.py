@@ -78,8 +78,9 @@ def test_expenses_page_can_show_old_expenses(self):
     url = f"{self.live_server_url}{expense_url}/{first_rent_date_ym}"
     self.browser.get(url)
 
+    formatted_amount = f'{amount:n}'
     # Frank notices that this URL does not show entries from other months
-    Helpers.verify_expense_was_created(self, amount, category_name, note)
+    Helpers.verify_expense_was_created(self, formatted_amount, category_name, note)
 
 
 def test_expenses_wont_show_expenses_in_the_future(self):

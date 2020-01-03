@@ -3,7 +3,7 @@ from django.template.defaultfilters import floatformat
 
 register = template.Library()
 
-
+# TODO: handle 0 and None
 @register.filter(name='sub')
 def subtract(value, arg):
     """
@@ -11,6 +11,7 @@ def subtract(value, arg):
     """
     return value - arg
 
+# TODO: handle 0 and None
 @register.filter(name='div')
 def subtract(value, arg):
     """

@@ -27,10 +27,14 @@ TODO
     </tr>
     <tr>
         <td>Result</td>
+        {% if current_balance and starting_balance%}
         <td class="{% if current_balance|sub:starting_balance < 0 %}text-danger{% else %}text-success{% endif %}">
           {{ currency }}{% if current_balance|sub:starting_balance < 0 %}-{% else %}+{% endif %}{{ current_balance|sub:starting_balance | intcomma }}
           ({% if current_balance|sub:starting_balance < 0 %}-{% else %}+{% endif %}{{ current_balance|div:starting_balance}}%)
         </td>
+        {% else %}
+          -
+        {% endif %}
     </tr>
   </table>
 </div>

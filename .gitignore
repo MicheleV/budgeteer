@@ -7,4 +7,5 @@ db.sqlite3
 /tools/inventory.ansible
 .env
 coverage_html
+htmlcov
 .coverage

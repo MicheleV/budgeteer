@@ -123,6 +123,15 @@ Run the unit test suite::
     [TEST_TARGET=localhost ] python manage.py test budgets --keep
 
 
+Coverage
+=======
+
+Generate coverage::
+
+    coverage run --omit="virtualenv/*,budgets/migrations/*,budgeteer/wsgi.py,budgets/admin*,budgets/app*,budgets/tests/*,functional_tests/*,manage.py" manage.py test
+    coverage html -d coverage_html
+
+
 References and useful links
 =======
 

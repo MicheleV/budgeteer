@@ -35,7 +35,6 @@ def get_total_of_monthly_balances(date):
     """
     balances = m.MonthlyBalance.objects.filter(date=date)
     balances_sum = balances.aggregate(Sum('amount'))['amount__sum']
-    print(balances_sum)
     return balances_sum
 
 

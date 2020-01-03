@@ -76,6 +76,48 @@ def current_month_boundaries():
     return (start, end)
 
 
+def generate_monthly_balance_graph(data):
+    """
+    Write syncronously the graph to a file
+    Return boolean representing whether a graph was generated or not
+    """
+    is_graph_generated = False
+    if len(data) > 1:
+        # Write graph to file
+        # NOTE: this is syncrous!
+        # NOTE: require static/images folder to exist, have privileges, etc
+        dates = []
+        amounts = []
+        for val in data:
+            amounts.append(val['amount'])
+            dates.append(val['date'])
+        plot.generateGraph(dates, amounts)
+        is_graph_generated = True
+    return is_graph_generated
+
+
+def generate_current_monthly_balance_pie_graph(data):
+    """
+    Write syncronously the graph to a file
+    Return boolean representing whether a graph was generated or not
+    """
+    is_graph_generated = False
+    if len(data) > 1:
+        # Write graph to file
+        # NOTE: this is syncrous!
+        # NOTE: require static/images folder to exist, have privileges, etc
+        labels = []
+        values = []
+        # print(current_mbdata)
+        for mb in filter(lambda y: y.amount > 0, data):
+            labels.append(mb.category.text)
+            values.append(mb.amount)
+        print(labels, values)
+        plot.generatePieGraph(labels, values)
+        is_graph_generated = True
+    return is_graph_generated
+
+
 @require_http_methods(["GET"])
 def home_page(request):
     """
@@ -91,6 +133,13 @@ def home_page(request):
     mb = m.MonthlyBalance.objects.values('date').order_by('date').annotate(amount=Sum('amount'))
     show_graph = generate_monthly_balance_graph(mb)
 
+    current_mb = m.MonthlyBalance.objects.select_related('category').filter(date=start)
+    current_mb_total = current_mb.aggregate(Sum('amount'))['amount__sum']
+
+    prev_mb = m.MonthlyBalance.objects.select_related('category').filter(date=prev_month)
+    prev_mb_total = prev_mb.aggregate(Sum('amount'))['amount__sum']
+
+    show_pie_graph = generate_current_monthly_balance_pie_graph(current_mb)
     # TODO check whether prefetch_related can be used for related models
     categories = m.Category.objects.all()
     for cat in categories:
@@ -117,9 +166,13 @@ def home_page(request):
         'income_categories': income_categories,
         'current_balance': current_balance,
         'starting_balance': starting_balance,
-        # TODO: do this on the template side
-        'currency': currency,
+        'currency': currency, # TODO: do this on the template side
         'show_graph': show_graph,
+        'show_pie_graph': show_pie_graph,
+        'current_mb': current_mb,
+        'current_mb_total': current_mb_total,
+        'prev_mb': prev_mb,
+        'prev_mb_total': prev_mb_total,
     })
 
 
@@ -297,26 +350,6 @@ def monthly_balance_categories_page(request):
                   {'categories': categories,
                    'errors': errors,
                    'form': f.MonthlyBalanceCategoryForm()})
-
-
-def generate_monthly_balance_graph(data):
-    """
-    Write syncronously the graph to a file
-    Return boolean representing whether a graph was generated or not
-    """
-    is_graph_generated = False
-    if len(data) > 1:
-        # Write graph to file
-        # NOTE: this is syncrous!
-        # NOTE: require static/images folder to exist, have privileges, etc
-        dates = []
-        amounts = []
-        for val in data:
-            amounts.append(val['amount'])
-            dates.append(val['date'])
-        plot.generateGraph(dates, amounts)
-        is_graph_generated = True
-    return is_graph_generated
 
 
 @require_http_methods(["GET", "POST"])

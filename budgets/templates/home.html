@@ -9,7 +9,6 @@
 
 TODO
 <ul>
-  <li>add pie graph for owned money (% category1, %category2, ...)</li>
   <li>add goal model</li>
   <li>show goal in here "X months(amount {currency} /month), Y months (bigger amount {currency} /month) to goal"</li>
 </ul>
@@ -46,6 +45,76 @@ TODO
   </div>
 {% endif %}
 
+{% if show_pie_graph %}
+  <div>
+    <!-- NOTE: this image is regenerated (overwritten) on each request -->
+    <img src="{% static 'images/pie-graph.png' %}">
+  </div>
+{% endif %}
+
+{% if current_mb %}
+<h6>Current situation</h6>
+<table class="table table-responsive-md table-sm" id="id_monthly_balances">
+  <tr>
+    <th>Category</th>
+    <th>Amount</th>
+  </tr>
+
+  {% for monthly_balance in current_mb %}
+    <tr>
+      <td>{{ monthly_balance.category.text }}</td>
+      <td>{{ currency}} {{ monthly_balance.amount | intcomma }}</td>
+    </tr>
+  {% endfor %}
+
+    <tr>
+      <td><b>Total</b></td>
+      <td><b>{{ currency}} {{ current_mb_total | intcomma }}</b></td>
+    </tr>
+</table>
+{% endif %}
+
+{% if prev_mb %}
+<h6>Previous month situation</h6>
+<table class="table table-responsive-md table-sm" id="id_monthly_balances">
+  <tr>
+    <th>Category</th>
+    <th>Amount</th>
+  </tr>
+
+  {% for monthly_balance in prev_mb %}
+    <tr>
+      <td>{{ monthly_balance.category.text }}</td>
+      <td>{{ currency}} {{ monthly_balance.amount | intcomma }}</td>
+    </tr>
+  {% endfor %}
+
+    <tr>
+      <td><b>Total</b></td>
+      <td><b>{{ currency}} {{ prev_mb_total | intcomma }}</b></td>
+    </tr>
+</table>
+{% endif %}
+
+<!-- TODO: shorten this. Hide amount = 0 items? -->
+{% if income_categories %}
+<table class="table table-responsive-md table-sm" id="id_incomes_total">
+  <tr>
+    <th>Category</th>
+    <th>Income amount</th>
+  </tr>
+  {% for inc in income_categories %}
+  <!-- TODO: verify at least on category is more than 0-->
+    {% if inc.total > 0 %}
+    <tr>
+      <td>{{ inc.text }}</td>
+      <td>{{ currency}} {{ inc.total | intcomma }}</td>
+    </tr>
+    {% endif %}
+  {% endfor %}
+</table>
+{% endif %}
+
 {% if categories %}
 <h5 id="id_current_month_date">Summary for {% now 'Y-m' %}</h5>
   <table class="table-responsive-md table-sm" id="id_expenses_total">
@@ -58,11 +127,11 @@ TODO
     {% for cat in categories %}
       <tr>
         <td>{{ cat.text }}</td>
-        <td>{{ cat.total | intcomma }}</td>
+        <td>{{ currency}} {{ cat.total | intcomma }}</td>
         <td>{{ cat.mb.amount|default:"No monthly budget for this month" }}</td>
         {% if cat.mb.amount %}
         <td class="{% if cat.mb.amount|sub:cat.total < 0 %}text-danger{% else %}text-success{% endif %}">
-          {{ cat.mb.amount|sub:cat.total | intcomma }}
+          {{ currency}} {{ cat.mb.amount|sub:cat.total | intcomma }}
         </td>
         {% else %}
         <td> {{ "N/A" }} </td>
@@ -70,21 +139,6 @@ TODO
       </tr>
     {% endfor %}
   </table>
-{% endif %}
-
-{% if income_categories %}
-<table class="table table-responsive-md table-sm" id="id_incomes_total">
-  <tr>
-    <th>Category</th>
-    <th>Income amount</th>
-  </tr>
-  {% for inc in income_categories %}
-    <tr>
-      <td>{{ inc.text }}</td>
-      <td>{{ inc.total | intcomma }}</td>
-    </tr>
-  {% endfor %}
-</table>
 {% endif %}
 
 {% endblock %}

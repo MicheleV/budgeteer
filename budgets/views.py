@@ -11,9 +11,32 @@ from rest_framework.decorators import api_view
 import budgets.models as m
 import budgets.forms as f
 from budgets.serializers import CategorySerializer
+# TODO: choose and apply the imports order to the project
 from graphs import plot
 import datetime
 import calendar
+from dateutil.relativedelta import relativedelta
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+def get_previous_month_first_day_date(date):
+    """
+    Return a date object, which is the first day of the month before the input
+    """
+    return (date - relativedelta(months=1)).replace(day=1)
+
+
+def get_total_of_monthly_balances(date):
+    """
+    Return the sum of the monthly balances for the input date
+    """
+    balances = m.MonthlyBalance.objects.filter(date=date)
+    balances_sum = balances.aggregate(Sum('amount'))['amount__sum']
+    print(balances_sum)
+    return balances_sum
 
 
 def get_month_boundaries(date):
@@ -59,7 +82,16 @@ def home_page(request):
     """
     Display the home page
     """
+    currency = os.getenv("currency")
     (start, end) = current_month_boundaries()
+    current_balance = get_total_of_monthly_balances(start)
+
+    prev_month = get_previous_month_first_day_date(start)
+    starting_balance = get_total_of_monthly_balances(prev_month)
+
+    mb = m.MonthlyBalance.objects.values('date').order_by('date').annotate(amount=Sum('amount'))
+    show_graph = generate_monthly_balance_graph(mb)
+
     # TODO check whether prefetch_related can be used for related models
     categories = m.Category.objects.all()
     for cat in categories:
@@ -83,7 +115,12 @@ def home_page(request):
 
     return render(request, 'home.html', {
         'categories': categories,
-        'income_categories': income_categories
+        'income_categories': income_categories,
+        'current_balance': current_balance,
+        'starting_balance': starting_balance,
+        # TODO: do this on the template side
+        'currency': currency,
+        'show_graph': show_graph,
     })
 
 
@@ -263,6 +300,26 @@ def monthly_balance_categories_page(request):
                    'form': f.MonthlyBalanceCategoryForm()})
 
 
+def generate_monthly_balance_graph(data):
+    """
+    Write syncronously the graph to a file
+    Return boolean representing whether a graph was generated or not
+    """
+    is_graph_generated = False
+    if len(data) > 1:
+        # Write graph to file
+        # NOTE: this is syncrous!
+        # NOTE: require static/images folder to exist, have privileges, etc
+        dates = []
+        amounts = []
+        for val in data:
+            amounts.append(val['amount'])
+            dates.append(val['date'])
+        plot.generateGraph(dates, amounts)
+        is_graph_generated = True
+    return is_graph_generated
+
+
 @require_http_methods(["GET", "POST"])
 def monthly_balances_page(request, date=None):
     """
@@ -286,17 +343,7 @@ def monthly_balances_page(request, date=None):
     show_graph = False
     if date is None:
         mb = m.MonthlyBalance.objects.values('date').order_by('date').annotate(amount=Sum('amount'))
-        if len(mb) > 1:
-            # Write graph to file
-            # NOTE: this is syncrous!
-            # NOTE: require static/images folder to exist, have privileges, etc
-            dates = []
-            amounts = []
-            for val in mb:
-                amounts.append(val['amount'])
-                dates.append(val['date'])
-            plot.generateGraph(dates, amounts)
-            show_graph = True
+        show_graph = generate_monthly_balance_graph(mb)
     else:
         complete_date = f"{date}-01"
         mb = m.MonthlyBalance.objects.select_related('category').filter(date=complete_date).order_by('date')

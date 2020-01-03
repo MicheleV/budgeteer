@@ -1,15 +1,50 @@
 {% extends 'base.html' %}
 {% load budgets_tags %}
 {% load humanize %}
+{% load staticfiles %}
 
 {% block title %}Budgeteer{% endblock %}
 
 {% block content %}
 
+TODO
+<ul>
+  <li>add pie graph for owned money (% category1, %category2, ...)</li>
+  <li>add goal model</li>
+  <li>show goal in here "X months(amount {currency} /month), Y months (bigger amount {currency} /month) to goal"</li>
+</ul>
+
+<h5>General recap</h5>
+<div class="table-responsive-md table-sm">
+  <table class="table" id="id_recap">
+    <tr>
+        <td>Starting balance</td>
+        <td>{{ currency}} {{ starting_balance | intcomma }}</td>
+    </tr>
+    <tr>
+        <td>Current balance</td>
+        <td>{{ currency }} {{ current_balance | intcomma }}</td>
+    </tr>
+    <tr>
+        <td>Result</td>
+        <td class="{% if current_balance|sub:starting_balance < 0 %}text-danger{% else %}text-success{% endif %}">
+          {{ currency }}{% if current_balance|sub:starting_balance < 0 %}-{% else %}+{% endif %}{{ current_balance|sub:starting_balance | intcomma }}
+          ({% if current_balance|sub:starting_balance < 0 %}-{% else %}+{% endif %}{{ current_balance|div:starting_balance}}%)
+        </td>
+    </tr>
+  </table>
+</div>
+
+{% if show_graph %}
+  <div>
+    <!-- NOTE: this image is regenerated (overwritten) on each request -->
+    <img src="{% static 'images/graph.png' %}">
+  </div>
+{% endif %}
+
 {% if categories %}
 <h5 id="id_current_month_date">Summary for {% now 'Y-m' %}</h5>
-  <div class="table-responsive-md">
-      <table class="table" id="id_expenses_total">
+  <table class="table-responsive-md table-sm" id="id_expenses_total">
     <tr>
       <th>Category</th>
       <th>Spended amount</th>
@@ -31,25 +66,21 @@
       </tr>
     {% endfor %}
   </table>
-</div>
 {% endif %}
 
 {% if income_categories %}
-<div class="table-responsive-md">
-    <table class="table" id="id_incomes_total">
+<table class="table table-responsive-md table-sm" id="id_incomes_total">
+  <tr>
+    <th>Category</th>
+    <th>Income amount</th>
+  </tr>
+  {% for inc in income_categories %}
     <tr>
-      <th>Category</th>
-      <th>Income amount</th>
+      <td>{{ inc.text }}</td>
+      <td>{{ inc.total | intcomma }}</td>
     </tr>
-    {% for inc in income_categories %}
-      <tr>
-        <td>{{ inc.text }}</td>
-        <td>{{ inc.total | intcomma }}</td>
-      </tr>
-    {% endfor %}
-  </table>
-
-</div>
+  {% endfor %}
+</table>
 {% endif %}
 
 {% endblock %}

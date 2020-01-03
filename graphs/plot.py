@@ -49,6 +49,8 @@ def prepareGraphData(x, y):
     # Make sure the x axis is not showing after or before the values we do have
     ax.set_xbound(lower=x[0], upper=x[-1])
 
+    # TODO: add horizontal line with goal1, goal2...etc
+
 
 def generateGraph(x, y):
     """

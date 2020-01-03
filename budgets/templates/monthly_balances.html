@@ -21,31 +21,27 @@
       <img src="{% static 'images/graph.png' %}">
     </div>
   {% endif %}
-  
-  <div class="table-responsive-md table-sm">
-    <table class="table" id="id_monthly_balances">
-      <tr>
-        <th>Date</th>
-        <th>Amount</th>
-        {% if not show_graph %}<th>Category</th> {% endif %}
-      </tr>
-      {% for monthly_balance in monthly_balance reversed%}
-        <tr>
-          <td>{{ monthly_balance.date | date:'Y-m' }}</td>
-          <td>{{ monthly_balance.amount | intcomma }}</td>
-          {% if not show_graph %}<td>{{ monthly_balance.category.text }}</td> {% endif %}
-        </tr>
-      {% endfor %}
-      {% if total > 0 and not show_graph%}
-        <tr>
-          <td>Total</td>
-          <td>{{ total }}</td>
-          <td> - </td>
-        </tr>
-      {% endif %}
-    </table>
-  </div>
 
-
+<table class="table table-responsive-md table-sm" id="id_monthly_balances">
+  <tr>
+    <th>Date</th>
+    <th>Amount</th>
+    {% if not show_graph %}<th>Category</th> {% endif %}
+  </tr>
+  {% for monthly_balance in monthly_balance reversed%}
+    <tr>
+      <td>{{ monthly_balance.date | date:'Y-m' }}</td>
+      <td>{{ monthly_balance.amount | intcomma }}</td>
+      {% if not show_graph %}<td>{{ monthly_balance.category.text }}</td> {% endif %}
+    </tr>
+  {% endfor %}
+  {% if total > 0 and not show_graph%}
+    <tr>
+      <td>Total</td>
+      <td>{{ total }}</td>
+      <td> - </td>
+    </tr>
+  {% endif %}
+</table>
 
 {% endblock %}

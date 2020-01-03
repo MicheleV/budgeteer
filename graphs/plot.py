@@ -20,6 +20,25 @@ def generateDummyData():
     return (x, y)
 
 
+# Docs: https://matplotlib.org/3.1.1/gallery/pie_and_polar_charts/pie_features.html#sphx-glr-gallery-pie-and-polar-charts-pie-features-py
+def generatePie(labels, values):
+    fig1, ax1 = plt.subplots()
+
+    # Credits: https://stackoverflow.com/a/46693008/2535658
+    def hide_0_percent_pies_labels(pct):
+        return ('%1.1f%%' % pct) if pct > 1 else ''
+
+    ax1.pie(values, labels=labels, autopct=hide_0_percent_pies_labels,
+          shadow=True, startangle=90)
+
+    # def autopct_more_than_1(pct):
+    #     return ('%1.f%%' % pct) if pct > 1 else ''
+
+    # ax1.pie(values, labels=labels, autopct='%1.1f%%',
+    #       shadow=True, startangle=90)
+    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+
+
 def prepareGraphData(x, y):
     """
     Prepare the data for the graph
@@ -50,6 +69,15 @@ def prepareGraphData(x, y):
     ax.set_xbound(lower=x[0], upper=x[-1])
 
     # TODO: add horizontal line with goal1, goal2...etc
+
+
+def generatePieGraph(labels, values):
+    """
+    Create the pie graph and write it to a file
+    """
+    generatePie(labels, values)
+    # Workaround for machines that do not have TKAgg
+    plt.savefig('static/images/pie-graph.png')
 
 
 def generateGraph(x, y):

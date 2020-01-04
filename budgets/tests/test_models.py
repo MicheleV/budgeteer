@@ -1,11 +1,13 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from django.db.utils import IntegrityError
-from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.utils import IntegrityError
+
+from django.core.exceptions import ValidationError
+
 import budgets.models as m
-from .base import BaseTest
+from budgets.tests.base import BaseTest
 
 
 class ModelsTest(BaseTest):

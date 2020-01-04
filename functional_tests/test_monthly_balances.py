@@ -1,8 +1,10 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+from django.urls import reverse
+from django.urls import resolve
+
 import functional_tests.helpers as Helpers
-from django.urls import reverse, resolve
 
 
 def test_image_is_not_displayed_without_data(self):

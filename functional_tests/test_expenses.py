@@ -1,9 +1,10 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from datetime import date, timedelta
+from datetime import date
+from datetime import timedelta
+
 from django.urls import reverse, resolve
-from datetime import date, timedelta
 import functional_tests.helpers as Helpers
 
 

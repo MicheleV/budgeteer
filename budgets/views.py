@@ -1,27 +1,30 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from django.db.models import Sum
-from django.shortcuts import render, redirect
-from django.views.decorators.http import require_http_methods
-from django.core.exceptions import ValidationError
-from django.urls import reverse
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-import budgets.models as m
-import budgets.forms as f
-from budgets.serializers import CategorySerializer
-# TODO: choose and apply the imports order to the project
-from graphs import plot
-import datetime
 import calendar
+import datetime
 from dateutil.relativedelta import relativedelta
 import os
+
+from django.db.models import Sum
+from django.core.exceptions import ValidationError
+from django.shortcuts import redirect
+from django.shortcuts import render
+from django.urls import reverse
+from django.views.decorators.http import require_http_methods
 from dotenv import load_dotenv
+from graphs import plot
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+import budgets.forms as f
+import budgets.models as m
+from budgets.serializers import CategorySerializer
 
 load_dotenv()
 
 
+# TODO: move these methods to an utility class
 def get_previous_month_first_day_date(date):
     """
     Return a date object, which is the first day of the month before the input
@@ -133,10 +136,10 @@ def home_page(request):
     mb = m.MonthlyBalance.objects.values('date').order_by('date').annotate(amount=Sum('amount'))
     show_graph = generate_monthly_balance_graph(mb)
 
-    current_mb = m.MonthlyBalance.objects.select_related('category').filter(date=start)
+    current_mb = m.MonthlyBalance.objects.select_related('category').filter(date=start).order_by('category_id')
     current_mb_total = current_mb.aggregate(Sum('amount'))['amount__sum']
 
-    prev_mb = m.MonthlyBalance.objects.select_related('category').filter(date=prev_month)
+    prev_mb = m.MonthlyBalance.objects.select_related('category').filter(date=prev_month).order_by('category_id')
     prev_mb_total = prev_mb.aggregate(Sum('amount'))['amount__sum']
 
     show_pie_graph = generate_current_monthly_balance_pie_graph(current_mb)

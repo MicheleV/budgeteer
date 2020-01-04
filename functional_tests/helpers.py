@@ -2,15 +2,17 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # Docs at https://selenium-python.readthedocs.io/waits.html
-from datetime import date, timedelta
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import Select
+from datetime import date
+from datetime import timedelta
+import locale
+
 # Docs at https://seleniumhq.github.io/selenium/docs/api/py/webdriver_support/
 #  selenium.webdriver.support.expected_conditions.html
-from selenium.webdriver.support import expected_conditions as EC
 from django.urls import resolve, reverse
-import locale
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
 
 locale.setlocale(locale.LC_ALL, '')
 MAX_DELAY = 3

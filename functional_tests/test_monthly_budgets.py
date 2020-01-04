@@ -2,9 +2,12 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 import datetime
-from django.urls import resolve, reverse
-import functional_tests.helpers as Helpers
 from unittest import skip
+
+from django.urls import resolve
+from django.urls import reverse
+
+import functional_tests.helpers as Helpers
 
 
 def test_cant_create_an_empty_monthly_budget(self):

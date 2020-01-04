@@ -2,19 +2,21 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 import os
+
+from django.test import LiveServerTestCase
+from django.urls import resolve
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
-from django.test import LiveServerTestCase
-from django.urls import resolve
+
 from budgets.models import Category
 import functional_tests.helpers as Helpers
 import functional_tests.test_categories as Categories
 import functional_tests.test_expenses as Expenses
+import functional_tests.test_monthly_balances as MonthlyBalances
 import functional_tests.test_monthly_budgets as MBudgets
 import functional_tests.test_page_access as PageAccess
 import functional_tests.test_views_and_layout as ViewAndLayout
-import functional_tests.test_monthly_balances as MonthlyBalances
 
 # Docs at https://docs.djangoproject.com/en/2.2/topics/testing/
 # tools/#django.test.TransactionTestCase

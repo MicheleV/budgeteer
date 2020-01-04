@@ -1,8 +1,10 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from django.urls import resolve, reverse
+from django.urls import resolve
+from django.urls import reverse
 from django.test import TestCase
+
 import budgets.models as m
 
 

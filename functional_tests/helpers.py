@@ -2,15 +2,19 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # Docs at https://selenium-python.readthedocs.io/waits.html
-from datetime import date, timedelta
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import Select
+from datetime import date
+from datetime import timedelta
+import locale
+
 # Docs at https://seleniumhq.github.io/selenium/docs/api/py/webdriver_support/
 #  selenium.webdriver.support.expected_conditions.html
-from selenium.webdriver.support import expected_conditions as EC
 from django.urls import resolve, reverse
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
 
+locale.setlocale(locale.LC_ALL, '')
 MAX_DELAY = 3
 
 
@@ -134,7 +138,8 @@ def create_a_monthly_budget(self, category_name, amount, date,
     submit_button.click()
 
     if verify_creation:
-        verify_monthly_expense_was_created(self, category_name, amount, date)
+        formatted_amount = f'{amount:n}'
+        verify_monthly_expense_was_created(self, category_name, formatted_amount, date)
 
 
 def create_entry(self, amount, category_name, note, expense_date,
@@ -172,8 +177,9 @@ def create_entry(self, amount, category_name, note, expense_date,
     submit_button.click()
 
     if verify_creation:
+        formatted_amount = f'{amount:n}'
         # Frank can see the information the correct information on the page
-        verify_expense_was_created(self, amount, category_name, note)
+        verify_expense_was_created(self, formatted_amount, category_name, note)
 
     # The page reload and the expense entered item is displayed correctly
     # TODO code smell, this wait_for_page_to_reload() should be needed
@@ -227,7 +233,7 @@ def verify_expense_was_created(self, amount, category_name, note):
     find_text_inside_table(self, str(amount), table)
     find_text_inside_table(self, category_name, table)
     find_text_inside_table(self, note, table)
-    # TODO: Find a way to verify the date taking in account the browser locale
+    # TODO: check for date! This is not browser dependent
     # find_text_inside_table('2019-08-04', table)
 
 

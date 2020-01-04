@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # Only imports and save expense categories and expenses for now
 # NOTE: This tool is not unit tested
@@ -5,11 +7,17 @@
 #
 
 import csv
-import sys
 from datetime import datetime
+import sys
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Base, Category, Expense, IncomeCategory, Income
+
+from models import Base
+from models import Category
+from models import Expense
+from models import Income
+from models import IncomeCategory
 
 
 class Usage(Exception):

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block title %}Incomes{% endblock %}
 
@@ -15,7 +16,7 @@
   {% endif %}
   {% csrf_token %}
 
- <div class="table-responsive-md">
+ <div class="table-responsive-md table-sm">
   <table class="table" id="id_incomes">
     <tr>
       <th>Amount</th>
@@ -25,7 +26,7 @@
     </tr>
     {% for income in incomes %}
       <tr>
-        <td>{{ income.amount }}</td>
+        <td>{{ income.amount | intcomma }}</td>
         <td>{{ income.category.text }}</td>
         <td>{{ income.date }}</td>
         <td>{{ income.note }}</td>

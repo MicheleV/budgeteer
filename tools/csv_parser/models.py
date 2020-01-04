@@ -1,8 +1,17 @@
-from sqlalchemy import Column, String, Integer, Date, ForeignKey
-from sqlalchemy import select, create_engine
-from sqlalchemy.orm import relationship, backref, sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine
 from sqlalchemy import exc
+from sqlalchemy import select
+from sqlalchemy import Column
+from sqlalchemy import Date
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm import sessionmaker
+
+
 
 # TODO: move this away from the global namespace
 Base = declarative_base()

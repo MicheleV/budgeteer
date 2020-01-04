@@ -17,6 +17,9 @@
         dest: "{{ app_dir }}"
         version: master
         force: yes
+      notify:
+          # TODO: check whether this fails on the first deploy or not
+        - restart gunicorn
 
     # TODO: Edit so that this is executed only if necessary
     - name: Allow nginx to read the base dir (posix permission)

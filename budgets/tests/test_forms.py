@@ -2,7 +2,7 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 import budgets.forms as f
-from .base import BaseTest
+from budgets.tests.base import BaseTest
 
 
 # Credits http://www.obeythetestinggoat.com/book/chapter_simple_form.html

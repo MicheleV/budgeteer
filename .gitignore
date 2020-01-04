@@ -6,3 +6,6 @@ db.sqlite3
 /static
 /tools/inventory.ansible
 .env
+coverage_html
+htmlcov
+.coverage

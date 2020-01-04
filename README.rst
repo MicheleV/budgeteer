@@ -123,6 +123,15 @@ Run the unit test suite::
     [TEST_TARGET=localhost ] python manage.py test budgets --keep
 
 
+Coverage
+=======
+
+Generate coverage::
+
+    coverage run --omit="virtualenv/*,budgets/migrations/*,budgeteer/wsgi.py,budgets/admin*,budgets/app*,budgets/tests/*,functional_tests/*,manage.py" manage.py test
+    coverage html -d coverage_html
+
+
 References and useful links
 =======
 
@@ -140,7 +149,7 @@ References and useful links
 9. `Ansible <https://docs.ansible.com/>`_
 10. `geckodriver <https://github.com/mozilla/geckodriver>`_
 11. `Executing queries on init (e.g. Models.py populating dropdown) <https://stackoverflow.com/a/39084645/2535658>`_
-
+12. `Imports order convention <https://docs.openstack.org/hacking/latest/user/hacking.html#imports>`_
 
 Author
 =======

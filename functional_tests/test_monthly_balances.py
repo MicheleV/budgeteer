@@ -1,8 +1,10 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+from django.urls import reverse
+from django.urls import resolve
+
 import functional_tests.helpers as Helpers
-from django.urls import reverse, resolve
 
 
 def test_image_is_not_displayed_without_data(self):
@@ -18,6 +20,21 @@ def test_image_is_not_displayed_without_data(self):
 def test_image_is_displayed_with_data(self):
     # Frank enters some data (he wants to get his hands on the new graphs asap)
     # Frank finally opens the monthly balances page and see a shiny graph
+    pass
+
+
+# TODO:write me
+def test_all_data_table_is_ordered_date_desc(self):
+    pass
+
+
+# TODO:write me
+def test_specific_month_data_shows_no_graph(self):
+    pass
+
+
+# TODO:write me
+def test_specific_month_data_shows_total(self):
     pass
 
 

@@ -13,88 +13,102 @@ TODO
   <li>show goal in here "X months(amount {currency} /month), Y months (bigger amount {currency} /month) to goal"</li>
 </ul>
 
-<h5>General recap</h5>
-<div class="table-responsive-md table-sm">
-  <table class="table" id="id_recap">
-    <tr>
-        <td>Starting balance</td>
-        <td>{{ currency}} {{ starting_balance | intcomma }}</td>
-    </tr>
-    <tr>
-        <td>Current balance</td>
-        <td>{{ currency }} {{ current_balance | intcomma }}</td>
-    </tr>
-    <tr>
-        <td>Result</td>
-        {% if current_balance and starting_balance%}
-        <td class="{% if current_balance|sub:starting_balance < 0 %}text-danger{% else %}text-success{% endif %}">
-          {{ currency }}{% if current_balance|sub:starting_balance < 0 %}-{% else %}+{% endif %}{{ current_balance|sub:starting_balance | intcomma }}
-          ({% if current_balance|sub:starting_balance < 0 %}-{% else %}+{% endif %}{{ current_balance|div:starting_balance}}%)
-        </td>
-        {% else %}
-          -
-        {% endif %}
-    </tr>
-  </table>
+
+<div class="row">
+  <div  class="col">
+    <h5>General recap</h5>
+    <div class="table-responsive-md table-sm">
+      <table class="table" id="id_recap">
+        <tr>
+            <td>Starting balance</td>
+            <td>{{ currency}} {{ starting_balance | intcomma }}</td>
+        </tr>
+        <tr>
+            <td>Current balance</td>
+            <td>{{ currency }} {{ current_balance | intcomma }}</td>
+        </tr>
+        <tr>
+            <td>Result</td>
+            {% if current_balance and starting_balance%}
+            <td class="{% if current_balance|sub:starting_balance < 0 %}text-danger{% else %}text-success{% endif %}">
+              {{ currency }}{% if current_balance|sub:starting_balance < 0 %}-{% else %}+{% endif %}{{ current_balance|sub:starting_balance | intcomma }}
+              ({% if current_balance|sub:starting_balance < 0 %}-{% else %}+{% endif %}{{ current_balance|div:starting_balance}}%)
+            </td>
+            {% else %}
+              -
+            {% endif %}
+        </tr>
+      </table>
+    </div>
+  </div>
 </div>
 
-{% if show_graph %}
-  <div>
-    <!-- NOTE: this image is regenerated (overwritten) on each request -->
-    <img src="{% static 'images/graph.png' %}">
+<div class="row">
+    {% if show_graph %}
+    <div  class="col">
+      <!-- NOTE: this image is regenerated (overwritten) on each request -->
+      <img src="{% static 'images/graph.png' %}" class="img-fluid" alt="Responsive image">
+    </div>
+    {% endif %}
+    {% if show_pie_graph %}
+      <div class="col">
+        <!-- NOTE: this image is regenerated (overwritten) on each request -->
+        <img src="{% static 'images/pie-graph.png' %}" class="img-fluid" alt="Responsive image">
+      </div>
+    {% endif %}
+</div>
+
+<div class="row">
+  {% if current_mb %}
+    <div  class="col">
+      <h6>Current situation</h6>
+      <table class="table table-responsive-md table-sm" id="id_monthly_balances">
+        <tr>
+          <th>Category</th>
+          <th>Amount</th>
+        </tr>
+
+        {% for monthly_balance in current_mb %}
+          <tr>
+            <td>{{ monthly_balance.category.text }}</td>
+            <td>{{ currency}} {{ monthly_balance.amount | intcomma }}</td>
+          </tr>
+        {% endfor %}
+
+          <tr>
+            <td><b>Total</b></td>
+            <td><b>{{ currency}} {{ current_mb_total | intcomma }}</b></td>
+          </tr>
+      </table>
+    </div>
+  {% endif %}
+
+  {% if prev_mb %}
+  <div  class="col">
+    <h6>Previous month situation</h6>
+    <table class="table table-responsive-md table-sm" id="id_monthly_balances">
+      <tr>
+        <th>Category</th>
+        <th>Amount</th>
+      </tr>
+
+      {% for monthly_balance in prev_mb %}
+        <tr>
+          <td>{{ monthly_balance.category.text }}</td>
+          <td>{{ currency}} {{ monthly_balance.amount | intcomma }}</td>
+        </tr>
+      {% endfor %}
+
+        <tr>
+          <td><b>Total</b></td>
+          <td><b>{{ currency}} {{ prev_mb_total | intcomma }}</b></td>
+        </tr>
+    </table>
   </div>
-{% endif %}
+  {% endif %}
+</div>
 
-{% if show_pie_graph %}
-  <div>
-    <!-- NOTE: this image is regenerated (overwritten) on each request -->
-    <img src="{% static 'images/pie-graph.png' %}">
-  </div>
-{% endif %}
 
-{% if current_mb %}
-<h6>Current situation</h6>
-<table class="table table-responsive-md table-sm" id="id_monthly_balances">
-  <tr>
-    <th>Category</th>
-    <th>Amount</th>
-  </tr>
-
-  {% for monthly_balance in current_mb %}
-    <tr>
-      <td>{{ monthly_balance.category.text }}</td>
-      <td>{{ currency}} {{ monthly_balance.amount | intcomma }}</td>
-    </tr>
-  {% endfor %}
-
-    <tr>
-      <td><b>Total</b></td>
-      <td><b>{{ currency}} {{ current_mb_total | intcomma }}</b></td>
-    </tr>
-</table>
-{% endif %}
-
-{% if prev_mb %}
-<h6>Previous month situation</h6>
-<table class="table table-responsive-md table-sm" id="id_monthly_balances">
-  <tr>
-    <th>Category</th>
-    <th>Amount</th>
-  </tr>
-
-  {% for monthly_balance in prev_mb %}
-    <tr>
-      <td>{{ monthly_balance.category.text }}</td>
-      <td>{{ currency}} {{ monthly_balance.amount | intcomma }}</td>
-    </tr>
-  {% endfor %}
-
-    <tr>
-      <td><b>Total</b></td>
-      <td><b>{{ currency}} {{ prev_mb_total | intcomma }}</b></td>
-    </tr>
-</table>
-{% endif %}
 
 <!-- TODO: shorten this. Hide amount = 0 items? -->
 {% if income_categories %}
@@ -105,12 +119,12 @@ TODO
   </tr>
   {% for inc in income_categories %}
   <!-- TODO: verify at least on category is more than 0-->
-    {% if inc.total > 0 %}
+    <!-- {% if inc.total > 0 %} -->
     <tr>
       <td>{{ inc.text }}</td>
       <td>{{ currency}} {{ inc.total | intcomma }}</td>
     </tr>
-    {% endif %}
+    <!-- {% endif %} -->
   {% endfor %}
 </table>
 {% endif %}
@@ -125,6 +139,7 @@ TODO
       <th>Status</th>
     </tr>
     {% for cat in categories %}
+      {% if cat.total > 0 or cat.mb.amount %}
       <tr>
         <td>{{ cat.text }}</td>
         <td>{{ currency}} {{ cat.total | intcomma }}</td>
@@ -137,6 +152,7 @@ TODO
         <td> {{ "N/A" }} </td>
         {% endif %}
       </tr>
+      {% endif %}
     {% endfor %}
   </table>
 {% endif %}

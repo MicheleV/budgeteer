@@ -28,22 +28,20 @@ def generatePie(labels, values):
     def hide_0_percent_pies_labels(pct):
         return ('%1.1f%%' % pct) if pct > 1 else ''
 
-    ax1.pie(values, labels=labels, autopct=hide_0_percent_pies_labels,
-          shadow=True, startangle=90)
+    patches, texts, _ = ax1.pie(values, autopct=hide_0_percent_pies_labels,
+                                shadow=True, startangle=90)
 
-    # def autopct_more_than_1(pct):
-    #     return ('%1.f%%' % pct) if pct > 1 else ''
+    # Set aspect ratio to be equal so that pie is drawn as a circle.
+    ax1.axis('equal')
 
-    # ax1.pie(values, labels=labels, autopct='%1.1f%%',
-    #       shadow=True, startangle=90)
-    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    plt.legend(patches, labels, loc="best", facecolor="white", framealpha=0.3)
+    plt.tight_layout()
 
 
 def prepareGraphData(x, y):
     """
     Prepare the data for the graph
     """
-    # TODO: matplot lib has problem with 4 bytes characters
     currency = os.getenv("currency")
     # Blue used in examples on matplotsite
     # https://github.com/matplotlib/matplotlib/blob/v3.1.2/lib/matplotlib/_color_data.py#L17
@@ -65,9 +63,6 @@ def prepareGraphData(x, y):
     # Force all dates labels to be displayed on the x axis
     xticks(((x)))
 
-    # Make sure the x axis is not showing after or before the values we do have
-    ax.set_xbound(lower=x[0], upper=x[-1])
-
     # TODO: add horizontal line with goal1, goal2...etc
 
 
@@ -76,8 +71,7 @@ def generatePieGraph(labels, values):
     Create the pie graph and write it to a file
     """
     generatePie(labels, values)
-    # Workaround for machines that do not have TKAgg
-    plt.savefig('static/images/pie-graph.png')
+    plt.savefig('static/images/pie-graph.png',  bbox_inches="tight", dpi=130)
 
 
 def generateGraph(x, y):
@@ -85,9 +79,7 @@ def generateGraph(x, y):
     Create the graph and write it to a file
     """
     prepareGraphData(x, y)
-
-    # Workaround for machines that do not have TKAgg
-    plt.savefig('static/images/graph.png', bbox_inches="tight")
+    plt.savefig('static/images/graph.png', bbox_inches="tight", dpi=130)
 
 
 def main(data, save_to_file=True):

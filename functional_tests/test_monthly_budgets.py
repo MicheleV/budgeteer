@@ -4,6 +4,7 @@
 import datetime
 from django.urls import resolve, reverse
 import functional_tests.helpers as Helpers
+from unittest import skip
 
 
 def test_cant_create_an_empty_monthly_budget(self):
@@ -18,20 +19,20 @@ def test_can_create_multiple_monthly_budgets(self):
     category_name = 'Rent'
     Helpers.create_a_category(self, category_name)
 
-    # Frank notices the home page is complaining about missing budgets for the
-    # current month
+    # Frank notices the home page is NOT complaining about missing budgets for
+    # the current month <- TODO: fix me
     url = reverse('home')
     self.browser.get(f"{self.live_server_url}{url}")
     table = self.browser.find_element_by_id('id_expenses_total')
-    missing_budget_err = "No monthly budget for this month"
-    Helpers.find_text_inside_table(self, missing_budget_err, table)
+    # TODO: change this as we now hide categories without a monthly budget
+    # missing_budget_err = "No monthly budget for this month"
+    # Helpers.find_text_inside_table(self, missing_budget_err, table)
 
     budget_date = datetime.date.today().replace(day=1)
     amount = 7000
     Helpers.create_a_monthly_budget(self, category_name, amount, budget_date)
 
-    # Frank notices the home page shows that amount he has set, and the notice
-    # has disappeared
+    # Frank notices the home page shows that amount he has set
     url = reverse('home')
     self.browser.get(f"{self.live_server_url}{url}")
     table = self.browser.find_element_by_id('id_expenses_total')

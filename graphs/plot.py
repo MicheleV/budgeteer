@@ -22,7 +22,6 @@ def generateDummyData():
     return (x, y)
 
 
-# Docs: https://matplotlib.org/3.1.1/gallery/pie_and_polar_charts/pie_features.html#sphx-glr-gallery-pie-and-polar-charts-pie-features-py
 def generatePie(labels, values):
     fig1, ax1 = plt.subplots()
 
@@ -30,7 +29,14 @@ def generatePie(labels, values):
     def hide_0_percent_pies_labels(pct):
         return ('%1.1f%%' % pct) if pct > 1 else ''
 
+    # Add theme
+    # Credits: https://www.pythonprogramming.in/how-to-pie-chart-with-different-color-themes-in-matplotlib.html
+    theme = plt.get_cmap('tab20c')
+    ax1.set_prop_cycle("color", [theme(1. * i / len(values))
+                             for i in range(len(values))])
+
     patches, texts, _ = ax1.pie(values, autopct=hide_0_percent_pies_labels,
+
                                 shadow=True, startangle=90)
 
     # Set aspect ratio to be equal so that pie is drawn as a circle.

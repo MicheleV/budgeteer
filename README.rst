@@ -77,7 +77,7 @@ Install the required packages on RHEL like distros::
     cd tools
     ansible-playbook -i inventory.ansible provision.yaml [--limit=<env-name>] [--ask-become-pass]
 
-Deploy
+Deploy::
 
     cd tools
     ansible-playbook -i inventory.ansible deploy.yaml [--limit=<env-name>] [--ask-become-pass]

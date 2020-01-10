@@ -16,3 +16,9 @@ Speeding up Seleniunm notes
 3. `Speeding up Selenium <https://helpfulsheep.com/2017-05-24-speeding-up-selenium/>`_
 4. `Tips on to improve speed of Selenium tests execution <https://letztest.blogspot.com/2016/03/10-tips-for-improving-speed-of.html>`_
 5. `More of it <https://seleniumjava.com/2015/12/12/how-to-make-selenium-webdriver-scripts-faster/>`_
+
+TODO
+=======
+1. Testing: prepopulate cookies with selenium when implementing login
+2. Testing: selenium delete_all_visible_cookies(), instead of closing the browser each time
+3. Testing: selenium-grid, look it up

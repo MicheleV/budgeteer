@@ -23,29 +23,6 @@ class HomePageTest(BaseTest):
         response = self.get_response_from_named_url('home')
         self.assertTemplateUsed(response, 'home.html')
 
-    def test_redirect_on_POST(self):
-        url = reverse('categories')
-        response = self.client.post(url, data={'text': 'Rent'})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], url)
-
-    def test_save_on_POST(self):
-        url = reverse('new_category')
-        response = self.client.post(url,  data={'text': 'Rent'})
-
-        self.assertEqual(Category.objects.count(), 1)
-        new_category = Category.objects.first()
-        self.assertEqual(new_category.text, 'Rent')
-
-    def test_displays_all_categories(self):
-        Category.objects.create(text='Rent')
-        Category.objects.create(text='Food')
-
-        url = reverse('categories')
-        response = self.client.get(url)
-        self.assertContains(response, 'Rent')
-        self.assertContains(response, 'Food')
-
 
 class CategoriesPageTest(BaseTest):
 
@@ -62,6 +39,20 @@ class CategoriesPageTest(BaseTest):
     def test_uses_category_form(self):
         response = self.get_response_from_named_url('categories')
         self.assertIsInstance(response.context['form'], f.CategoryForm)
+
+    def test_redirect_on_POST(self):
+        url = reverse('categories')
+        response = self.client.post(url, data={'text': 'Rent'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], url)
+
+    def test_save_on_POST(self):
+        url = reverse('new_category')
+        response = self.client.post(url,  data={'text': 'Rent'})
+
+        self.assertEqual(Category.objects.count(), 1)
+        new_category = Category.objects.first()
+        self.assertEqual(new_category.text, 'Rent')
 
     def test_save_and_retrieve_categories(self):
         first_category = self.create_category('Rent')
@@ -85,6 +76,15 @@ class CategoriesPageTest(BaseTest):
         self.assertFalse(form.is_valid())
         self.check_if_error_matches('Ensure this value has at most',
                                     form.errors['text'])
+
+    def test_displays_all_categories(self):
+        Category.objects.create(text='Rent')
+        Category.objects.create(text='Food')
+
+        url = reverse('categories')
+        response = self.client.get(url)
+        self.assertContains(response, 'Rent')
+        self.assertContains(response, 'Food')
 
 
 class MonthlyBudgetPageTest(BaseTest):

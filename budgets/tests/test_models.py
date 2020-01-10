@@ -12,6 +12,52 @@ from budgets.tests.base import BaseTest
 
 class ModelsTest(BaseTest):
 
+    def test_models_to_string(self):
+        category = self.create_category('Rent')
+        amount = 5000
+        note = 'First month of rent'
+        date = '2019-08-04'
+        first_expense = self.create_expense(
+          category=category,
+          amount=amount,
+          note=note,
+          date=date
+        )
+        second_expense = self.create_expense(
+          category=category,
+          amount=amount,
+          note=note,
+          date=date,
+        )
+        string_repr = f"{category.id}: ({note}), {amount}, {date}"
+        self.assertEqual("%s" % second_expense, string_repr)
+
+        inc_category = self.create_income_category('Rent')
+        string_repr = f"{inc_category.text}"
+        self.assertEqual("%s" % inc_category, 'Rent')
+
+        inc_amount = 10000
+        inc_note = 'August Wage'
+        inc_date = '2019-08-10'
+        first_income = self.create_income(
+          category=inc_category,
+          amount=inc_amount,
+          note=inc_note,
+          date=inc_date
+        )
+        string_repr = f"{first_income.id}: {inc_amount}, {inc_note}, {inc_date}"
+        self.assertEqual("%s" % first_income, string_repr)
+
+        b_category = self.create_monthly_balance_category('Bank')
+        string_repr = f"{inc_category.text}"
+        self.assertEqual("%s" % b_category, 'Bank')
+
+        m_amount = 42000
+        m_date = '2019-08-10'
+        m_balance = self.create_monthly_balance(b_category, amount, date)
+        string_repr = f"{m_balance.id}: {amount}, {date}"
+        self.assertEqual("%s" % m_balance, string_repr)
+
     def test_saving_and_retrieving_expenses(self):
         category = self.create_category('Rent')
 

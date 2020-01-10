@@ -100,4 +100,5 @@ def test_cant_create_multiple_monthly_budgets_for_same_month(self):
     Helpers.create_a_monthly_budget(self, category_name, amount, budget_date)
 
     # However an error promtply notifies him that this is not allowed
-    Helpers.find_error(self, 'Monthly budget with this Category and Date already exists.')
+    error = 'Monthly budget with this Category and Date already exists.'
+    Helpers.find_error(self, error)

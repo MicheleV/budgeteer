@@ -139,7 +139,8 @@ def create_a_monthly_budget(self, category_name, amount, date,
 
     if verify_creation:
         formatted_amount = f'{amount:n}'
-        verify_monthly_expense_was_created(self, category_name, formatted_amount, date)
+        verify_monthly_expense_was_created(self, category_name,
+                                           formatted_amount, date)
 
 
 def create_entry(self, amount, category_name, note, expense_date,

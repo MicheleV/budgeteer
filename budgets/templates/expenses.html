@@ -1,37 +1,58 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load staticfiles %}
 
 {% block title %}Expenses{% endblock %}
 
 {% block content %}
-<h5 id="id_current_month_date">Expenses logged during {{ month }}</h5>
-<hr>
-<form method="POST" action="{% url 'new_expense' %}">
-  {% csrf_token %}
-  {{ form }}
-  <input type="submit" id="id_submit" value="Submit">
-</form>
-  {% if errors %}
-      <div>{{ errors }}</div>
-  {% endif %}
-  {% csrf_token %}
+<div class="row">
+  <div  class="col">
+    <h5 id="id_current_month_date">Expenses logged during {{ month }}</h5>
+    <hr>
+    <form method="POST" action="{% url 'new_expense' %}">
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" id="id_submit" value="Submit">
+    </form>
+      {% if errors %}
+          <div>{{ errors }}</div>
+      {% endif %}
+      {% csrf_token %}
+  </div>
+</div>
 
-<div class="table-responsive-md table-sm">
-  <table class="table" id="id_expenses">
-  <tr>
-    <th>Spended date</th>
-    <th>Amount</th>
-    <th>Category</th>
-    <th>Note</th>
-  </tr>
-  {% for expense in expenses %}
-    <tr>
-      <td>{{ expense.date }}</td>
-      <td>{{ expense.amount | intcomma }}</td>
-      <td>{{ expense.category.text }}</td>
-      <td>{{ expense.note }}</td>
-    </tr>
-  {% endfor %}
-  </table>
+<div class="row">
+  <div  class="col">
+    <div class="table-responsive-md table-sm">
+      <table class="table" id="id_expenses">
+      <tr>
+        <th>Spended date</th>
+        <th>Amount</th>
+        <th>Category</th>
+        <th>Note</th>
+      </tr>
+      {% if expenses_sum %}
+        <tr>
+          <td> - </td>
+          <td><b>{{ expenses_sum | intcomma }}</b></td>
+          <td><b>Total</b></td>
+          <td> - </td>
+        </tr>
+      {% endif %}
+      {% for expense in expenses %}
+        <tr>
+          <td>{{ expense.date }}</td>
+          <td>{{ expense.amount | intcomma }}</td>
+          <td>{{ expense.category.text }}</td>
+          <td>{{ expense.note }}</td>
+        </tr>
+      {% endfor %}
+      </table>
+    </div>
+  </div>
+  <div class="col">
+    <!-- NOTE: this image is regenerated (overwritten) on each request -->
+    <img src="{% static 'images/pie-graph.png' %}" class="img-fluid" alt="Responsive image">
+  </div>
 </div>
 {% endblock %}

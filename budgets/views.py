@@ -111,11 +111,48 @@ def generate_current_monthly_balance_pie_graph(data):
         # NOTE: require static/images folder to exist, have privileges, etc
         labels = []
         values = []
-        # print(current_mbdata)
         for mb in filter(lambda y: y.amount > 0, data):
             labels.append(mb.category.text)
             values.append(mb.amount)
-        print(labels, values)
+
+        plot.generatePieGraph(labels, values)
+        is_graph_generated = True
+    return is_graph_generated
+
+
+# Credits https://stackoverflow.com/a/58612038
+def findInList(List, item):
+    """
+    Return the index of item inside List, or -1 if not found
+    """
+    try:
+        return List.index(item)
+    except ValueError:
+        return -1
+
+
+def generate_current_month_expenses_pie_graph(data):
+    """
+    Write syncronously the graph to a file
+    Return boolean representing whether a graph was generated or not
+    """
+    is_graph_generated = False
+    if len(data) > 1:
+        # Write graph to file
+        # NOTE: this is syncrous!
+        # NOTE: require static/images folder to exist, have privileges, etc
+        labels = []
+        values = []
+
+        # NOTE: this ugly block saves us one query... is it worth it?
+        for mb in filter(lambda y: y.amount > 0, data):
+            index = findInList(labels, mb.category.text)
+            if index == -1:
+                labels.append(mb.category.text)
+                values.append(mb.amount)
+            else:
+                values[index] = values[index] + mb.amount
+
         plot.generatePieGraph(labels, values)
         is_graph_generated = True
     return is_graph_generated
@@ -133,24 +170,25 @@ def home_page(request):
     prev_month = get_previous_month_first_day_date(start)
     starting_balance = get_total_of_monthly_balances(prev_month)
 
-    mb = m.MonthlyBalance.objects.values('date').order_by('date').annotate(amount=Sum('amount'))
+    mb = m.MonthlyBalance.objects.values('date').order_by('date'). \
+        annotate(amount=Sum('amount'))
     show_graph = generate_monthly_balance_graph(mb)
 
-    current_mb = m.MonthlyBalance.objects.select_related('category').filter(date=start).order_by('category_id')
+    current_mb = m.MonthlyBalance.objects.select_related('category'). \
+        filter(date=start).order_by('category_id')
     current_mb_total = current_mb.aggregate(Sum('amount'))['amount__sum']
 
-    prev_mb = m.MonthlyBalance.objects.select_related('category').filter(date=prev_month).order_by('category_id')
+    prev_mb = m.MonthlyBalance.objects.select_related('category'). \
+        filter(date=prev_month).order_by('category_id')
     prev_mb_total = prev_mb.aggregate(Sum('amount'))['amount__sum']
 
     show_pie_graph = generate_current_monthly_balance_pie_graph(current_mb)
-    # TODO check whether prefetch_related can be used for related models
+
     categories = m.Category.objects.all()
     for cat in categories:
         expenses = m.Expense.objects.filter(category_id=cat.id). \
                    filter(date__range=(start, end))
-        expenses_sum = sum(ex.amount for ex in expenses)
-        # TODO refactor the line above using aggrefate(Sum())
-        # expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
+        expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
         cat.total = expenses_sum
         cat.mb = cat.monthlybudget_set.filter(date=start).first()
 
@@ -169,7 +207,8 @@ def home_page(request):
         'income_categories': income_categories,
         'current_balance': current_balance,
         'starting_balance': starting_balance,
-        'currency': currency, # TODO: do this on the template side
+        # TODO: do this on the template side
+        'currency': currency,
         'show_graph': show_graph,
         'show_pie_graph': show_pie_graph,
         'current_mb': current_mb,
@@ -228,9 +267,14 @@ def expenses_page(request, date=None):
     # and aggregation
     categories = m.Category.objects.all()
     expenses = m.Expense.objects.filter(date__range=(start, end))
+    expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
+
+    show_pie_graph = generate_current_month_expenses_pie_graph(expenses)
+
     return render(request, 'expenses.html', {
         'categories': categories,
         'expenses': expenses,
+        'expenses_sum': expenses_sum,
         'form': f.ExpenseForm(),
         'errors': errors,
         'month': start.strftime("%Y-%m")
@@ -377,11 +421,13 @@ def monthly_balances_page(request, date=None):
     total = None
     show_graph = False
     if date is None:
-        mb = m.MonthlyBalance.objects.values('date').order_by('date').annotate(amount=Sum('amount'))
+        mb = m.MonthlyBalance.objects.values('date').order_by('date'). \
+            annotate(amount=Sum('amount'))
         show_graph = generate_monthly_balance_graph(mb)
     else:
         complete_date = f"{date}-01"
-        mb = m.MonthlyBalance.objects.select_related('category').filter(date=complete_date).order_by('date')
+        mb = m.MonthlyBalance.objects.select_related('category'). \
+            filter(date=complete_date).order_by('date')
 
     total = mb.aggregate(Sum('amount'))['amount__sum']
 

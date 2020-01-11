@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='category',
             name='is_archived',
-            field=models.BooleanField(default=True),
+            field=models.BooleanField(default=False),
         ),
     ]

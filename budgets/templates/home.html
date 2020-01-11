@@ -32,7 +32,7 @@ TODO
             {% if current_balance and starting_balance%}
             <td class="{% if current_balance|sub:starting_balance < 0 %}text-danger{% else %}text-success{% endif %}">
               {{ currency }}{% if current_balance|sub:starting_balance < 0 %}-{% else %}+{% endif %}{{ current_balance|sub:starting_balance | intcomma }}
-              ({% if current_balance|sub:starting_balance < 0 %}-{% else %}+{% endif %}{{ current_balance|div:starting_balance}}%)
+              ({% if starting_balance and current_balance|sub:starting_balance < 0 %}-{% else %}+{% endif %}{{ current_balance|div:starting_balance}}%)
             </td>
             {% else %}
               -
@@ -144,7 +144,7 @@ TODO
         <td>{{ cat.text }}</td>
         <td>{{ currency}} {{ cat.total | intcomma }}</td>
         <td>{{ cat.mb.amount|default:"No monthly budget for this month" }}</td>
-        {% if cat.mb.amount %}
+        {% if cat.mb.amount and cat.total %}
         <td class="{% if cat.mb.amount|sub:cat.total < 0 %}text-danger{% else %}text-success{% endif %}">
           {{ currency}} {{ cat.mb.amount|sub:cat.total | intcomma }}
         </td>

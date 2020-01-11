@@ -4,11 +4,11 @@ import os
 from dotenv import load_dotenv
 import matplotlib.cm as cmx
 from matplotlib.cm import get_cmap
-import matplotlib.colors as colors
 from matplotlib.dates import DayLocator
 from matplotlib.dates import HourLocator
 from matplotlib.dates import DateFormatter
 from matplotlib.dates import drange
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import xticks
 import numpy as np
@@ -80,10 +80,15 @@ def prepareGraphData(x, y, goals=None):
         cmap = get_cmap("Set1")
         color_list = cmap.colors
 
+        legend_items = []
         for idx in range(len(goals)):
             goal = goals[idx]
             colorVal = color_list[idx]
             ax.axhline(y=goal.amount, xmin=0.0, xmax=1.0, color=colorVal)
+            # Set goal legend
+            red_patch = mpatches.Patch(color=colorVal, label=goal.text)
+            legend_items.append(red_patch)
+        plt.legend(handles=legend_items)
 
 
 def generatePieGraph(labels, values):

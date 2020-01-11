@@ -2,8 +2,14 @@ import datetime
 import os
 
 from dotenv import load_dotenv
+import matplotlib.cm as cmx
+from matplotlib.cm import get_cmap
+import matplotlib.colors as colors
+from matplotlib.dates import DayLocator
+from matplotlib.dates import HourLocator
+from matplotlib.dates import DateFormatter
+from matplotlib.dates import drange
 import matplotlib.pyplot as plt
-from matplotlib.dates import DayLocator, HourLocator, DateFormatter, drange
 from matplotlib.pyplot import xticks
 import numpy as np
 import pandas as pd
@@ -12,22 +18,12 @@ import pandas as pd
 load_dotenv()
 
 
-def generateDummyData():
-    """
-    Generate dates and hardcoded values
-    Return tuples in format ([dates...], [values...])
-    """
-    x = pd.date_range(start='2016/08/01',  end='2016/10/01',  freq='MS')
-    y = [1295541, 1687282, 2099517]
-    return (x, y)
-
-
 def generatePie(labels, values):
     fig1, ax1 = plt.subplots()
 
     # Credits: https://stackoverflow.com/a/46693008/2535658
-    def hide_0_percent_pies_labels(pct):
-        return ('%1.1f%%' % pct) if pct > 1 else ''
+    def hide_less_2_perc_pies_labels(pct):
+        return ('%1.1f%%' % pct) if pct > 2 else ''
 
     # Add theme
     # Credits: https://www.pythonprogramming.in/how-to-pie-chart-with-different-color-themes-in-matplotlib.html
@@ -35,23 +31,30 @@ def generatePie(labels, values):
     ax1.set_prop_cycle("color", [theme(1. * i / len(values))
                              for i in range(len(values))])
 
-    patches, texts, _ = ax1.pie(values, autopct=hide_0_percent_pies_labels,
+    explode = tuple([0.05] * len(values))
+    # explode = (0.05,0.05,0.05,0.05)
 
-                                shadow=True, startangle=90)
+    patches, texts, _ = ax1.pie(values, autopct=hide_less_2_perc_pies_labels,
+                                shadow=False, startangle=90, explode=explode)
 
     # Set aspect ratio to be equal so that pie is drawn as a circle.
     ax1.axis('equal')
 
+    centre_circle = plt.Circle((0, 0), 0.80, fc='white')
+    fig = plt.gcf()
+    fig.gca().add_artist(centre_circle)
+
+    # Legend
     plt.legend(patches, labels, loc="best", facecolor="white", framealpha=0.3)
     plt.tight_layout()
 
 
-def prepareGraphData(x, y):
+def prepareGraphData(x, y, goals=None):
     """
-    Prepare the data for the graph
+    Prepare the data for the bar graph
     """
     currency = os.getenv("currency")
-    # Blue used in examples on matplotsite
+    # The blue color used in the examples on matplot docs
     # https://github.com/matplotlib/matplotlib/blob/v3.1.2/lib/matplotlib/_color_data.py#L17
     base_color = '#1f77b4'
 
@@ -66,12 +69,21 @@ def prepareGraphData(x, y):
     ax.grid(True, which='major')
 
     # Turns the date labels by 90 degrees, so they do not overlap
-    plt.setp(plt.gca().get_xticklabels(), rotation=90, horizontalalignment='right')
+    x_ticket_labels = plt.gca().get_xticklabels()
+    plt.setp(x_ticket_labels, rotation=90, horizontalalignment='right')
 
     # Force all dates labels to be displayed on the x axis
     xticks(((x)))
 
-    # TODO: add horizontal line with goal1, goal2...etc
+    # Draw goals if present
+    if goals:
+        cmap = get_cmap("Set1")
+        color_list = cmap.colors
+
+        for idx in range(len(goals)):
+            goal = goals[idx]
+            colorVal = color_list[idx]
+            ax.axhline(y=goal.amount, xmin=0.0, xmax=1.0, color=colorVal)
 
 
 def generatePieGraph(labels, values):
@@ -82,39 +94,9 @@ def generatePieGraph(labels, values):
     plt.savefig('static/images/pie-graph.png',  bbox_inches="tight", dpi=130)
 
 
-def generateGraph(x, y):
+def generateGraph(x, y, goals):
     """
     Create the graph and write it to a file
     """
-    prepareGraphData(x, y)
+    prepareGraphData(x, y, goals)
     plt.savefig('static/images/graph.png', bbox_inches="tight", dpi=130)
-
-
-def main(data, save_to_file=True):
-    # Close plots that might have been left open
-    plt.close(1)
-
-    if data is None:
-        # TODO: handle this
-        print("Need data!")
-        return 1
-    else:
-        x, y = data
-
-    # Process and prepare the data
-    prepareGraphData(x, y)
-
-    # Workaround for machines that do not have TKAgg
-    if save_to_file:
-        plt.savefig('static/images/graph.png', bbox_inches="tight")
-    else:
-        # matplotlib.use('TkAgg')
-        plt.show()
-
-
-# Display demo graph if this file is called from cli
-if __name__ == "__main__":
-    # Generate some data to display
-    save_to_file = False
-    data = generateDummyData()
-    main(data, save_to_file)

@@ -79,7 +79,7 @@ def current_month_boundaries():
     return (start, end)
 
 
-def generate_monthly_balance_graph(data):
+def generate_monthly_balance_graph(data, goals=[]):
     """
     Write syncronously the graph to a file
     Return boolean representing whether a graph was generated or not
@@ -94,7 +94,7 @@ def generate_monthly_balance_graph(data):
         for val in data:
             amounts.append(val['amount'])
             dates.append(val['date'])
-        plot.generateGraph(dates, amounts)
+        plot.generateGraph(dates, amounts, goals)
         is_graph_generated = True
     return is_graph_generated
 
@@ -172,7 +172,9 @@ def home_page(request):
 
     mb = m.MonthlyBalance.objects.values('date').order_by('date'). \
         annotate(amount=Sum('amount'))
-    show_graph = generate_monthly_balance_graph(mb)
+    # Display only not archived goals
+    goals = m.Goal.objects.filter(is_archived=False)
+    show_graph = generate_monthly_balance_graph(mb, goals)
 
     current_mb = m.MonthlyBalance.objects.select_related('category'). \
         filter(date=start).order_by('category_id')
@@ -423,7 +425,9 @@ def monthly_balances_page(request, date=None):
     if date is None:
         mb = m.MonthlyBalance.objects.values('date').order_by('date'). \
             annotate(amount=Sum('amount'))
-        show_graph = generate_monthly_balance_graph(mb)
+        # Display only not archived goals
+        goals = m.Goal.objects.filter(is_archived=False)
+        show_graph = generate_monthly_balance_graph(mb, goals)
     else:
         complete_date = f"{date}-01"
         mb = m.MonthlyBalance.objects.select_related('category'). \

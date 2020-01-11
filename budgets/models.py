@@ -6,7 +6,7 @@ from django.db import models
 
 class Category(models.Model):
     text = models.CharField(max_length=20, default=None, unique=True)
-    is_archived = models.BooleanField(default=True)
+    is_archived = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.text}"
@@ -93,3 +93,16 @@ class MonthlyBalance(models.Model):
 
     class Meta:
         unique_together = ('category', 'date')
+
+
+class Goal(models.Model):
+    def __str__(self):
+        id = self.id
+        amount = self.amount
+        text = self.text
+        return f"{id}: {amount}, {text}"
+
+    amount = models.IntegerField()
+    text = models.CharField(max_length=20, default=None, unique=True)
+    note = models.CharField(max_length=50, default=None, unique=True)
+    is_archived = models.BooleanField(default=False)

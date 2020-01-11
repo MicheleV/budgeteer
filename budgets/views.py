@@ -4,6 +4,7 @@
 import calendar
 import datetime
 from dateutil.relativedelta import relativedelta
+import math
 import os
 
 from django.db.models import Sum
@@ -79,7 +80,7 @@ def current_month_boundaries():
     return (start, end)
 
 
-def generate_monthly_balance_graph(data, goals=[]):
+def generate_monthly_balance_graph(data, goals):
     """
     Write syncronously the graph to a file
     Return boolean representing whether a graph was generated or not
@@ -165,27 +166,47 @@ def home_page(request):
     """
     currency = os.getenv("currency")
     (start, end) = current_month_boundaries()
-    current_balance = get_total_of_monthly_balances(start)
 
+    # Get current and preivous month balances
+    current_balance = get_total_of_monthly_balances(start)
     prev_month = get_previous_month_first_day_date(start)
     starting_balance = get_total_of_monthly_balances(prev_month)
 
-    mb = m.MonthlyBalance.objects.values('date').order_by('date'). \
-        annotate(amount=Sum('amount'))
-    # Display only not archived goals
-    goals = m.Goal.objects.filter(is_archived=False)
-    show_graph = generate_monthly_balance_graph(mb, goals)
-
-    current_mb = m.MonthlyBalance.objects.select_related('category'). \
-        filter(date=start).order_by('category_id')
-    current_mb_total = current_mb.aggregate(Sum('amount'))['amount__sum']
-
+    # Fetch previous month data to comapre it with the current month's
     prev_mb = m.MonthlyBalance.objects.select_related('category'). \
         filter(date=prev_month).order_by('category_id')
     prev_mb_total = prev_mb.aggregate(Sum('amount'))['amount__sum']
 
+    # Display pie graph
+    current_mb = m.MonthlyBalance.objects.select_related('category'). \
+        filter(date=start).order_by('category_id')
+    current_mb_total = current_mb.aggregate(Sum('amount'))['amount__sum']
     show_pie_graph = generate_current_monthly_balance_pie_graph(current_mb)
 
+    # two_months_diff = -50000
+    two_months_diff = current_mb_total - prev_mb_total
+    two_months_diff_perc = (current_mb_total / prev_mb_total * 100) - 100
+    # Truncate to two decimals
+    two_months_diff_perc = val = '%.2f' % (two_months_diff_perc)
+
+    # Display bar graph (only draw "active" goals)
+    goals = m.Goal.objects.filter(is_archived=False)
+    # Calculate time to complete each goal given the last two months difference
+    for goal in goals:
+        if current_mb_total >= goal.amount:
+            goal.months_to_go = 0
+        elif two_months_diff < 0:
+            # Handle case where two_months_diff is negative
+            goal.months_to_go = None
+        else:
+            diff = goal.amount - current_mb_total
+            months_to_go = diff / two_months_diff
+            goal.months_to_go = math.ceil(months_to_go)
+    mb = m.MonthlyBalance.objects.values('date').order_by('date'). \
+        annotate(amount=Sum('amount'))
+    show_graph = generate_monthly_balance_graph(mb, goals)
+
+    # Fetch expenses and related categories
     categories = m.Category.objects.all()
     for cat in categories:
         expenses = m.Expense.objects.filter(category_id=cat.id). \
@@ -194,14 +215,12 @@ def home_page(request):
         cat.total = expenses_sum
         cat.mb = cat.monthlybudget_set.filter(date=start).first()
 
-    # TODO this code is duplicatd from above, let's make a function for this
+    # Fetch income and related categories
     income_categories = m.IncomeCategory.objects.all()
     for inc_c in income_categories:
-        # TODO refactor these queries after reading Django docs about
-        # annotation and aggregation
         income = m.Income.objects.filter(category_id=inc_c.id). \
             filter(date__range=(start, end))
-        income_sum = sum(ex.amount for ex in income)
+        income_sum = expenses.aggregate(Sum('amount'))['amount__sum']
         inc_c.total = income_sum
 
     return render(request, 'home.html', {
@@ -217,6 +236,9 @@ def home_page(request):
         'current_mb_total': current_mb_total,
         'prev_mb': prev_mb,
         'prev_mb_total': prev_mb_total,
+        'two_months_diff': two_months_diff,
+        'two_months_diff_perc': two_months_diff_perc,
+        'goals': goals,
     })
 
 

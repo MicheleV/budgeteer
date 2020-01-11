@@ -13,34 +13,65 @@ TODO
   <li>show goal in here "X months(amount {currency} /month), Y months (bigger amount {currency} /month) to goal"</li>
 </ul>
 
+<div class="row">
+    <h3>General recap</h3>
+</div>
 
 <div class="row">
-  <div  class="col">
-    <h5>General recap</h5>
-    <div class="table-responsive-md table-sm">
-      <table class="table" id="id_recap">
-        <tr>
-            <td>Starting balance</td>
-            <td>{{ currency}} {{ starting_balance | intcomma }}</td>
-        </tr>
-        <tr>
-            <td><b>Current balance</b></td>
-            <td><b>{{ currency }} {{ current_balance | intcomma }}</b></td>
-        </tr>
-        <tr>
-            <td>Result</td>
-            {% if current_balance and starting_balance%}
-            <td class="{% if current_balance|sub:starting_balance < 0 %}text-danger{% else %}text-success{% endif %}">
-              {{ currency }}{% if current_balance|sub:starting_balance < 0 %}-{% else %}+{% endif %}{{ current_balance|sub:starting_balance | intcomma }}
-              ({% if starting_balance and current_balance|sub:starting_balance < 0 %}-{% else %}+{% endif %}{{ current_balance|div:starting_balance}}%)
-            </td>
-            {% else %}
-              -
-            {% endif %}
-        </tr>
-      </table>
+    <div  class="col">
+      <h5>Last two months</h5>
+      <div class="table-responsive-md table-sm">
+        <table class="table" id="id_recap">
+          <tr>
+              <td>Starting balance</td>
+              <td>{{ currency}} {{ starting_balance | intcomma }}</td>
+          </tr>
+          <tr>
+              <td><b>Current balance</b></td>
+              <td><b>{{ currency }} {{ current_balance | intcomma }}</b></td>
+          </tr>
+          <tr>
+              <td>Result</td>
+              {% if current_balance and starting_balance%}
+                <td class="{% if two_months_diff < 0 %}text-danger{% else %}text-success{% endif %}">
+                  {{ currency }}{% if two_months_diff > 0 %}+{% endif %}{{ two_months_diff | intcomma }}
+                  <!-- TODO: check if we get two minus sign when the diff is negative -->
+                  ({% if two_months_diff < 0 %}-{% else %}+{% endif %}{{ two_months_diff_perc }}%)
+                </td>
+              {% else %}
+                -
+              {% endif %}
+          </tr>
+        </table>
+      </div>
     </div>
-  </div>
+    {% if goals %}
+      <div  class="col">
+        <h5>Goals</h5>
+        <div class="table-responsive-md table-sm">
+          <table class="table" id="id_recap">
+            <tr>
+              <th>Goal</th>
+              <th>Amount</th>
+              <th>Months to go</th>
+            </tr>
+            {% for goal in goals %}
+              <tr>
+                <td>{{ goal.text }}</td>
+                <td>{{ currency}} {{ goal.amount | intcomma }}</td>
+                {% if goal.months_to_go is None %}
+                  <td class="text-danger">Negative balance: N/A</td>
+                {% elif goal.months_to_go > 0 %}
+                  <td>{{ goal.months_to_go }}</td>
+                {% else %}
+                  <td class="text-success">Goal already achieved!</td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    {% endif %}
 </div>
 
 <div class="row">

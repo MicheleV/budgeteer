@@ -109,8 +109,6 @@ def generatePieGraph(labels, values):
     Return False in case of failure
     """
     generatePie(labels, values)
-    # TODO: remove this (also update deploy playbook)
-    plt.savefig('static/images/pie-graph.png',  bbox_inches="tight", dpi=130)
     buf = BytesIO()
     plt.savefig(buf, format="png", bbox_inches="tight", dpi=130)
     # Embed the result in the html output.
@@ -124,8 +122,6 @@ def generateGraph(x, y, goals):
     Return False in case of failure
     """
     prepareGraphData(x, y, goals)
-    # TODO: remove this (also update deploy playbook)
-    plt.savefig('static/images/graph.png', bbox_inches="tight", dpi=130)
     buf = BytesIO()
     plt.savefig(buf, format="png", bbox_inches="tight", dpi=130)
     # Embed the result in the html output.

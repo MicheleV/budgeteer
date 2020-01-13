@@ -41,8 +41,6 @@ class MonthlyBudget(models.Model):
         unique_together = ('category', 'date')
 
 
-# This class is a duplicate of Category
-# TODO add a `type` field to Category
 class IncomeCategory(models.Model):
     text = models.CharField(max_length=20, default=None, unique=True)
 
@@ -50,8 +48,6 @@ class IncomeCategory(models.Model):
         return f"{self.text}"
 
 
-# This class is a duplicate of Expense
-# TODO think if we can just add a `is_income` flag to category
 class Income(models.Model):
 
     def __str__(self):
@@ -70,8 +66,6 @@ class Income(models.Model):
     date = models.DateField()
 
 
-# This class is a duplicate of Category
-# TODO add a `type` field to Category
 class MonthlyBalanceCategory(models.Model):
     text = models.CharField(max_length=20, default=None, unique=True)
 

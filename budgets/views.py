@@ -83,9 +83,8 @@ def current_month_boundaries():
 def generate_monthly_balance_graph(data, goals):
     """
     Write syncronously the graph to a file
-    Return boolean representing whether a graph was generated or not
+    Return the graph representing whether a graph was generated or not
     """
-    is_graph_generated = False
     if len(data) > 1:
         # Write graph to file
         # NOTE: this is syncrous!
@@ -95,17 +94,16 @@ def generate_monthly_balance_graph(data, goals):
         for val in data:
             amounts.append(val['amount'])
             dates.append(val['date'])
-        plot.generateGraph(dates, amounts, goals)
-        is_graph_generated = True
-    return is_graph_generated
+        return plot.generateGraph(dates, amounts, goals)
+
+    return False
 
 
 def generate_current_monthly_balance_pie_graph(data):
     """
-    Write syncronously the graph to a file
+    Return the graph and returns the data in base64
     Return boolean representing whether a graph was generated or not
     """
-    is_graph_generated = False
     if len(data) > 1:
         # Write graph to file
         # NOTE: this is syncrous!
@@ -116,9 +114,8 @@ def generate_current_monthly_balance_pie_graph(data):
             labels.append(mb.category.text)
             values.append(mb.amount)
 
-        plot.generatePieGraph(labels, values)
-        is_graph_generated = True
-    return is_graph_generated
+        return plot.generatePieGraph(labels, values)
+    return False
 
 
 # Credits https://stackoverflow.com/a/58612038
@@ -134,10 +131,9 @@ def findInList(List, item):
 
 def generate_current_month_expenses_pie_graph(data):
     """
-    Write syncronously the graph to a file
+    Return the graph and returns the data in base64
     Return boolean representing whether a graph was generated or not
     """
-    is_graph_generated = False
     if len(data) > 1:
         # Write graph to file
         # NOTE: this is syncrous!
@@ -154,9 +150,8 @@ def generate_current_month_expenses_pie_graph(data):
             else:
                 values[index] = values[index] + mb.amount
 
-        plot.generatePieGraph(labels, values)
-        is_graph_generated = True
-    return is_graph_generated
+        return plot.generatePieGraph(labels, values)
+    return False
 
 
 @require_http_methods(["GET"])
@@ -181,13 +176,19 @@ def home_page(request):
     current_mb = m.MonthlyBalance.objects.select_related('category'). \
         filter(date=start).order_by('category_id')
     current_mb_total = current_mb.aggregate(Sum('amount'))['amount__sum']
-    show_pie_graph = generate_current_monthly_balance_pie_graph(current_mb)
+    pie_graph = generate_current_monthly_balance_pie_graph(current_mb)
 
-    # two_months_diff = -50000
-    two_months_diff = current_mb_total - prev_mb_total
-    two_months_diff_perc = (current_mb_total / prev_mb_total * 100) - 100
-    # Truncate to two decimals
-    two_months_diff_perc = val = '%.2f' % (two_months_diff_perc)
+    if current_mb_total is None:
+        two_months_diff = 0
+        two_months_diff_perc = 0
+    elif prev_mb_total is None:
+        two_months_diff = current_mb_total
+        two_months_diff_perc = None
+    else:
+        two_months_diff = current_mb_total - prev_mb_total
+        two_months_diff_perc = (current_mb_total / prev_mb_total * 100) - 100
+        # Truncate to two decimals
+        two_months_diff_perc = '%.2f' % (two_months_diff_perc)
 
     # Display bar graph (only draw "active" goals)
     goals = m.Goal.objects.filter(is_archived=False)
@@ -204,7 +205,7 @@ def home_page(request):
             goal.months_to_go = math.ceil(months_to_go)
     mb = m.MonthlyBalance.objects.values('date').order_by('date'). \
         annotate(amount=Sum('amount'))
-    show_graph = generate_monthly_balance_graph(mb, goals)
+    bar_graph = generate_monthly_balance_graph(mb, goals)
 
     # Fetch expenses and related categories
     categories = m.Category.objects.all()
@@ -230,8 +231,8 @@ def home_page(request):
         'starting_balance': starting_balance,
         # TODO: do this on the template side
         'currency': currency,
-        'show_graph': show_graph,
-        'show_pie_graph': show_pie_graph,
+        'bar_graph': bar_graph,
+        'pie_graph': pie_graph,
         'current_mb': current_mb,
         'current_mb_total': current_mb_total,
         'prev_mb': prev_mb,
@@ -293,12 +294,13 @@ def expenses_page(request, date=None):
     expenses = m.Expense.objects.filter(date__range=(start, end))
     expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
 
-    show_pie_graph = generate_current_month_expenses_pie_graph(expenses)
+    pie_graph = generate_current_month_expenses_pie_graph(expenses)
 
     return render(request, 'expenses.html', {
         'categories': categories,
         'expenses': expenses,
         'expenses_sum': expenses_sum,
+        'pie_graph': pie_graph,
         'form': f.ExpenseForm(),
         'errors': errors,
         'month': start.strftime("%Y-%m")
@@ -443,13 +445,13 @@ def monthly_balances_page(request, date=None):
             errors = form.errors
 
     total = None
-    show_graph = False
+    bar_graph = False
     if date is None:
         mb = m.MonthlyBalance.objects.values('date').order_by('date'). \
             annotate(amount=Sum('amount'))
         # Display only not archived goals
         goals = m.Goal.objects.filter(is_archived=False)
-        show_graph = generate_monthly_balance_graph(mb, goals)
+        bar_graph = generate_monthly_balance_graph(mb, goals)
     else:
         complete_date = f"{date}-01"
         mb = m.MonthlyBalance.objects.select_related('category'). \
@@ -459,8 +461,7 @@ def monthly_balances_page(request, date=None):
 
     return render(request, 'monthly_balances.html', {
       'monthly_balance': mb,
-      # TODO: improve variable naming
-      'show_graph': show_graph,
+      'bar_graph': bar_graph,
       'form': f.MonthlyBalanceForm(),
       'total': total,
       'errors': errors

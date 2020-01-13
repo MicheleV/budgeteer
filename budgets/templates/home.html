@@ -35,8 +35,7 @@ TODO
               {% if current_balance and starting_balance%}
                 <td class="{% if two_months_diff < 0 %}text-danger{% else %}text-success{% endif %}">
                   {{ currency }}{% if two_months_diff > 0 %}+{% endif %}{{ two_months_diff | intcomma }}
-                  <!-- TODO: check if we get two minus sign when the diff is negative -->
-                  ({% if two_months_diff < 0 %}-{% else %}+{% endif %}{{ two_months_diff_perc }}%)
+                  ({% if two_months_diff <= 0 %}-{% else %}+{% endif %}{{ two_months_diff_perc }}%)
                 </td>
               {% else %}
                 -
@@ -75,16 +74,14 @@ TODO
 </div>
 
 <div class="row">
-    {% if show_graph %}
+    {% if bar_graph %}
     <div  class="col">
-      <!-- NOTE: this image is regenerated (overwritten) on each request -->
-      <img src="{% static 'images/graph.png' %}" class="img-fluid" alt="Responsive image">
+      <img src="data:image/png;base64,{{ bar_graph }}" class="img-fluid" alt="Bar graph">
     </div>
     {% endif %}
-    {% if show_pie_graph %}
+    {% if pie_graph %}
       <div class="col">
-        <!-- NOTE: this image is regenerated (overwritten) on each request -->
-        <img src="{% static 'images/pie-graph.png' %}" class="img-fluid" alt="Responsive image">
+        <img src="data:image/png;base64,{{ pie_graph }}" class="img-fluid" alt="Pie graph">
       </div>
     {% endif %}
 </div>

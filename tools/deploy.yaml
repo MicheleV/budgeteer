@@ -6,7 +6,6 @@
     base_dir: "/srv/{{ ansible_user }}"
     app_dir: "{{ base_dir }}/budgeteer"
     static_dir : "{{app_dir}}/static"
-    graphs_dir: "{{static_dir}}/images"
     venv_dir: "{{ app_dir }}/virtualenv"
     virtualenv_python: "{{ venv_dir}}/bin/python"
 
@@ -81,14 +80,6 @@
         mode: 0750
         recurse: yes
 
-    - name: Create graphs directory
-      file:
-        path: "{{ graphs_dir }}"
-        state: directory
-        owner: "{{ ansible_user }}"
-        group: "nginx"
-        mode: 0750
-
     - name: "Determine if selinux is allowing nginx"
       register: selinuxsyscontent
       # Note: using `|| true` to prevent exit code 1 when grep does not find the rule
@@ -129,8 +120,8 @@
         path: " {{ venv_dir }}"
         state: directory
         owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        mode: 0750
+        group: "{{ ansible_user }}" # TODO: this should be group: 'nginx'. This is what probably triggers
+        mode: 0750                  # task 'Allow nginx to read the base dir (posix permission)' at each execution
         recurse: yes
 
     - name: Set Django manage.py path

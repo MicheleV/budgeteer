@@ -50,9 +50,12 @@
       </table>
     </div>
   </div>
-  <div class="col">
-    <!-- NOTE: this image is regenerated (overwritten) on each request -->
-    <img src="{% static 'images/pie-graph.png' %}" class="img-fluid" alt="Responsive image">
-  </div>
+
+  {% if pie_graph %}
+    <div class="col">
+      <img src="data:image/png;base64,{{ pie_graph }}" class="img-fluid" alt="Pie graph">
+    </div>
+  {% endif %}
+
 </div>
 {% endblock %}

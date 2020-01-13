@@ -1,7 +1,10 @@
+import base64
 import datetime
+from io import BytesIO
 import os
 
 from dotenv import load_dotenv
+from matplotlib import use as mpl_use
 import matplotlib.cm as cmx
 from matplotlib.cm import get_cmap
 from matplotlib.dates import DayLocator
@@ -14,11 +17,18 @@ from matplotlib.pyplot import xticks
 import numpy as np
 import pandas as pd
 
-
+# Read env variables from .env file
 load_dotenv()
+
+# Avoid threading issues
+# Credits: https://stackoverflow.com/a/51178529
+mpl_use('Agg')
 
 
 def generatePie(labels, values):
+    """
+    Prepare the data for the pie graph
+    """
     fig1, ax1 = plt.subplots()
 
     # Credits: https://stackoverflow.com/a/46693008/2535658
@@ -91,17 +101,32 @@ def prepareGraphData(x, y, goals=None):
         plt.legend(handles=legend_items)
 
 
+# Source: https://matplotlib.org/3.1.1/faq/howto_faq.html#how-to-use-matplotlib-in-a-web-application-server
 def generatePieGraph(labels, values):
     """
-    Create the pie graph and write it to a file
+    Create the pie graph data
+    Returns the data in base64
+    Return False in case of failure
     """
     generatePie(labels, values)
+    # TODO: remove this (also update deploy playbook)
     plt.savefig('static/images/pie-graph.png',  bbox_inches="tight", dpi=130)
+    buf = BytesIO()
+    plt.savefig(buf, format="png", bbox_inches="tight", dpi=130)
+    # Embed the result in the html output.
+    return base64.b64encode(buf.getbuffer()).decode("ascii")
 
 
 def generateGraph(x, y, goals):
     """
-    Create the graph and write it to a file
+    Create the bar graph data
+    Returns the data in base64
+    Return False in case of failure
     """
     prepareGraphData(x, y, goals)
+    # TODO: remove this (also update deploy playbook)
     plt.savefig('static/images/graph.png', bbox_inches="tight", dpi=130)
+    buf = BytesIO()
+    plt.savefig(buf, format="png", bbox_inches="tight", dpi=130)
+    # Embed the result in the html output.
+    return base64.b64encode(buf.getbuffer()).decode("ascii")

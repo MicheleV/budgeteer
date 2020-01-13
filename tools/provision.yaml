@@ -47,6 +47,7 @@
         enabled: yes
         masked: no
 
+    # TODO: do we really need these libraries? Also, update_cache:true could be quite time consuming!
     - name: Ensure latest version of nss, curl and libcurl are installed
       yum:
         name: "{{ packages }}"

@@ -21,8 +21,7 @@ current_version=$(sqlite3 --version | cut -d. -f1,2)
   echo "export LD_LIBRARY_PATH=/home/$@/opt/sqlite/lib" >> /home/$@/.bashrc
   echo "export LD_RUN_PATH=/home/$@/opt/sqlite/lib" >> /home/$@/.bashrc
 
-  # TODO: find a proper solution that does not involve compiling python from source
-  #       (slower provisioning, unable to update ptyhon using yum anymore)
+  # Set env varitables for gunicorn
   echo "LD_LIBRARY_PATH=/home/$@/opt/sqlite/lib" >> /srv/$@/budgeteer/.env
   echo "LD_RUN_PATH=/home/$@/opt/sqlite/lib" >> /srv/$@/budgeteer/.env
 

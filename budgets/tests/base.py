@@ -64,14 +64,14 @@ class BaseTest(TestCase):
         return category
 
     def create_income(self, category, amount, note, date):
-        expense = m.Income()
-        expense.category = category
-        expense.amount = amount
-        expense.note = note
-        expense.date = date
-        expense.full_clean()
-        expense.save()
-        return expense
+        income = m.Income()
+        income.category = category
+        income.amount = amount
+        income.note = note
+        income.date = date
+        income.full_clean()
+        income.save()
+        return income
 
     def create_monthly_balance_category(self, text):
         mbc = m.MonthlyBalanceCategory()

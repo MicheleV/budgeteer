@@ -32,9 +32,9 @@ class ModelsTest(BaseTest):
         string_repr = f"{category.id}: ({note}), {amount}, {date}"
         self.assertEqual("%s" % second_expense, string_repr)
 
-        inc_category = self.create_income_category('Rent')
+        inc_category = self.create_income_category('Wage')
         string_repr = f"{inc_category.text}"
-        self.assertEqual("%s" % inc_category, 'Rent')
+        self.assertEqual("%s" % inc_category, 'Wage')
 
         inc_amount = 10000
         inc_note = 'August Wage'

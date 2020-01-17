@@ -148,10 +148,12 @@ class IncomeCategoriesPageTest(BaseTest):
         pass
 
     def test_title_is_displayed(self):
-        self.check_if_title_is_displayed('income_categories', 'Income Categories')
+        self.check_if_title_is_displayed('income_categories',
+                                         'Income Categories')
 
     def test_uses_correct_view(self):
-        self.check_if_correct_view('income_categories', v.income_categories_page)
+        self.check_if_correct_view('income_categories',
+                                   v.income_categories_page)
         response = self.get_response_from_named_url('income_categories')
 
     def test_uses_correct_template(self):
@@ -182,14 +184,18 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         pass
 
     def test_title_is_displayed(self):
-        self.check_if_title_is_displayed('monthly_balance_categories', 'Monthly Balance Categories')
+        self.check_if_title_is_displayed('monthly_balance_categories',
+                                         'Monthly Balance Categories')
 
     def test_uses_correct_view(self):
-        self.check_if_correct_view('monthly_balance_categories', v.monthly_balance_categories_page)
-        response = self.get_response_from_named_url('monthly_balance_categories')
+        self.check_if_correct_view('monthly_balance_categories',
+                                   v.monthly_balance_categories_page)
+        named_url = 'monthly_balance_categories'
+        response = self.get_response_from_named_url(named_url)
 
     def test_uses_correct_template(self):
-        response = self.get_response_from_named_url('monthly_balance_categories')
+        named_url = 'monthly_balance_categories'
+        response = self.get_response_from_named_url(named_url)
         self.assertTemplateUsed(response, 'monthly_balance_categories.html')
 
 
@@ -199,7 +205,8 @@ class MonthlyBalanceTest(BaseTest):
         pass
 
     def test_title_is_displayed(self):
-        self.check_if_title_is_displayed('monthly_balances', 'Monthly Balances')
+        self.check_if_title_is_displayed('monthly_balances',
+                                         'Monthly Balances')
 
     def test_uses_correct_view(self):
         self.check_if_correct_view('monthly_balances', v.monthly_balances_page)

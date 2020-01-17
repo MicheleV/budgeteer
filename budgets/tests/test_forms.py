@@ -2,6 +2,7 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 import budgets.forms as f
+import budgets.models as m
 from budgets.tests.base import BaseTest
 
 
@@ -295,3 +296,48 @@ class MonthlyBudgetFormTest(BaseTest):
           'Enter a valid date',
           form.errors.as_text(),
         )
+
+    def test_save_and_update_models(self):
+        """
+        Test whether the models are updated correctly or not
+        """
+        inc_cat_form = f.IncomeCategoryForm(data={'text': 'Wage'})
+        inc_cat_form.full_clean()
+        inc_cat_form.save()
+
+        saved_income_category = m.IncomeCategory.objects.first()
+        self.assertEqual(saved_income_category.text, 'Wage')
+
+        income_form = f.IncomeForm(data={
+            'category': saved_income_category.id,
+            'amount': 10000,
+            'note': 'Wage for August 2019',
+            'date': '2019-08-01'
+        })
+        income_form.full_clean()
+        income_form.save()
+
+        saved_income = m.Income.objects.first()
+        self.assertEqual(saved_income.amount, 10000)
+        self.assertEqual(saved_income.note, 'Wage for August 2019')
+        self.assertEqual(saved_income.date.strftime("%Y-%m-%d"), '2019-08-01')
+
+        income_form = f.IncomeForm(data={
+            'category': saved_income_category.id,
+            'amount': 42,
+            'note': 'Donation',
+            'date': '2019-08-02'
+        }, instance=saved_income)
+        income_form.full_clean()
+        income_form.save()
+
+        # No new instances were created
+        all_incomes = m.Income.objects.all()
+        self.assertEqual(len(all_incomes), 1)
+
+        # The update was saved correctly
+        updated_income = all_incomes.first()
+        self.assertEqual(updated_income.amount, 42)
+        self.assertEqual(updated_income.note, 'Donation')
+        self.assertEqual(updated_income.date.strftime("%Y-%m-%d"),
+                         '2019-08-02')

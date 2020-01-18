@@ -473,17 +473,22 @@ def monthly_balances_page(request, date=None):
 def monthly_balances_edit_page(request, id=None):
     errors = None
     mb = get_object_or_404(m.MonthlyBalance, pk=id)
+
     if request.method == 'POST':
         try:
             form = f.MonthlyBalanceForm(data=request.POST, instance=mb)
             if form.is_valid():
                 form.full_clean()
                 form.save()
-                redirect_url = reverse('monthly_balances')
+
+                # Redirect to the monthly_balances for the current mb's month
+                format_str = '%Y-%m'
+                date_ym = mb.date.strftime(format_str)
+                view_url = reverse('monthly_balances')
+                redirect_url = f"{view_url}/{date_ym}"
                 return redirect(redirect_url)
             else:
                 errors = form.errors
-                # del form.errors
         except ValidationError:
             errors = form.errors
     else:

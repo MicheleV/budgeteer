@@ -104,7 +104,7 @@ Install the requirements::
 
     pip install -r test-requirements.txt
 
-`Note keep option docs <https://docs.djangoproject.com/en/2.2/topics/testing/overview/#the-test-database>`_
+`keep option docs <https://docs.djangoproject.com/en/2.2/topics/testing/overview/#the-test-database>`_
 
 Run both function and unit test suite::
 
@@ -137,7 +137,7 @@ References and useful links
 1. `TDD with Python and Django <http://obeythetestinggoat.com/>`_
 2. `About custom selinux policies <https://serverfault.com/a/763507/332670>`_
 3. `CentOS and nginx <https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-virtual-hosts-server-blocks-on-centos-6>`_
-4. `Tmp folder permissions in Fedora,RHEL,etc <https://stackoverflow.com/a/33223403>`_
+4. `Tmp folder permissions in RHEL like distro <https://stackoverflow.com/a/33223403>`_
     
     ...  your system probably using namespaced temporary directories, which means every 
     service can only see its own files in   /tmp.

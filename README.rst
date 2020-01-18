@@ -1,8 +1,8 @@
-|License|
-
-*******
+*********
 Budgeteer
-*******
+*********
+
+|License| |Coverage|
 
 - `About the project <README.rst#about-the-project>`_
 
@@ -20,7 +20,7 @@ Budgeteer
 - `License <README.rst#license>`_
 
 About the project
-=======
+=================
 
 Budgeteer is a barebone web application used to build a household budget.
 
@@ -32,15 +32,15 @@ Built with:
 - Ansible
 
 Getting started
-=======
+===============
 
 Prerequisites
----------------------
+--------------------------
 - Python 3.6 installed
 - geckodriver in your system $PATH
 
 Installation
----------------------
+--------------------------
 
 Clone the repo::
 
@@ -54,7 +54,7 @@ Gather the static files::
     python manage.py collectstatic
 
 Provisioning and deploying
----------------------
+--------------------------
 
 Install ansible::
 
@@ -124,16 +124,15 @@ Run the unit test suite::
 
 
 Coverage
-=======
+===========================
 
 Generate coverage::
 
-    coverage run --omit="virtualenv/*,budgets/migrations/*,budgeteer/wsgi.py,budgets/admin*,budgets/app*,budgets/tests/*,functional_tests/*,manage.py" manage.py test
-    coverage html -d coverage_html
+    ./tools/generate_coverage.sh
 
 
 References and useful links
-=======
+===========================
 
 1. `TDD with Python and Django <http://obeythetestinggoat.com/>`_
 2. `About custom selinux policies <https://serverfault.com/a/763507/332670>`_
@@ -167,3 +166,6 @@ See `COPYING <COPYING>`_ to see the full text.
 .. |License| image:: https://img.shields.io/badge/license-GPL%20v3.0-brightgreen.svg
    :target: COPYING
    :alt: Repository License
+
+.. |Coverage| image:: https://img.shields.io/badge/coverage-74%25-brightgreen
+   :alt: Code Coverage

@@ -88,3 +88,13 @@ class BaseTest(TestCase):
         mb.full_clean()
         mb.save()
         return mb
+
+    def create_goal(self, amount, text, note, is_archived=False):
+        g = m.Goal()
+        g.amount = amount
+        g.text = text
+        g.note = note
+        g.is_archived = is_archived
+        g.full_clean()
+        g.save()
+        return g

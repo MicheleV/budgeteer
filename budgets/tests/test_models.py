@@ -58,6 +58,13 @@ class ModelsTest(BaseTest):
         string_repr = f"{m_balance.id}: {amount}, {date}"
         self.assertEqual("%s" % m_balance, string_repr)
 
+        amount = 5000
+        text = "My first goal"
+        note = "Rainy days founds"
+        goal = self.create_goal(amount, text, note)
+        string_repr = f"{goal.id}: {amount}, {text}"
+        self.assertEqual("%s" % goal, string_repr)
+
     def test_saving_and_retrieving_expenses(self):
         category = self.create_category('Rent')
 

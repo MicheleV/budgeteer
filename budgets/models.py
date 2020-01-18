@@ -3,6 +3,11 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.db import models
 
+# TODO: when we''ll have multiple users, we should expose UUID instead of ID
+# in the urls/API
+# How to do migrations that include unique fields
+# https://docs.djangoproject.com/en/2.2/howto/writing-migrations/#migrations-that-add-unique-fields
+
 
 class Category(models.Model):
     text = models.CharField(max_length=20, default=None, unique=True)

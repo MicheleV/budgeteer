@@ -35,8 +35,6 @@ class CategoryForm(forms.models.ModelForm):
 class ExpenseForm(forms.models.ModelForm):
 
     class Meta:
-        def get_choices():
-            return m.Category.objects.all()
 
         model = m.Expense
         fields = ('date', 'amount', 'note', 'category')
@@ -50,14 +48,13 @@ class ExpenseForm(forms.models.ModelForm):
             'date': forms.fields.TextInput(attrs={
                 'placeholder': '%Y-%m-%d format',
             }),
+            'category': forms.fields.Select,
         }
 
 
 class MonthlyBudgetForm(forms.models.ModelForm):
 
     class Meta:
-        def get_choices():
-            return m.Category.objects.all()
 
         model = m.MonthlyBudget
         fields = ('category', 'amount', 'date')
@@ -68,6 +65,7 @@ class MonthlyBudgetForm(forms.models.ModelForm):
           'date': forms.fields.TextInput(attrs={
               'placeholder': '%Y-%m-%d format',
           }),
+          'category': forms.fields.Select,
         }
 
     # Make monthlybudgets be on the first day of the month
@@ -130,8 +128,6 @@ class MonthlyBalanceCategoryForm(forms.models.ModelForm):
 class MonthlyBalanceForm(forms.models.ModelForm):
 
     class Meta:
-        def get_choices():
-            return m.MonthlyBalanceCategory.objects.all()
 
         model = m.MonthlyBalance
         fields = ('category', 'amount', 'date')
@@ -142,4 +138,5 @@ class MonthlyBalanceForm(forms.models.ModelForm):
             'date': forms.fields.TextInput(attrs={
                 'placeholder': '%Y-%m-%d format',
             }),
+            'category': forms.fields.Select,
         }

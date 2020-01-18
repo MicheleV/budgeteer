@@ -12,7 +12,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
 
 
-
 # TODO: move this away from the global namespace
 Base = declarative_base()
 

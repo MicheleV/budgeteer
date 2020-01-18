@@ -46,6 +46,8 @@ urlpatterns = [
             views.monthly_balances_page, name='monthly_balances'),
     path('new_monthly_balance', views.monthly_balances_page,
          name='new_monthly_balance'),
+    path('edit_monthly_balance/<int:id>', views.monthly_balances_edit_page,
+         name='edit_monthly_balance'),
 
     path('api/', views.api_categories)
 ]

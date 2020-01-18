@@ -26,19 +26,34 @@
   <tr>
     <th>Date</th>
     <th>Amount</th>
-    {% if not bar_graph %}<th>Category</th> {% endif %}
+    {% if not bar_graph %}
+      <th>Category</th>
+      <th>ID</th>
+    {% else %}
+      <th>Month details</th>
+    {% endif %}
   </tr>
   {% for monthly_balance in monthly_balance reversed%}
     <tr>
       <td>{{ monthly_balance.date | date:'Y-m' }}</td>
       <td>{{ monthly_balance.amount | intcomma }}</td>
-      {% if not bar_graph %}<td>{{ monthly_balance.category.text }}</td> {% endif %}
+      {% if not bar_graph %}
+        <td>{{ monthly_balance.category.text }}</td>
+        <td>
+          <a href={% url 'edit_monthly_balance' monthly_balance.id %}>Edit</a>
+        </td>
+      {% else %}
+        {% with ym_date=monthly_balance.date|date:'Y-m' %}
+        <td><a href={% url 'monthly_balances' ym_date %}>See details</a></td>
+        {% endwith %}
+     {% endif %}
     </tr>
   {% endfor %}
   {% if total > 0 and not bar_graph%}
     <tr>
       <td>Total</td>
       <td>{{ total }}</td>
+      <td> - </td>
       <td> - </td>
     </tr>
   {% endif %}

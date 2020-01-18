@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Edit monthly budget{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div  class="col">
+    <h5 id="id_current_month_date">Expenses logged during {{ month }}</h5>
+    <hr>
+    <form method="POST" action="{% url 'edit_monthly_balance' id  %}">
+        <!-- FIXME: As this form contains the previously entered data
+             We need to hide the errors, in order to be able
+            to show them all at once, after the submit button -->
+        {% for field in form %}
+              {{ field.label_tag }} {{ field }}
+        {% endfor %}
+      <input type="submit" id="id_submit" value="Submit">
+
+      {% if errors %}
+          <div>{{ errors }}</div>
+      {% endif %}
+
+      {% csrf_token %}
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{{ form }}

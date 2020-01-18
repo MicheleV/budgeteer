@@ -11,6 +11,7 @@ from django.db.models import Sum
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect
 from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from dotenv import load_dotenv
@@ -464,6 +465,34 @@ def monthly_balances_page(request, date=None):
       'bar_graph': bar_graph,
       'form': f.MonthlyBalanceForm(),
       'total': total,
+      'errors': errors
+    })
+
+# TODO: DUPLICATED CODE! Merge this with monthly_balances_page()
+@require_http_methods(["GET", "POST"])
+def monthly_balances_edit_page(request, id=None):
+    errors = None
+    mb = get_object_or_404(m.MonthlyBalance, pk=id)
+    if request.method == 'POST':
+        try:
+            form = f.MonthlyBalanceForm(data=request.POST, instance=mb)
+            if form.is_valid():
+                form.full_clean()
+                form.save()
+                redirect_url = reverse('monthly_balances')
+                return redirect(redirect_url)
+            else:
+                errors = form.errors
+                # del form.errors
+        except ValidationError:
+            errors = form.errors
+    else:
+        form = f.MonthlyBalanceForm(instance=mb)
+        print(type(form.errors))
+
+    return render(request, 'edit_monthly_balances.html', {
+      'id': id,
+      'form': form,
       'errors': errors
     })
 

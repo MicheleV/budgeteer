@@ -11,7 +11,12 @@
     <hr>
     <form method="POST" action="{% url 'new_expense' %}">
       {% csrf_token %}
-      {{ form }}
+      <!-- FIXME: As this form contains the previously entered data
+           We need to hide the errors, in order to be able
+          to show them all at once, after the submit button -->
+      {% for field in form %}
+            {{ field.label_tag }} {{ field }}
+      {% endfor %}
       <input type="submit" id="id_submit" value="Submit">
     </form>
       {% if errors %}

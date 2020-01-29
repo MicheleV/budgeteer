@@ -23,6 +23,8 @@ import budgets.forms as f
 import budgets.models as m
 from budgets.serializers import CategorySerializer
 
+# NOTE: is this really needed? Check whether to do load_dotenv() inside urls.py
+# once is enough or not
 load_dotenv()
 
 
@@ -283,16 +285,26 @@ def expenses_page(request, date=None):
             if form.is_valid():
                 form.full_clean()
                 form.save()
+                redirect_url = reverse('expenses')
+                return redirect(redirect_url)
             else:
                 errors = form.errors
         except ValidationError:
+            # NOTE: we save errors in here as we're going to display them
+            # separately from the form
             errors = form.errors
+    else:
+        form = f.ExpenseForm()
+
+    # Filter out archived categories
+    categories = m.Category.objects.filter(is_archived=False)
+    form.fields['category'].queryset = categories
 
     (start, end) = get_month_boundaries(date)
     # TODO refactor these queries after reading Django docs about annotation
     # and aggregation
-    categories = m.Category.objects.all()
-    expenses = m.Expense.objects.filter(date__range=(start, end))
+    expenses = m.Expense.objects.filter(date__range=(start, end)) \
+                .order_by('-date', '-id')
     expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
 
     pie_graph = generate_current_month_expenses_pie_graph(expenses)
@@ -302,7 +314,7 @@ def expenses_page(request, date=None):
         'expenses': expenses,
         'expenses_sum': expenses_sum,
         'pie_graph': pie_graph,
-        'form': f.ExpenseForm(),
+        'form': form,
         'errors': errors,
         'month': start.strftime("%Y-%m")
     })

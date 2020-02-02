@@ -15,6 +15,9 @@ urlpatterns = [
     re_path(r'expenses/(?P<date>(19|20)[0-9]{2}-(0[1-9]|1[012]))',
             views.expenses_page, name='expenses'),
     path('new_expense', views.expenses_page, name='new_expense'),
+    path('delete_expense/<int:id>', views.delete_expense_page,
+         name='delete_expense'),
+
 
     path('monthly_budgets',
          views.monthly_budgets_page, name='monthly_budgets'),

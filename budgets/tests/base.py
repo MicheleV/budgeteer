@@ -45,9 +45,14 @@ class BaseTest(TestCase):
         budget.save()
         return budget
 
-    def get_response_from_named_url(self, named_url):
-        url = reverse(named_url)
-        response = self.client.get(url)
+    def get_response_from_named_url(self, named_url, args=None):
+        # TODO: code smell. DELET verb should be handled through 'verb' parms
+        if args:
+            url = reverse('delete_expense', kwargs=args)
+            response = self.client.delete(url)
+        else:
+            url = reverse(named_url)
+            response = self.client.get(url)
         return response
 
     def check_if_error_matches(self, text, rows):

@@ -320,6 +320,14 @@ def expenses_page(request, date=None):
     })
 
 
+@require_http_methods(["DELETE"])
+def delete_expense_page(request, id):
+    errors = None
+    mb = get_object_or_404(m.Expense, pk=id)
+    mb.delete()
+    return redirect('expenses')
+
+
 @require_http_methods(["GET", "POST"])
 def monthly_budgets_page(request, date=None):
     """

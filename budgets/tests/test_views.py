@@ -5,7 +5,7 @@ from django.urls import resolve
 from django.urls import reverse
 
 import budgets.forms as f
-from budgets.models import Category
+from budgets.models import Category, Expense
 from budgets.tests.base import BaseTest
 import budgets.views as v
 
@@ -140,6 +140,31 @@ class ExpensesPageTest(BaseTest):
         # NOTE: Atm we do use `on_delete=models.CASCADE` on Expense model,
         # but this test will be necessary in case we do change that
         pass
+
+    def test_create_and_delete_expenses(self):
+        category = self.create_category('Rent')
+        expense = self.create_expense(category, 100, 'An expense', '2020-01-01')
+
+        expenses = Expense.objects.all()
+        self.assertEqual(expenses.count(), 1)
+
+        url = reverse('expenses')
+        arg = {'id': 7}
+        response = self.get_response_from_named_url('delete_expense', arg)
+
+        # 404 is thrown for non existing expenses
+        arg = {'id': 7}
+        response = self.get_response_from_named_url('delete_expense', arg)
+        self.assertEqual(response.status_code, 404)
+
+        # Deletion is successful
+        arg = {'id': expense.id}
+        response = self.get_response_from_named_url('delete_expense', arg)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], url)
+
+        expenses = Expense.objects.all()
+        self.assertEqual(expenses.count(), 0)
 
 
 class IncomeCategoriesPageTest(BaseTest):

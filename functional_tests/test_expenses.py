@@ -85,11 +85,16 @@ def test_expenses_page_can_show_old_expenses(self):
                                        formatted_amount, category_name, note)
 
 
+# TODO: write me
 def test_expenses_wont_show_expenses_in_the_future(self):
-    # TODO
     pass
 
 
+# TODO: write me
 def test_creating_expenses_before_categories_will_fail(self):
-    # TODO
+    pass
+
+
+# TODO: write me
+def test_graph_is_displayed_in_expenses_page_with_only_one_expense(self):
     pass

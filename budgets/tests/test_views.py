@@ -103,6 +103,14 @@ class MonthlyBudgetPageTest(BaseTest):
         response = self.get_response_from_named_url('monthly_budgets')
         self.assertIsInstance(response.context['form'], f.MonthlyBudgetForm)
 
+    # TODO
+    def test_delete_button_showed_with_param(self):
+        pass
+
+    # TODO
+    def test_delete_button_missing_without_param(self):
+        pass
+
     # TODO: write me
     def test_save_and_retrieve_monthly_budget(self):
         pass
@@ -123,6 +131,14 @@ class ExpensesPageTest(BaseTest):
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('expenses')
         self.assertTemplateUsed(response, 'expenses.html')
+
+    # TODO
+    def test_delete_button_showed_with_param(self):
+        pass
+
+    # TODO
+    def test_delete_button_missing_without_param(self):
+        pass
 
     # TODO
     def test_save_and_retrieve_expenses(self):
@@ -148,11 +164,8 @@ class ExpensesPageTest(BaseTest):
         expenses = Expense.objects.all()
         self.assertEqual(expenses.count(), 1)
 
-        url = reverse('expenses')
-        arg = {'id': 7}
-        response = self.get_response_from_named_url('delete_expense', arg)
-
         # 404 is thrown for non existing expenses
+        url = reverse('expenses')
         arg = {'id': 7}
         response = self.get_response_from_named_url('delete_expense', arg)
         self.assertEqual(response.status_code, 404)

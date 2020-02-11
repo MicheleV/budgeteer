@@ -296,6 +296,9 @@ def expenses_page(request, date=None):
     else:
         form = f.ExpenseForm()
 
+    # Toggle delete buttons
+    show_delete = request.GET.get('delete', False) == '1'
+
     # Filter out archived categories
     categories = m.Category.objects.filter(is_archived=False)
     form.fields['category'].queryset = categories
@@ -316,12 +319,16 @@ def expenses_page(request, date=None):
         'pie_graph': pie_graph,
         'form': form,
         'errors': errors,
-        'month': start.strftime("%Y-%m")
+        'month': start.strftime("%Y-%m"),
+        'show_delete': show_delete,
     })
 
 
-@require_http_methods(["DELETE"])
+@require_http_methods(["POST"])
 def delete_expense_page(request, id):
+    """
+    Delete an expense
+    """
     errors = None
     mb = get_object_or_404(m.Expense, pk=id)
     mb.delete()
@@ -347,6 +354,9 @@ def monthly_budgets_page(request, date=None):
         except ValidationError:
             errors = form.errors
 
+    # Toggle delete buttons
+    show_delete = request.GET.get('delete', False) == '1'
+
     categories = m.Category.objects.all()
     if date is None:
         monthly_budgets = m.MonthlyBudget.objects.all()
@@ -357,6 +367,7 @@ def monthly_budgets_page(request, date=None):
       'categories': categories,
       'monthly_budgets': monthly_budgets,
       'form': f.MonthlyBudgetForm(),
+      'show_delete': show_delete,
       'errors': errors
     })
 
@@ -465,6 +476,9 @@ def monthly_balances_page(request, date=None):
         except ValidationError:
             errors = form.errors
 
+    # Toggle delete buttons
+    show_delete = request.GET.get('delete', False) == '1'
+
     total = None
     bar_graph = False
     if date is None:
@@ -485,10 +499,38 @@ def monthly_balances_page(request, date=None):
       'bar_graph': bar_graph,
       'form': f.MonthlyBalanceForm(),
       'total': total,
+      'show_delete': show_delete,
       'errors': errors
     })
 
-# TODO: DUPLICATED CODE! Merge this with monthly_balances_page()
+
+def create_url_for_monthly_budget(mb, delete=False):
+    """
+    Redirect to the monthly_balances for the argument's date
+    """
+    format_str = '%Y-%m'
+    date_ym = mb.date.strftime(format_str)
+    view_url = reverse('monthly_balances')
+    redirect_url = f"{view_url}/{date_ym}"
+    if delete:
+        redirect_url = f"{redirect_url}?delete=1"
+    return redirect_url
+
+
+@require_http_methods(["POST"])
+def delete_monthly_balance_page(request, id=None):
+    """
+    Delete a monthly balance
+    """
+    errors = None
+    mb = get_object_or_404(m.MonthlyBalance, pk=id)
+    # Since we delete a monthly balance, the previous page was showing buttons
+    show_delete = True
+    redirect_url = create_url_for_monthly_budget(mb, show_delete)
+    mb.delete()
+    return redirect(redirect_url)
+
+
 @require_http_methods(["GET", "POST"])
 def monthly_balances_edit_page(request, id=None):
     errors = None
@@ -501,11 +543,7 @@ def monthly_balances_edit_page(request, id=None):
                 form.full_clean()
                 form.save()
 
-                # Redirect to the monthly_balances for the current mb's month
-                format_str = '%Y-%m'
-                date_ym = mb.date.strftime(format_str)
-                view_url = reverse('monthly_balances')
-                redirect_url = f"{view_url}/{date_ym}"
+                redirect_url = create_url_for_monthly_budget(mb)
                 return redirect(redirect_url)
             else:
                 errors = form.errors
@@ -522,10 +560,10 @@ def monthly_balances_edit_page(request, id=None):
     })
 
 
+# TODO: move me inside a namespace
 @api_view(['GET'])
 # @renderer_classes([JSONRenderer])
 def api_categories(request):
-    # return Response({"message": "Hello, world!"})
     """
     List all categories
     """

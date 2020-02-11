@@ -3,6 +3,7 @@
 {% load humanize %}
 {% block title %}Monthly Balances{% endblock %}
 
+
 {% block content %}
   <form method="POST" action="{% url 'new_monthly_balance' %}">
     {{ form }}
@@ -21,6 +22,14 @@
     </div>
   {% endif %}
 
+{% if not bar_graph %}
+  {% if show_delete %}
+    <a href="?delete=0">Hide delete buttons</a>
+  {% else %}
+    <a href="?delete=1">Show delete buttons</a>
+  {% endif %}
+  <hr>
+{% endif %}
 
 <table class="table table-responsive-md table-sm" id="id_monthly_balances">
   <tr>
@@ -29,11 +38,14 @@
     {% if not bar_graph %}
       <th>Category</th>
       <th>ID</th>
+      {% if show_delete %}
+        <th><b>Delete</b></th>
+      {% endif %}
     {% else %}
       <th>Month details</th>
     {% endif %}
   </tr>
-  {% for monthly_balance in monthly_balance reversed%}
+  {% for monthly_balance in monthly_balance reversed %}
     <tr>
       <td>{{ monthly_balance.date | date:'Y-m' }}</td>
       <td>{{ monthly_balance.amount | intcomma }}</td>
@@ -42,6 +54,14 @@
         <td>
           <a href={% url 'edit_monthly_balance' monthly_balance.id %}>Edit</a>
         </td>
+        {% if show_delete %}
+           <td>
+            <form method="POST" action="{% url 'delete_monthly_balance' id=monthly_balance.id %}">
+              {% csrf_token %}
+              <input type="submit" id="id_submit" value="Yes, DELETE">
+            </form>
+          </td>
+        {% endif %}
       {% else %}
         {% with ym_date=monthly_balance.date|date:'Y-m' %}
         <td><a href={% url 'monthly_balances' ym_date %}>See details</a></td>

@@ -194,10 +194,8 @@ def create_category_and_two_expenses(self, first_item, second_item,
     first_date = date.today().replace(day=1)
     delta = timedelta(weeks=10)
     second_date = first_date - delta
-    if is_income:
-        method = create_entry
-    else:
-        method = create_entry
+    method = create_entry
+
     # Frank visits the expenses url and enters the expense details
     method(
       self,

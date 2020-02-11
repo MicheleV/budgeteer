@@ -52,6 +52,12 @@ class ExpenseForm(forms.models.ModelForm):
         }
 
 
+class DeleteExpenseForm(forms.models.ModelForm):
+    class Meta:
+        model = m.Expense
+        fields = []
+
+
 class MonthlyBudgetForm(forms.models.ModelForm):
 
     class Meta:

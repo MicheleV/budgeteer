@@ -8,6 +8,11 @@
 <div class="row">
   <div  class="col">
     <h5 id="id_current_month_date">Expenses logged during {{ month }}</h5>
+    {% if show_delete %}
+      <a href="{% url 'expenses' %}">Hide delete buttons</a>
+    {% else %}
+      <a href="{% url 'expenses' %}?delete=1">Show delete buttons</a>
+    {% endif %}
     <hr>
     <form method="POST" action="{% url 'new_expense' %}">
       {% csrf_token %}
@@ -36,6 +41,9 @@
         <th>Amount</th>
         <th>Category</th>
         <th>Note</th>
+        {% if show_delete %}
+          <th>Delete</th>
+        {% endif %}
       </tr>
       {% if expenses_sum %}
         <tr>
@@ -43,6 +51,10 @@
           <td><b>{{ expenses_sum | intcomma }}</b></td>
           <td><b>Total</b></td>
           <td> - </td>
+          {% if show_delete %}
+            <td> - </td>
+          {% endif %}
+
         </tr>
       {% endif %}
       {% for expense in expenses %}
@@ -51,6 +63,14 @@
           <td>{{ expense.amount | intcomma }}</td>
           <td>{{ expense.category.text }}</td>
           <td>{{ expense.note }}</td>
+          {% if show_delete %}
+            <td>
+              <form method="POST" action="{% url 'delete_expense' id=expense.id %}">
+                {% csrf_token %}
+                <input type="submit" id="id_submit" value="Yes, DELETE">
+              </form>
+            </td>
+          {% endif %}
         </tr>
       {% endfor %}
       </table>

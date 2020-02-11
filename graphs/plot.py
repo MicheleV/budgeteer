@@ -98,7 +98,7 @@ def prepareGraphData(x, y, goals=None):
             # Set goal legend
             red_patch = mpatches.Patch(color=colorVal, label=goal.text)
             legend_items.append(red_patch)
-        plt.legend(handles=legend_items)
+        plt.legend(handles=legend_items, loc="center left")
 
 
 # Source: https://matplotlib.org/3.1.1/faq/howto_faq.html#how-to-use-matplotlib-in-a-web-application-server

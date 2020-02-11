@@ -11,6 +11,7 @@ from selenium.webdriver.firefox.options import Options
 
 from budgets.models import Category
 import functional_tests.helpers as Helpers
+import functional_tests.test_api as API
 import functional_tests.test_categories as Categories
 import functional_tests.test_expenses as Expenses
 import functional_tests.test_monthly_balances as MonthlyBalances
@@ -96,3 +97,6 @@ class FunctionalTest(LiveServerTestCase):
         ViewAndLayout.test_home_page_has_links_in_nav(self)
         ViewAndLayout.test_layout_and_styling(self)
         ViewAndLayout.check_autofocus(self)
+
+    def test_api(self):
+        API.test_create_and_delete_expenses(self)

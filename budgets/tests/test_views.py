@@ -5,7 +5,7 @@ from django.urls import resolve
 from django.urls import reverse
 
 import budgets.forms as f
-from budgets.models import Category, Expense
+from budgets.models import Category, Expense, MonthlyBalanceCategory
 from budgets.tests.base import BaseTest
 import budgets.views as v
 
@@ -40,12 +40,6 @@ class CategoriesPageTest(BaseTest):
         response = self.get_response_from_named_url('categories')
         self.assertIsInstance(response.context['form'], f.CategoryForm)
 
-    def test_redirect_on_POST(self):
-        url = reverse('categories')
-        response = self.client.post(url, data={'text': 'Rent'})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], url)
-
     def test_save_on_POST(self):
         url = reverse('new_category')
         response = self.client.post(url,  data={'text': 'Rent'})
@@ -53,6 +47,12 @@ class CategoriesPageTest(BaseTest):
         self.assertEqual(Category.objects.count(), 1)
         new_category = Category.objects.first()
         self.assertEqual(new_category.text, 'Rent')
+
+    def test_redirect_on_POST(self):
+        url = reverse('categories')
+        response = self.client.post(url, data={'text': 'Rent'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], url)
 
     def test_save_and_retrieve_categories(self):
         first_category = self.create_category('Rent')
@@ -116,6 +116,10 @@ class MonthlyBudgetPageTest(BaseTest):
         pass
 
     # TODO: write me
+    def test_save_on_POST(self):
+        pass
+
+    # TODO: write me
     def test_redirect_on_POST(self):
         pass
 
@@ -131,6 +135,22 @@ class ExpensesPageTest(BaseTest):
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('expenses')
         self.assertTemplateUsed(response, 'expenses.html')
+
+    # TODO: write me
+    def test_save_on_POST(self):
+        pass
+
+    # TODO: write me
+    def test_redirect_on_POST(self):
+        pass
+
+    # TODO: write me
+    def test_delete_won_POST(self):
+        pass
+
+    # TODO: write me
+    def test_redirect_on_delete_POST(self):
+        pass
 
     # TODO
     def test_delete_button_showed_with_param(self):
@@ -152,14 +172,15 @@ class ExpensesPageTest(BaseTest):
         # TODO
         pass
 
-    def test_deleting_categories_witho_attached_expense_will_throw_error(self):
+    def test_deleting_categories_without_attached_expense_will_error(self):
         # NOTE: Atm we do use `on_delete=models.CASCADE` on Expense model,
         # but this test will be necessary in case we do change that
         pass
 
     def test_create_and_delete_expenses(self):
         category = self.create_category('Rent')
-        expense = self.create_expense(category, 100, 'An expense', '2020-01-01')
+        expense = self.create_expense(category, 100, 'An expense',
+                                      '2020-01-01')
 
         expenses = Expense.objects.all()
         self.assertEqual(expenses.count(), 1)
@@ -182,6 +203,10 @@ class ExpensesPageTest(BaseTest):
 
 class IncomeCategoriesPageTest(BaseTest):
     # TODO: write me
+    def test_save_on_POST(self):
+        pass
+
+    # TODO: write me
     def test_redirect_on_POST(self):
         pass
 
@@ -200,6 +225,11 @@ class IncomeCategoriesPageTest(BaseTest):
 
 
 class IncomePageTest(BaseTest):
+
+    # TODO: write me
+    def test_save_on_POST(self):
+        pass
+
     # TODO: write me
     def test_redirect_on_POST(self):
         pass
@@ -217,8 +247,32 @@ class IncomePageTest(BaseTest):
 
 
 class MonthlyBalanceCategoriesTest(BaseTest):
-    # TODO: write me
+
+    def createMonthlyBalanceCategory(self, text):
+        url = reverse('monthly_balance_categories')
+        response = self.client.post(url,  data={'text': text})
+        return response
+
+    def test_save_on_POST(self):
+        self.createMonthlyBalanceCategory('Account #1')
+
+        # self.fail('write me')
+        self.assertEqual(MonthlyBalanceCategory.objects.count(), 1)
+        new_category = MonthlyBalanceCategory.objects.first()
+        self.assertEqual(new_category.text, 'Account #1')
+
     def test_redirect_on_POST(self):
+        url = reverse('monthly_balance_categories')
+        response = self.createMonthlyBalanceCategory('Account #1')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], url)
+
+    # TODO: write me
+    def test_delete_won_POST(self):
+        pass
+
+    # TODO: write me
+    def test_redirect_on_delete_POST(self):
         pass
 
     def test_title_is_displayed(self):
@@ -238,6 +292,23 @@ class MonthlyBalanceCategoriesTest(BaseTest):
 
 
 class MonthlyBalanceTest(BaseTest):
+
+    # TODO: write me
+    def test_save_on_POST(self):
+        pass
+
+    # TODO: write me
+    def test_redirect_on_POST(self):
+        pass
+
+    # TODO: write me
+    def test_delete_won_POST(self):
+        pass
+
+    # TODO: write me
+    def test_redirect_on_delete_POST(self):
+        pass
+
     # TODO: write me
     def data_is_ordered_by_date_ascending(self):
         pass

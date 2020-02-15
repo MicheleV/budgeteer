@@ -1,6 +1,9 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+import random
+import string
+
 from django.urls import resolve
 from django.urls import reverse
 from django.test import TestCase
@@ -47,7 +50,7 @@ class BaseTest(TestCase):
 
     def get_response_from_named_url(self, named_url, args=None):
         if args:
-            url = reverse('delete_expense', kwargs=args)
+            url = reverse(named_url, kwargs=args)
             response = self.client.post(url)
         else:
             url = reverse(named_url)
@@ -102,3 +105,11 @@ class BaseTest(TestCase):
         g.full_clean()
         g.save()
         return g
+
+    @staticmethod
+    def generateString(length=10):
+        """
+        Generate a random string of a given length
+        """
+        char = string.ascii_lowercase
+        return ''.join(random.choice(char) for i in range(length))

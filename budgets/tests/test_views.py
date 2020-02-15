@@ -1,11 +1,13 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+import random
+
 from django.urls import resolve
 from django.urls import reverse
 
 import budgets.forms as f
-from budgets.models import Category, Expense, MonthlyBalanceCategory
+import budgets.models as m
 from budgets.tests.base import BaseTest
 import budgets.views as v
 
@@ -26,6 +28,23 @@ class HomePageTest(BaseTest):
 
 class CategoriesPageTest(BaseTest):
 
+    def test_save_on_POST(self):
+        url = reverse('new_category')
+        text = self.generateString(10)
+        response = self.client.post(url,  data={'text': text})
+
+        self.assertEqual(m.Category.objects.count(), 1)
+        new_category = m.Category.objects.first()
+        self.assertEqual(new_category.text, text)
+
+    def test_redirect_on_POST(self):
+        url = reverse('categories')
+        text = self.generateString(10)
+        response = self.client.post(url, data={'text': text})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], url)
+
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('categories', 'Categories')
 
@@ -40,54 +59,71 @@ class CategoriesPageTest(BaseTest):
         response = self.get_response_from_named_url('categories')
         self.assertIsInstance(response.context['form'], f.CategoryForm)
 
-    def test_save_on_POST(self):
-        url = reverse('new_category')
-        response = self.client.post(url,  data={'text': 'Rent'})
-
-        self.assertEqual(Category.objects.count(), 1)
-        new_category = Category.objects.first()
-        self.assertEqual(new_category.text, 'Rent')
-
-    def test_redirect_on_POST(self):
-        url = reverse('categories')
-        response = self.client.post(url, data={'text': 'Rent'})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], url)
-
     def test_save_and_retrieve_categories(self):
-        first_category = self.create_category('Rent')
-        second_category = self.create_category('Food')
+        text1 = self.generateString(10)
+        first_category = self.create_category(text1)
+        text2 = self.generateString(10)
+        second_category = self.create_category(text2)
 
-        saved_categories = Category.objects.all()
+        saved_categories = m.Category.objects.all()
         self.assertEqual(saved_categories.count(), 2)
 
         first_saved_category = saved_categories[0]
+        self.assertEqual(first_saved_category.text, text1)
         second_saved_category = saved_categories[1]
-        self.assertEqual(first_saved_category.text, 'Rent')
-        self.assertEqual(second_saved_category.text, 'Food')
+        self.assertEqual(second_saved_category.text, text2)
 
     def test_create_malformed_categories(self):
         form = f.CategoryForm(data={'text': ''})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['text'], ['This field is required.'])
 
+        long_string = self.generateString(50)
         form = f.CategoryForm(
-          data={'text': 'text longer than constraints!!!!!!!!!!!!!!!!!!!!!!!'})
+          data={'text': long_string})
         self.assertFalse(form.is_valid())
         self.check_if_error_matches('Ensure this value has at most',
                                     form.errors['text'])
 
     def test_displays_all_categories(self):
-        Category.objects.create(text='Rent')
-        Category.objects.create(text='Food')
+        text1 = self.generateString(10)
+        m.Category.objects.create(text=text1)
+        text2 = self.generateString(10)
+        m.Category.objects.create(text=text2)
 
         url = reverse('categories')
         response = self.client.get(url)
-        self.assertContains(response, 'Rent')
-        self.assertContains(response, 'Food')
+        self.assertContains(response, text1)
+        self.assertContains(response, text2)
 
 
 class MonthlyBudgetPageTest(BaseTest):
+
+    def test_save_on_POST(self):
+        text = self.generateString(10)
+        cat = self.create_category(text)
+        url = reverse('new_monthly_budget')
+        amount = random.randint(1, 90000)
+        response = self.client.post(url,  data={'amount': amount,
+                                    'date': '2020-02-16', 'category': cat.id})
+        mb = m.MonthlyBudget.objects.first()
+        self.assertEqual(mb.amount, amount)
+        date = mb.date.strftime('%Y-%m-%d')
+        # Monthly budgets dates have their date set to '1' before being saved
+        self.assertEqual('2020-02-01', date)
+        self.assertEqual(mb.category.id, cat.id)
+
+    def test_redirect_on_POST(self):
+        text = self.generateString(10)
+        cat = self.create_category(text)
+        url = reverse('new_monthly_budget')
+        amount = random.randint(1, 90000)
+        response = self.client.post(url,  data={'amount': amount,
+                                    'date': '2020-02-16', 'category': cat.id})
+        url = reverse('monthly_balance_categories')
+        response = self.client.post(url,  data={'text': 'Account #1'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], url)
 
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('monthly_budgets', 'Monthly budgets')
@@ -115,6 +151,9 @@ class MonthlyBudgetPageTest(BaseTest):
     def test_save_and_retrieve_monthly_budget(self):
         pass
 
+
+class ExpensesPageTest(BaseTest):
+
     # TODO: write me
     def test_save_on_POST(self):
         pass
@@ -123,8 +162,29 @@ class MonthlyBudgetPageTest(BaseTest):
     def test_redirect_on_POST(self):
         pass
 
+    def test_delete_expenses(self):
+        text = self.generateString(10)
+        category = self.create_category(text)
+        expense = self.create_expense(category, 100, 'An expense',
+                                      '2020-01-01')
 
-class ExpensesPageTest(BaseTest):
+        expenses = m.Expense.objects.all()
+        self.assertEqual(expenses.count(), 1)
+
+        # Delete an unexisting object
+        url = reverse('expenses')
+        arg = {'id': 7}
+        response = self.get_response_from_named_url('delete_expense', arg)
+        self.assertEqual(response.status_code, 404)
+
+        # Deletion is successful
+        arg = {'id': expense.id}
+        response = self.get_response_from_named_url('delete_expense', arg)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], url)
+
+        expenses = m.Expense.objects.all()
+        self.assertEqual(expenses.count(), 0)
 
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('expenses', 'Expenses')
@@ -135,22 +195,6 @@ class ExpensesPageTest(BaseTest):
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('expenses')
         self.assertTemplateUsed(response, 'expenses.html')
-
-    # TODO: write me
-    def test_save_on_POST(self):
-        pass
-
-    # TODO: write me
-    def test_redirect_on_POST(self):
-        pass
-
-    # TODO: write me
-    def test_delete_won_POST(self):
-        pass
-
-    # TODO: write me
-    def test_redirect_on_delete_POST(self):
-        pass
 
     # TODO
     def test_delete_button_showed_with_param(self):
@@ -176,29 +220,6 @@ class ExpensesPageTest(BaseTest):
         # NOTE: Atm we do use `on_delete=models.CASCADE` on Expense model,
         # but this test will be necessary in case we do change that
         pass
-
-    def test_create_and_delete_expenses(self):
-        category = self.create_category('Rent')
-        expense = self.create_expense(category, 100, 'An expense',
-                                      '2020-01-01')
-
-        expenses = Expense.objects.all()
-        self.assertEqual(expenses.count(), 1)
-
-        # 404 is thrown for non existing expenses
-        url = reverse('expenses')
-        arg = {'id': 7}
-        response = self.get_response_from_named_url('delete_expense', arg)
-        self.assertEqual(response.status_code, 404)
-
-        # Deletion is successful
-        arg = {'id': expense.id}
-        response = self.get_response_from_named_url('delete_expense', arg)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], url)
-
-        expenses = Expense.objects.all()
-        self.assertEqual(expenses.count(), 0)
 
 
 class IncomeCategoriesPageTest(BaseTest):
@@ -248,32 +269,39 @@ class IncomePageTest(BaseTest):
 
 class MonthlyBalanceCategoriesTest(BaseTest):
 
-    def createMonthlyBalanceCategory(self, text):
-        url = reverse('monthly_balance_categories')
-        response = self.client.post(url,  data={'text': text})
-        return response
-
     def test_save_on_POST(self):
-        self.createMonthlyBalanceCategory('Account #1')
-
-        # self.fail('write me')
-        self.assertEqual(MonthlyBalanceCategory.objects.count(), 1)
-        new_category = MonthlyBalanceCategory.objects.first()
-        self.assertEqual(new_category.text, 'Account #1')
+        url = reverse('monthly_balance_categories')
+        text = self.generateString(10)
+        response = self.client.post(url,  data={'text': text})
+        mb = m.MonthlyBalanceCategory.objects.all()
+        self.assertEqual(mb.count(), 1)
+        mb = mb.first()
+        self.assertEqual(mb.text, text)
 
     def test_redirect_on_POST(self):
         url = reverse('monthly_balance_categories')
-        response = self.createMonthlyBalanceCategory('Account #1')
+        text = self.generateString(10)
+        response = self.client.post(url,  data={'text': text})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], url)
 
-    # TODO: write me
-    def test_delete_won_POST(self):
-        pass
+    def test_delete_on_POST(self):
+        text = self.generateString(10)
+        self.create_monthly_balance_category(text)
+        new_category = m.MonthlyBalanceCategory.objects.first()
+        mb = self.create_monthly_balance(new_category, 42000, '2020-02-16')
 
-    # TODO: write me
-    def test_redirect_on_delete_POST(self):
-        pass
+        show_delete = True
+        redirect_url = v.create_url_for_monthly_budget(mb, show_delete)
+        arg = {'id': mb.id}
+        response = self.get_response_from_named_url('delete_monthly_balance',
+                                                    arg)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], redirect_url)
+
+        mb = m.MonthlyBalance.objects.all()
+        self.assertEqual(mb.count(), 0)
 
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('monthly_balance_categories',
@@ -302,7 +330,7 @@ class MonthlyBalanceTest(BaseTest):
         pass
 
     # TODO: write me
-    def test_delete_won_POST(self):
+    def test_delete_on_POST(self):
         pass
 
     # TODO: write me

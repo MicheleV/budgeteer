@@ -72,7 +72,7 @@ Create your ansible inventory file inside ``tools/inventory.ansible`` ::
     [production]
     <your-production-server-address> ansible_become=yes ansible_ssh_user=<your-user>
 
-Install the required packages on RHEL like distros::
+Provision (on RHEL like distros)::
 
     cd tools
     ansible-playbook -i inventory.ansible provision.yaml [--limit=<env-name>] [--ask-become-pass]
@@ -130,6 +130,9 @@ Generate coverage::
 
     ./tools/generate_coverage.sh
 
+View it in html::
+
+    coverage html
 
 References and useful links
 ===========================
@@ -167,5 +170,5 @@ See `COPYING <COPYING>`_ to see the full text.
    :target: COPYING
    :alt: Repository License
 
-.. |Coverage| image:: https://img.shields.io/badge/coverage-74%25-yellow
+.. |Coverage| image:: https://img.shields.io/badge/coverage-77%25-yellow
    :alt: Code Coverage

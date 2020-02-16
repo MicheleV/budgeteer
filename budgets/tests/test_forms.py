@@ -32,7 +32,7 @@ class CategoriesTest(BaseTest):
           f.IncomeCategoryForm,
           f.MonthlyBalanceCategoryForm
         ]
-        text = '----------------text longer than constraints--------------'
+        text = self.generateString(50)
 
         for form in forms:
             filled_form = form(data={'text': text})
@@ -83,7 +83,6 @@ class MonthlyBalanceCategoryFormTest(BaseTest):
 # ------------------ end of Categories tests ------------------
 
 
-# TODO: Write me!
 class IncomeFormTest(BaseTest):
     def test_form_renders_correctly(self):
         form = f.IncomeForm()
@@ -196,7 +195,7 @@ class ExpenseFormTest(BaseTest):
         form = f.ExpenseForm(data={
             'category': category.id,
             'amount': 5000,
-            'date': 'I am a string, not a valid date'
+            'date': self.generateString(50)
         })
         self.assertFalse(form.is_valid())
         self.assertIn(
@@ -285,7 +284,7 @@ class MonthlyBudgetFormTest(BaseTest):
         form = f.MonthlyBudgetForm(data={
             'category': category.id,
             'amount': 5000,
-            'date': 'I am a string, not a valid date'
+            'date': self.generateString(50),
         })
         self.assertFalse(form.is_valid())
         self.assertIn(

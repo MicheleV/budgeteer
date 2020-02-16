@@ -411,6 +411,8 @@ def incomes_page(request, date=None):
             if form.is_valid():
                 form.full_clean()
                 form.save()
+                redirect_url = reverse('incomes')
+                return redirect(redirect_url)
             else:
                 errors = form.errors
         except ValidationError:

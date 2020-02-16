@@ -504,13 +504,13 @@ def monthly_balances_page(request, date=None):
     })
 
 
-def create_url_for_monthly_budget(mb, delete=False):
+def append_year_and_month_to_url(obj, named_url, delete=False):
     """
-    Redirect to the monthly_balances for the argument's date
+    Return an url with obj's date appended in YYYY-mm format
     """
     format_str = '%Y-%m'
-    date_ym = mb.date.strftime(format_str)
-    view_url = reverse('monthly_balances')
+    date_ym = obj.date.strftime(format_str)
+    view_url = reverse(named_url)
     redirect_url = f"{view_url}/{date_ym}"
     if delete:
         redirect_url = f"{redirect_url}?delete=1"
@@ -526,7 +526,8 @@ def delete_monthly_balance_page(request, id=None):
     mb = get_object_or_404(m.MonthlyBalance, pk=id)
     # Since we delete a monthly balance, the previous page was showing buttons
     show_delete = True
-    redirect_url = create_url_for_monthly_budget(mb, show_delete)
+    redirect_url = append_year_and_month_to_url(mb, 'monthly_balances',
+                                                show_delete)
     mb.delete()
     return redirect(redirect_url)
 
@@ -543,7 +544,8 @@ def monthly_balances_edit_page(request, id=None):
                 form.full_clean()
                 form.save()
 
-                redirect_url = create_url_for_monthly_budget(mb)
+                redirect_url = append_year_and_month_to_url(mb,
+                                                            'monthly_balances')
                 return redirect(redirect_url)
             else:
                 errors = form.errors

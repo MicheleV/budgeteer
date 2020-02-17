@@ -274,7 +274,7 @@ def categories_page(request):
 
 
 @require_http_methods(["GET", "POST"])
-def expenses_page(request, date=None):
+def expenses_page(request, start=None, end=None):
     """
     Display the expenses page
     """
@@ -303,7 +303,11 @@ def expenses_page(request, date=None):
     categories = m.Category.objects.filter(is_archived=False)
     form.fields['category'].queryset = categories
 
-    (start, end) = get_month_boundaries(date)
+    if end is None:
+        (start, end) = get_month_boundaries(start)
+    else:
+        format_str = '%Y-%m-%d'
+        start = datetime.datetime.strptime(start, format_str).date()
     # TODO refactor these queries after reading Django docs about annotation
     # and aggregation
     expenses = m.Expense.objects.filter(date__range=(start, end)) \

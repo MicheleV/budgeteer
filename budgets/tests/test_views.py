@@ -1,6 +1,7 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+import datetime
 import random
 
 from django.urls import resolve
@@ -91,14 +92,15 @@ class MonthlyBudgetPageTest(BaseTest):
         url = reverse('new_monthly_budget')
         redirect_url = reverse('monthly_budgets')
         amount = random.randint(1, 90000)
+        date = datetime.date.today().replace(day=16).strftime("%Y-%m-%d")
         response = self.client.post(url,  data={'amount': amount,
-                                    'date': '2020-02-16', 'category': cat.id})
+                                    'date': date, 'category': cat.id})
         mb = m.MonthlyBudget.objects.first()
-        date = mb.date.strftime('%Y-%m-%d')
 
         self.assertEqual(mb.amount, amount)
         # Monthly budgets dates have their date set to '1' before being saved
-        self.assertEqual('2020-02-01', date)
+        date_1 = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        self.assertEqual(mb.date.strftime("%Y-%m-%d"), date_1)
         self.assertEqual(mb.category.id, cat.id)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
@@ -119,6 +121,8 @@ class MonthlyBudgetPageTest(BaseTest):
 
     # TODO
     def test_delete_button_showed_with_param(self):
+        text = self.generateString(10)
+        cat = self.create_category(text)
         pass
 
     # TODO
@@ -133,7 +137,7 @@ class MonthlyBudgetPageTest(BaseTest):
 
         amount1 = random.randint(1, 90000)
         amount2 = random.randint(1, 90000)
-        date = '2020-02-01'
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
         mb = self.create_monthly_budgets(cat1, amount1, date)
         mb = self.create_monthly_budgets(cat2, amount2, date)
 
@@ -156,14 +160,23 @@ class ExpensesPageTest(BaseTest):
         url = reverse('new_expense')
         redirect_url = reverse('expenses')
         amount = random.randint(1, 90000)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
         response = self.client.post(url,  data={'amount': amount,
-                                    'date': '2020-02-16', 'category': cat.id})
+                                    'date': date, 'category': cat.id})
         exp = m.Expense.objects.first()
-        date = exp.date.strftime('%Y-%m-%d')
+
+        url = reverse('new_expense')
+        redirect_url = reverse('expenses')
 
         self.assertEqual(exp.amount, amount)
-        self.assertEqual('2020-02-16', date)
+        self.assertEqual(exp.date.strftime("%Y-%m-%d"), date)
         self.assertEqual(exp.category.id, cat.id)
+
+        # Merged test_save_and_retrieve_expenses
+        view_page = reverse('expenses')
+        second_response = self.client.get(view_page)
+        # Note: we're hardcoding comma as thousand separator in the views
+        self.assertContains(second_response, '{:,}'.format(amount))
 
         # Merged test_redirect_on_POST(self)
         self.assertEqual(response.status_code, 302)
@@ -171,9 +184,11 @@ class ExpensesPageTest(BaseTest):
 
     def test_delete_expenses(self):
         text = self.generateString(10)
+        text_2 = self.generateString(10)
         category = self.create_category(text)
-        expense = self.create_expense(category, 100, 'An expense',
-                                      '2020-01-01')
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        expense = self.create_expense(category, 100, text_2,
+                                      date)
 
         expenses = m.Expense.objects.all()
         self.assertEqual(expenses.count(), 1)
@@ -203,17 +218,39 @@ class ExpensesPageTest(BaseTest):
         response = self.get_response_from_named_url('expenses')
         self.assertTemplateUsed(response, 'expenses.html')
 
-    # TODO
     def test_delete_button_showed_with_param(self):
-        pass
+        text = self.generateString(10)
+        text_2 = self.generateString(10)
+        text_3 = self.generateString(10)
+        category = self.create_category(text)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        exp = self.create_expense(category, 100, text_2, date)
+        exp2 = self.create_expense(category, 100, text_3, date)
 
-    # TODO
+        url = f"{reverse('expenses')}?delete=1"
+        response = second_response = self.client.get(url)
+
+        delete_form_html = f"form method=\"POST\" action=\"/delete_expense/{exp.id}\""
+        delete_form_html_2 = f"form method=\"POST\" action=\"/delete_expense/{exp2.id}\""
+        button_html = '<input type="submit" id="id_submit" value="Yes, DELETE">'
+        self.assertContains(response, delete_form_html)
+        self.assertContains(response, delete_form_html_2)
+        self.assertContains(response, button_html)
+
     def test_delete_button_missing_without_param(self):
-        pass
+        text = self.generateString(10)
+        text_2 = self.generateString(10)
+        category = self.create_category(text)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        exp = self.create_expense(category, 100, text_2, date)
 
-    # TODO
-    def test_save_and_retrieve_expenses(self):
-        pass
+        url = f"{reverse('expenses')}?delete=0"
+        response = second_response = self.client.get(url)
+
+        delete_form_html = 'form method="POST" action="/delete_expense/'
+        button_html = '<input type="submit" id="id_submit" value="Yes, DELETE">'
+        self.assertNotContains(response, delete_form_html)
+        self.assertNotContains(response, button_html)
 
     # TODO
     def test_creating_malformed_expenses_throw_errors(self):
@@ -272,13 +309,14 @@ class IncomePageTest(BaseTest):
         url = reverse('new_income')
         redirect_url = reverse('incomes')
         amount = random.randint(1, 90000)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
         response = self.client.post(url,  data={'amount': amount,
-                                    'date': '2020-02-16', 'category': cat.id})
+                                    'date': date, 'category': cat.id})
         inc = m.Income.objects.first()
         date = inc.date.strftime('%Y-%m-%d')
 
         self.assertEqual(inc.amount, amount)
-        self.assertEqual('2020-02-16', date)
+        self.assertEqual(inc.date.strftime("%Y-%m-%d"), date)
         self.assertEqual(inc.category.id, cat.id)
 
         # Merged test_redirect_on_POST(self)
@@ -319,7 +357,8 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         text = self.generateString(10)
         self.create_monthly_balance_category(text)
         new_category = m.MonthlyBalanceCategory.objects.first()
-        mb = self.create_monthly_balance(new_category, 42000, '2020-02-16')
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        mb = self.create_monthly_balance(new_category, 42000, date)
 
         show_delete = True
         redirect_url = v.append_year_and_month_to_url(mb, 'monthly_balances',
@@ -359,18 +398,15 @@ class MonthlyBalanceTest(BaseTest):
         url = reverse('new_monthly_balance')
         redirect_url = reverse('monthly_balances')
         amount = random.randint(1, 90000)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
         response = self.client.post(url,  data={'amount': amount,
-                                    'date': '2020-02-16', 'category': cat.id})
+                                    'date': date, 'category': cat.id})
         exp = m.MonthlyBalance.objects.first()
         date = exp.date.strftime('%Y-%m-%d')
 
         # Merged test_redirect_on_POST(self)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
-
-    # TODO: write me
-    def test_redirect_on_delete_POST(self):
-        pass
 
     # TODO: write me
     def data_is_ordered_by_date_ascending(self):

@@ -119,16 +119,6 @@ class MonthlyBudgetPageTest(BaseTest):
         response = self.get_response_from_named_url('monthly_budgets')
         self.assertIsInstance(response.context['form'], f.MonthlyBudgetForm)
 
-    # TODO
-    def test_delete_button_showed_with_param(self):
-        text = self.generateString(10)
-        cat = self.create_category(text)
-        pass
-
-    # TODO
-    def test_delete_button_missing_without_param(self):
-        pass
-
     def test_save_and_retrieve_monthly_budget(self):
         text1 = self.generateString(10)
         cat1 = self.create_category(text1)
@@ -410,6 +400,27 @@ class MonthlyBalanceTest(BaseTest):
 
     # TODO: write me
     def data_is_ordered_by_date_ascending(self):
+        pass
+
+    def test_delete_button_showed_with_param(self):
+        text = self.generateString(10)
+        cat = self.create_monthly_balance_category(text)
+        amount = random.randint(1, 90000)
+        date = datetime.date.today().replace(day=1)
+        date_ymd = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        date_ym = datetime.date.today().replace(day=1).strftime("%Y-%m")
+        mb = self.create_monthly_balance(cat, amount, date_ymd)
+
+        url = f"{reverse('monthly_balances')}/{date_ym}?delete=1"
+        response = second_response = self.client.get(url)
+
+        delete_form_html = 'form method="POST" action="/delete_monthly_balance/'
+        button_html = '<input type="submit" id="id_submit" value="Yes, DELETE">'
+        self.assertContains(response, delete_form_html)
+        self.assertContains(response, button_html)
+
+    # TODO: write me
+    def test_delete_button_missing_without_param(self):
         pass
 
     def test_title_is_displayed(self):

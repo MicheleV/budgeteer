@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Start a Centos VM and reboot it
+# Start a Centos7 VM and reboot it
 
 # Get CentOS Minimal from http://isoredirect.centos.org/centos/7/isos/x86_64/
 # /var/lib/libvirt/images/CentOS-7-x86_64-Minimal-1908.iso should be owned by qemu:qemu
@@ -16,7 +16,7 @@ network_name=default
 virt-install --name $vm_name \
 --location $iso_path \
 --initrd-inject kickstart.cfg \
---memory=1024 --vcpus=1 --disk size=10 \
+--memory=2048 --vcpus=2 --disk size=10 \
 --extra-args "ks=file:/kickstart.cfg console=ttyS0,115200" \
 --noautoconsole --wait=-1 --serial pty --console pty
 

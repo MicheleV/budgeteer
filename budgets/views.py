@@ -182,6 +182,7 @@ def home_page(request):
     pie_graph = generate_current_monthly_balance_pie_graph(current_mb)
 
     if current_mb_total is None:
+        current_mb_total = 0
         two_months_diff = 0
         two_months_diff_perc = 0
     elif prev_mb_total is None:
@@ -204,7 +205,10 @@ def home_page(request):
             goal.months_to_go = None
         else:
             diff = goal.amount - current_mb_total
-            months_to_go = diff / two_months_diff
+            try:
+                months_to_go = diff / two_months_diff
+            except ZeroDivisionError:
+                months_to_go = 0
             goal.months_to_go = math.ceil(months_to_go)
     mb = m.MonthlyBalance.objects.values('date').order_by('date'). \
         annotate(amount=Sum('amount'))

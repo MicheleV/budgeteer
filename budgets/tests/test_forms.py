@@ -1,6 +1,8 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+import random
+
 import budgets.forms as f
 import budgets.models as m
 from budgets.tests.base import BaseTest
@@ -90,21 +92,130 @@ class IncomeFormTest(BaseTest):
         self.assertIn('placeholder="Keyword about this entry"', form.as_p())
         self.assertIn('placeholder="%Y-%m-%d format"', form.as_p())
 
-    # TODO: write me
     def test_form_validation_amount_field(self):
-        pass
+        text = self.generateString(20)
+        category = self.create_income_category(text)
+        form = f.IncomeForm(data={
+            'category': category.id,
+            'amount': None,
+            'date': '2019-09-23'
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn(
+          'amount',
+          form.errors.as_text(),
+        )
+        self.assertIn(
+          'This field is required',
+          form.errors.as_text(),
+        )
 
-    # TODO: write me
     def test_form_validation_note_field(self):
-        pass
+        text = self.generateString(20)
+        # Note has max length of 150 (set in models.py)
+        long_text = self.generateString(150)
+        category = self.create_income_category(text)
+        amount = random.randint(1, 90000)
+        date = '2020-03-01'
+        form = f.IncomeForm(data={
+            'category': category.id,
+            'amount': amount,
+            'date': date,
+            'note': long_text
+        })
+        self.assertTrue(form.is_valid())
+        self.assertNotIn(
+          'note',
+          form.errors.as_text(),
+        )
+        self.assertNotIn(
+          'Ensure this value has at most',
+          form.errors.as_text(),
+        )
+        # note field can be None
+        form = f.IncomeForm(data={
+            'category': category.id,
+            'amount': amount,
+            'date': date,
+            'note': None
+        })
+        self.assertTrue(form.is_valid())
+        self.assertNotIn(
+          'note',
+          form.errors.as_text(),
+        )
+        self.assertNotIn(
+          'Ensure this value has at most',
+          form.errors.as_text(),
+        )
 
-    # TODO: write me
     def test_form_validation_date_field(self):
-        pass
+        # Case None
+        text = self.generateString(20)
+        category = self.create_income_category(text)
+        amount = random.randint(1, 90000)
+        form = f.IncomeForm(data={
+            'category': category.id,
+            'amount': amount,
+            'date': None
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn(
+          'date',
+          form.errors.as_text(),
+        )
+        self.assertIn(
+          'This field is required',
+          form.errors.as_text(),
+        )
 
-    # TODO: write me
+        # Case empty string
+        form = f.IncomeForm(data={
+            'category': category.id,
+            'amount': amount,
+            'date': ''
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn(
+          'date',
+          form.errors.as_text(),
+        )
+        self.assertIn(
+          'This field is required',
+          form.errors.as_text(),
+        )
+        # Case invalid string
+        form = f.ExpenseForm(data={
+            'category': category.id,
+            'amount': amount,
+            'date': self.generateString(50)
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn(
+          'date',
+          form.errors.as_text(),
+        )
+        self.assertIn(
+          'Enter a valid date',
+          form.errors.as_text(),
+        )
+
     def test_form_validation_category_field(self):
-        pass
+        amount = random.randint(1, 90000)
+        form = f.IncomeForm(data={
+            'category': None,
+            'amount': amount,
+            'date': '2019-09-23'
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn(
+          'category',
+          form.errors.as_text(),
+        )
+        self.assertIn(
+          'This field is required',
+          form.errors.as_text(),
+        )
 
 
 class MonthlyBalanceFormTest(BaseTest):
@@ -143,7 +254,8 @@ class ExpenseFormTest(BaseTest):
         )
 
     def test_form_validation_amount_field(self):
-        category = self.create_category('Rent')
+        text = self.generateString(20)
+        category = self.create_category(text)
         form = f.ExpenseForm(data={
             'category': category.id,
             'amount': None,
@@ -160,11 +272,13 @@ class ExpenseFormTest(BaseTest):
         )
 
     def test_form_validation_date_field(self):
-        category = self.create_category('Rent')
+        text = self.generateString(20)
+        category = self.create_category(text)
+        amount = random.randint(1, 90000)
         # Case None
         form = f.ExpenseForm(data={
             'category': category.id,
-            'amount': 5000,
+            'amount': amount,
             'date': None
         })
         self.assertFalse(form.is_valid())
@@ -179,7 +293,7 @@ class ExpenseFormTest(BaseTest):
         # Case empty string
         form = f.ExpenseForm(data={
             'category': category.id,
-            'amount': 5000,
+            'amount': amount,
             'date': ''
         })
         self.assertFalse(form.is_valid())
@@ -194,7 +308,7 @@ class ExpenseFormTest(BaseTest):
         # Case invalid string
         form = f.ExpenseForm(data={
             'category': category.id,
-            'amount': 5000,
+            'amount': amount,
             'date': self.generateString(50)
         })
         self.assertFalse(form.is_valid())
@@ -251,9 +365,10 @@ class MonthlyBudgetFormTest(BaseTest):
     def test_form_validation_date_field(self):
         category = self.create_category('Rent')
         # Case None
+        amount = random.randint(1, 90000)
         form = f.MonthlyBudgetForm(data={
             'category': category.id,
-            'amount': 5000,
+            'amount': amount,
             'date': None
         })
         self.assertFalse(form.is_valid())
@@ -268,7 +383,7 @@ class MonthlyBudgetFormTest(BaseTest):
         # Case empty string
         form = f.MonthlyBudgetForm(data={
             'category': category.id,
-            'amount': 5000,
+            'amount': amount,
             'date': ''
         })
         self.assertFalse(form.is_valid())
@@ -283,7 +398,7 @@ class MonthlyBudgetFormTest(BaseTest):
         # Case invalid string
         form = f.MonthlyBudgetForm(data={
             'category': category.id,
-            'amount': 5000,
+            'amount': amount,
             'date': self.generateString(50),
         })
         self.assertFalse(form.is_valid())
@@ -298,34 +413,42 @@ class MonthlyBudgetFormTest(BaseTest):
 
     def test_save_and_update_models(self):
         """
-        Test whether the models are updated correctly or not
+        Test whether the models are saved and updated correctly or not
         """
-        inc_cat_form = f.IncomeCategoryForm(data={'text': 'Wage'})
+        amount = random.randint(1, 90000)
+        date = '2019-08-01'
+        text = self.generateString(20)
+        note = self.generateString(20)
+
+        amount2 = random.randint(1, 90000)
+        date2 = '2019-08-02'
+        note2 = self.generateString(20)
+        inc_cat_form = f.IncomeCategoryForm(data={'text': text})
         inc_cat_form.full_clean()
         inc_cat_form.save()
 
         saved_income_category = m.IncomeCategory.objects.first()
-        self.assertEqual(saved_income_category.text, 'Wage')
+        self.assertEqual(saved_income_category.text, text)
 
         income_form = f.IncomeForm(data={
             'category': saved_income_category.id,
-            'amount': 10000,
-            'note': 'Wage for August 2019',
-            'date': '2019-08-01'
+            'amount': amount,
+            'note': note,
+            'date': date
         })
         income_form.full_clean()
         income_form.save()
 
         saved_income = m.Income.objects.first()
-        self.assertEqual(saved_income.amount, 10000)
-        self.assertEqual(saved_income.note, 'Wage for August 2019')
-        self.assertEqual(saved_income.date.strftime("%Y-%m-%d"), '2019-08-01')
+        self.assertEqual(saved_income.amount, amount)
+        self.assertEqual(saved_income.note, note)
+        self.assertEqual(saved_income.date.strftime("%Y-%m-%d"), date)
 
         income_form = f.IncomeForm(data={
             'category': saved_income_category.id,
-            'amount': 42,
-            'note': 'Donation',
-            'date': '2019-08-02'
+            'amount': amount2,
+            'note': note2,
+            'date': date2
         }, instance=saved_income)
         income_form.full_clean()
         income_form.save()
@@ -336,7 +459,79 @@ class MonthlyBudgetFormTest(BaseTest):
 
         # The update was saved correctly
         updated_income = all_incomes.first()
-        self.assertEqual(updated_income.amount, 42)
-        self.assertEqual(updated_income.note, 'Donation')
+        self.assertEqual(updated_income.amount, amount2)
+        self.assertEqual(updated_income.note, note2)
         self.assertEqual(updated_income.date.strftime("%Y-%m-%d"),
-                         '2019-08-02')
+                         date2)
+
+
+class GoalFormTest(BaseTest):
+    def test_form_renders_correctly(self):
+        form = f.GoalForm()
+        amount = 'Enter the amount'
+        name = 'Name of the goal (Shows in the graphs)'
+        text = 'Description of what you are trying to achieve'
+        self.assertIn(f'placeholder="{amount}"', form.as_p())
+        self.assertIn(f'placeholder="{name}"', form.as_p())
+        self.assertIn(f'placeholder="{text}"', form.as_p())
+
+    # TODO: write me
+    def test_form_validation_amount_field(self):
+        """
+        """
+        pass
+
+    # TODO: write me
+    def test_form_validation_name_field(self):
+        """
+        """
+        pass
+
+    # TODO: write me
+    def test_form_validation_text_field(self):
+        """
+        """
+        pass
+
+    def test_save_and_update_models(self):
+        """
+        Test whether the models are saved and updated correctly or not
+        """
+        amount = random.randint(1, 90000)
+        text = self.generateString(20)
+        note = self.generateString(20)
+        is_archived = False
+        goal_form = f.GoalForm(data={
+            'amount': amount,
+            'text': text,
+            'note': note,
+            'is_archived': is_archived,
+        })
+        goal_form.full_clean()
+        goal_form.save()
+
+        saved_goal = m.Goal.objects.first()
+        self.assertEqual(saved_goal.amount, amount)
+        self.assertEqual(saved_goal.text, text)
+        self.assertEqual(saved_goal.note, note)
+        self.assertEqual(saved_goal.is_archived, is_archived)
+
+        income_form = f.GoalForm(data={
+            'amount': amount,
+            'text':  text,
+            'note': note,
+            'is_archived': is_archived
+        }, instance=saved_goal)
+        income_form.full_clean()
+        income_form.save()
+
+        # No new instances were created
+        all_goals = m.Goal.objects.all()
+        self.assertEqual(len(all_goals), 1)
+
+        # The update was saved correctly
+        goal_form = all_goals.first()
+        self.assertEqual(goal_form.amount, amount)
+        self.assertEqual(goal_form.text, text)
+        self.assertEqual(goal_form.note, note)
+        self.assertEqual(goal_form.is_archived, is_archived)

@@ -35,7 +35,6 @@ class CategoryForm(forms.models.ModelForm):
 class ExpenseForm(forms.models.ModelForm):
 
     class Meta:
-
         model = m.Expense
         fields = ('date', 'amount', 'note', 'category')
         widgets = {
@@ -61,7 +60,6 @@ class DeleteExpenseForm(forms.models.ModelForm):
 class MonthlyBudgetForm(forms.models.ModelForm):
 
     class Meta:
-
         model = m.MonthlyBudget
         fields = ('category', 'amount', 'date')
         widgets = {
@@ -134,7 +132,6 @@ class MonthlyBalanceCategoryForm(forms.models.ModelForm):
 class MonthlyBalanceForm(forms.models.ModelForm):
 
     class Meta:
-
         model = m.MonthlyBalance
         fields = ('category', 'amount', 'date')
         widgets = {
@@ -145,4 +142,23 @@ class MonthlyBalanceForm(forms.models.ModelForm):
                 'placeholder': '%Y-%m-%d format',
             }),
             'category': forms.fields.Select,
+        }
+
+
+class GoalForm(forms.models.ModelForm):
+
+    class Meta:
+        model = m.Goal
+        fields = ('amount', 'text', 'note', 'is_archived')
+        widgets = {
+            'amount': forms.fields.TextInput(attrs={
+                'placeholder': 'Enter the amount',
+            }),
+            'text': forms.fields.TextInput(attrs={
+                'placeholder': 'Name of the goal (Shows in the graphs)',
+            }),
+            'note': forms.fields.TextInput(attrs={
+                'placeholder': 'Description of what you are trying to achieve',
+            }),
+            'is_archived': forms.fields.CheckboxInput,
         }

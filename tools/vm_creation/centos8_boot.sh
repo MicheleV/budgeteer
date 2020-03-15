@@ -15,12 +15,10 @@ network_name=default
 # NOTE --wait=-1 make sure the reboot is issued after installation is complete
 # as per https://access.redhat.com/solutions/41976
 
-# virt-install --name $vm_name \
-# --cdrom $iso_path \
-# --initrd-inject centos8.cfg \
-# --memory=2048 --vcpus=2 --disk size=10 \
-# --extra-args "ks=file:/centos8.cfg console=ttyS0,115200" \
-# --noautoconsole --wait=-1 --serial pty --console pty
+qemu-img create -f qcow2 centos8.qcow2 10G
+mv centos8.qcow2 /var/lib/libvirt/images/centos8.qcow2
+chown qemu:qemu /var/lib/libvirt/images/centos8.qcow2
+#restorecon -rvvf /var/lib/libvirt/images/
 
 virt-install \
     --name $vm_name \

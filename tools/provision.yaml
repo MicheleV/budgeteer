@@ -21,6 +21,8 @@
         gpgcheck: yes
         gpgkey: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
         enabled: yes
+      tags:
+        - packages
 
     - name: Ensure git, python 3.6, development tools and nginx are installed
       yum:
@@ -35,11 +37,24 @@
           - make
           - nginx
           - firewalld
+      tags:
+        - packages
+
+    - name: Install setuptools
+      yum:
+        name: python-setuptools
+      become: true
+      when: ansible_distribution == 'CentOS'
+      tags:
+        - packages
 
     - name: Install virtualenv via pip
       pip:
         name: virtualenv
         executable: pip3
+        virtualenv_python: python3.6
+      tags:
+        - packages
 
     - name: Enable service nginx and ensure it is not masked
       systemd:
@@ -47,19 +62,22 @@
         enabled: yes
         masked: no
 
-    # TODO: do we really need these libraries? Also, update_cache:true could be quite time consuming!
-    - name: Ensure latest version of nss, curl and libcurl are installed
-      yum:
-        name: "{{ packages }}"
-        state: latest
-        update_cache: true
-      become: true
-      vars:
-        packages:
-          - nss
-          - curl
-          - libcurl
+    # # TODO: do we really need these libraries? Also, update_cache:true could be quite time consuming!
+    # - name: Ensure latest version of nss, curl and libcurl are installed
+    #   yum:
+    #     name: "{{ packages }}"
+    #     state: latest
+    #     update_cache: true
+    #   become: true
+    #   vars:
+    #     packages:
+    #       - nss
+    #       - curl
+    #       - libcurl
+    #   tags:
+    #     - packages, long
 
+    # It seems on RHEL like distro, a new version of sqlite is not available yet
     - name: Copy script to update sqlite3 to 3.29 (Django 2.2 requires 3.8.3+)
       copy: 
         src: update_sqlite3.sh
@@ -67,18 +85,26 @@
         mode: 0700
         owner: "{{ ansible_user }}"
       changed_when: False
+      # when: ansible_distribution == 'Red Hat Enterprise Linux'
+      tags:
+        - packages
 
     - name: Compiling sqlite3 (this task will take a while!)
-      shell: /home/{{ ansible_user }}/update_sqlite3.sh {{ ansible_user }}
+      shell: /home/{{ ansible_user }}/update_sqlite3.sh
       become_user: "{{ ansible_user }}"
       register: execute_sqlite_update
       changed_when: '"Install sqlite3" in execute_sqlite_update.stdout'
+      tags:
+        - packages
 
     - name: Remove the script to update sqlite3
       file:
         path: /home/{{ ansible_user }}/update_sqlite3.sh
         state: absent
       changed_when: False
+      # when: ansible_distribution == 'Red Hat Enterprise Linux'
+      tags:
+        - packages
 
     - name: Enable firewalld
       service:

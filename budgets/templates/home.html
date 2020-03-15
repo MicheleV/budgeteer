@@ -67,6 +67,61 @@
     {% endif %}
 </div>
 
+{% if categories or income_categories%}
+<div class="row">
+  {% if categories %}
+    <div class="col">
+      <h5 id="id_current_month_date">Summary for {% now 'Y-m' %}</h5>
+      <table class="table-responsive-md table-sm" id="id_expenses_total">
+        <tr>
+          <th>Category</th>
+          <th>Spended amount</th>
+          <th>Budgeted amount</th>
+          <th>Status</th>
+        </tr>
+        {% for cat in categories %}
+          {% if cat.total > 0 or cat.mb.amount %}
+          <tr>
+            <td>{{ cat.text }}</td>
+            <td>{{ currency}} {{ cat.total | intcomma }}</td>
+            <td>{{ cat.mb.amount|default:"No monthly budget for this month" }}</td>
+            {% if cat.mb.amount and cat.total %}
+            <td class="{% if cat.mb.amount|sub:cat.total < 0 %}text-danger{% else %}text-success{% endif %}">
+              {{ currency}} {{ cat.mb.amount|sub:cat.total | intcomma }}
+            </td>
+            {% else %}
+            <td> {{ "N/A" }} </td>
+            {% endif %}
+          </tr>
+          {% endif %}
+        {% endfor %}
+      </table>
+    </div>
+    {% endif %}
+
+  <div class="col">
+    <!-- TODO: shorten this. Hide amount = 0 items? -->
+    {% if income_categories %}
+    <table class="table table-responsive-md table-sm" id="id_incomes_total">
+      <tr>
+        <th>Category</th>
+        <th>Income amount</th>
+      </tr>
+      {% for inc in income_categories %}
+      <!-- TODO: verify at least on category is more than 0-->
+        <!-- {% if inc.total > 0 %} -->
+        <tr>
+          <td>{{ inc.text }}</td>
+          <td>{{ currency}} {{ inc.total | intcomma }}</td>
+        </tr>
+        <!-- {% endif %} -->
+      {% endfor %}
+    </table>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
 <div class="row">
     {% if bar_graph %}
     <div  class="col">
@@ -129,54 +184,5 @@
   </div>
   {% endif %}
 </div>
-
-
-
-<!-- TODO: shorten this. Hide amount = 0 items? -->
-{% if income_categories %}
-<table class="table table-responsive-md table-sm" id="id_incomes_total">
-  <tr>
-    <th>Category</th>
-    <th>Income amount</th>
-  </tr>
-  {% for inc in income_categories %}
-  <!-- TODO: verify at least on category is more than 0-->
-    <!-- {% if inc.total > 0 %} -->
-    <tr>
-      <td>{{ inc.text }}</td>
-      <td>{{ currency}} {{ inc.total | intcomma }}</td>
-    </tr>
-    <!-- {% endif %} -->
-  {% endfor %}
-</table>
-{% endif %}
-
-{% if categories %}
-<h5 id="id_current_month_date">Summary for {% now 'Y-m' %}</h5>
-  <table class="table-responsive-md table-sm" id="id_expenses_total">
-    <tr>
-      <th>Category</th>
-      <th>Spended amount</th>
-      <th>Budgeted amount</th>
-      <th>Status</th>
-    </tr>
-    {% for cat in categories %}
-      {% if cat.total > 0 or cat.mb.amount %}
-      <tr>
-        <td>{{ cat.text }}</td>
-        <td>{{ currency}} {{ cat.total | intcomma }}</td>
-        <td>{{ cat.mb.amount|default:"No monthly budget for this month" }}</td>
-        {% if cat.mb.amount and cat.total %}
-        <td class="{% if cat.mb.amount|sub:cat.total < 0 %}text-danger{% else %}text-success{% endif %}">
-          {{ currency}} {{ cat.mb.amount|sub:cat.total | intcomma }}
-        </td>
-        {% else %}
-        <td> {{ "N/A" }} </td>
-        {% endif %}
-      </tr>
-      {% endif %}
-    {% endfor %}
-  </table>
-{% endif %}
 
 {% endblock %}

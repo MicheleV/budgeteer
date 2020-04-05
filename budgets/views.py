@@ -274,7 +274,7 @@ def categories_page(request):
                   'categories.html',
                   {'categories': categories,
                    'errors': errors,
-                   'form': f.CategoryForm()})
+                   'form': f.CategoryForm()})# TODO: this should be 'form': form, otherwise on error, we clean the user input
 
 
 @require_http_methods(["GET", "POST"])

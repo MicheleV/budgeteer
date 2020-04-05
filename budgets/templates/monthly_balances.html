@@ -72,7 +72,7 @@
   {% if total > 0 and not bar_graph%}
     <tr>
       <td>Total</td>
-      <td>{{ total }}</td>
+      <td>{{ total | intcomma }}</td>
       <td> - </td>
       <td> - </td>
     </tr>

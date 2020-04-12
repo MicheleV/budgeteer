@@ -119,12 +119,15 @@ class MonthlyBalanceCategoryForm(forms.models.ModelForm):
 
     class Meta:
         model = m.MonthlyBalanceCategory
-        fields = ('text',)
+        fields = ('text','is_foreign_currency')
         widgets = {
             'text': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter a new category of balance (i.e. savings, cash)',
                 'class': 'form-control input-lg',
                 'autofocus': 'autofocus',
+            }),
+            'is_foreign_currency': forms.fields.CheckboxInput(attrs={
+              'class': 'form-check-input'
             })
         }
 

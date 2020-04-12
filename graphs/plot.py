@@ -63,7 +63,7 @@ def prepareGraphData(x, y, goals=None):
     """
     Prepare the data for the bar graph
     """
-    currency = os.getenv("currency")
+    currency = os.getenv("CURRENCY")
     # The blue color used in the examples on matplot docs
     # https://github.com/matplotlib/matplotlib/blob/v3.1.2/lib/matplotlib/_color_data.py#L17
     base_color = '#1f77b4'

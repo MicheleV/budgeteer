@@ -37,6 +37,7 @@
     <th>Amount</th>
     {% if not bar_graph %}
       <th>Category</th>
+      <th>Is foreign currency?</th>
       <th>ID</th>
       {% if show_delete %}
         <th><b>Delete</b></th>
@@ -51,6 +52,7 @@
       <td>{{ monthly_balance.amount | intcomma }}</td>
       {% if not bar_graph %}
         <td>{{ monthly_balance.category.text }}</td>
+        <td>{{ monthly_balance.category.is_foreign_currency }}</td>
         <td>
           <a href={% url 'edit_monthly_balance' monthly_balance.id %}>Edit</a>
         </td>

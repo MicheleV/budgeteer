@@ -73,6 +73,7 @@ class Income(models.Model):
 
 class MonthlyBalanceCategory(models.Model):
     text = models.CharField(max_length=20, default=None, unique=True)
+    is_foreign_currency = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.text}"

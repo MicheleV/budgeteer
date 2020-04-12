@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 import math
 import os
 
-from django.db.models import Sum
+from django.db.models import Sum, F, Case, When
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -40,9 +40,12 @@ def get_total_of_monthly_balances(date):
     """
     Return the sum of the monthly balances for the input date
     """
-    balances = m.MonthlyBalance.objects.filter(date=date)
-    balances_sum = balances.aggregate(Sum('amount'))['amount__sum']
-    return balances_sum
+    rate = os.getenv("EXCHANGE_RATE")
+    balances = m.MonthlyBalance.objects.select_related('category').filter(date=date)
+    return balances.aggregate(correct_sum=Sum(Case(
+      When(category__is_foreign_currency=False, then='amount'),
+      When(category__is_foreign_currency=True, then=F('amount') * rate)
+    )))['correct_sum']
 
 
 def get_month_boundaries(date):
@@ -95,8 +98,12 @@ def generate_monthly_balance_graph(data, goals):
         dates = []
         amounts = []
         for val in data:
-            amounts.append(val['amount'])
             dates.append(val['date'])
+            try:
+                amounts.append(val['actual_amount'])
+            except (AttributeError, NameError) as e:
+                print("You've forgot to add actual_amount somewhere (bar)")
+                amounts.append(val['amount'])
         return plot.generateGraph(dates, amounts, goals)
 
     return False
@@ -115,7 +122,13 @@ def generate_current_monthly_balance_pie_graph(data):
         values = []
         for mb in filter(lambda y: y.amount > 0, data):
             labels.append(mb.category.text)
-            values.append(mb.amount)
+            # TODO: remove this once all places calling this function are
+            # passing monthly budgets with actual_ammount attribute
+            try:
+                values.append(mb.actual_amount)
+            except AttributeError as e:
+                print("You've forgot to add actual_amount somewhere (pie)")
+                values.append(mb.amount)
 
         return plot.generatePieGraph(labels, values)
     return False
@@ -162,9 +175,9 @@ def home_page(request):
     """
     Display the home page
     """
-    currency = os.getenv("currency")
+    currency = os.getenv("CURRENCY")
     (start, end) = current_month_boundaries()
-
+    rate = os.getenv("EXCHANGE_RATE")
     # Get current and preivous month balances
     current_balance = get_total_of_monthly_balances(start)
     prev_month = get_previous_month_first_day_date(start)
@@ -172,13 +185,32 @@ def home_page(request):
 
     # Fetch previous month data to comapre it with the current month's
     prev_mb = m.MonthlyBalance.objects.select_related('category'). \
-        filter(date=prev_month).order_by('category_id')
-    prev_mb_total = prev_mb.aggregate(Sum('amount'))['amount__sum']
+        annotate(actual_amount=Case(
+          # The annotation 'amount' conflicts with a field on the model.
+          When(category__is_foreign_currency=False, then='amount'),
+          When(category__is_foreign_currency=True, then=F('amount') * rate)
+        )).filter(date=prev_month).order_by('category_id')
+
+    prev_mb_total = prev_mb.aggregate(correct_sum=Sum(Case(
+      When(category__is_foreign_currency=False, then='amount'),
+      When(category__is_foreign_currency=True, then=F('amount') * rate)
+    )))['correct_sum']
 
     # Display pie graph
+    # TODO: we could turn "actual_amount" into amount if we find how to
+    #       overwrite/shadow the amount field
     current_mb = m.MonthlyBalance.objects.select_related('category'). \
-        filter(date=start).order_by('category_id')
-    current_mb_total = current_mb.aggregate(Sum('amount'))['amount__sum']
+        annotate(actual_amount=Case(
+          # The annotation 'amount' conflicts with a field on the model.
+          When(category__is_foreign_currency=False, then='amount'),
+          When(category__is_foreign_currency=True, then=F('amount') * rate)
+        )).filter(date=start).order_by('category_id')
+
+    current_mb_total = current_mb.aggregate(correct_sum=Sum(Case(
+      When(category__is_foreign_currency=False, then='amount'),
+      When(category__is_foreign_currency=True, then=F('amount') * rate)
+    )))['correct_sum']
+
     pie_graph = generate_current_monthly_balance_pie_graph(current_mb)
 
     if current_mb_total is None:
@@ -201,7 +233,7 @@ def home_page(request):
         if current_mb_total >= goal.amount:
             goal.months_to_go = 0
         elif two_months_diff < 0:
-            # Handle case where two_months_diff is negative
+            # Handle case where the balance has decreased
             goal.months_to_go = None
         else:
             diff = goal.amount - current_mb_total
@@ -210,8 +242,12 @@ def home_page(request):
             except ZeroDivisionError:
                 months_to_go = 0
             goal.months_to_go = math.ceil(months_to_go)
-    mb = m.MonthlyBalance.objects.values('date').order_by('date'). \
-        annotate(amount=Sum('amount'))
+
+    mb = m.MonthlyBalance.objects.select_related('category').values('date'). \
+        annotate(actual_amount=Sum(Case(
+          When(category__is_foreign_currency=False, then='amount'),
+          When(category__is_foreign_currency=True, then=F('amount') * rate)
+        ))).order_by('date')
     bar_graph = generate_monthly_balance_graph(mb, goals)
 
     # Fetch expenses and related categories
@@ -459,7 +495,7 @@ def monthly_balance_categories_page(request):
         except ValidationError:
             errors = form.errors
 
-    categories = m.MonthlyBalanceCategory.objects.all()
+    categories = m.MonthlyBalanceCategory.objects.all().order_by('-id')
     return render(request,
                   'monthly_balance_categories.html',
                   {'categories': categories,
@@ -488,17 +524,22 @@ def monthly_balances_page(request, date=None):
 
     # Toggle delete buttons
     show_delete = request.GET.get('delete', False) == '1'
-
+    rate = os.getenv("EXCHANGE_RATE")
     total = None
     bar_graph = False
     if date is None:
-        mb = m.MonthlyBalance.objects.values('date').order_by('date'). \
-            annotate(amount=Sum('amount'))
+        mb = m.MonthlyBalance.objects.select_related('category'). \
+            values('date').order_by('date'). \
+            annotate(amount=Sum(Case(
+              When(category__is_foreign_currency=False, then='amount'),
+              When(category__is_foreign_currency=True, then=F('amount') * rate)
+            )))
         # Display only not archived goals
         goals = m.Goal.objects.filter(is_archived=False)
         bar_graph = generate_monthly_balance_graph(mb, goals)
     else:
         complete_date = f"{date}-01"
+        # Do NOT converto to local currency in here
         mb = m.MonthlyBalance.objects.select_related('category'). \
             filter(date=complete_date).order_by('date')
 

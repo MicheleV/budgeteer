@@ -138,7 +138,7 @@
 <div class="row">
   {% if current_mb %}
     <div  class="col">
-      <h6>Current situation</h6>
+      <h6><b>Current</b> month situation</h6>
       <table class="table table-responsive-md table-sm" id="id_monthly_balances">
         <tr>
           <th>Category</th>
@@ -148,7 +148,12 @@
         {% for monthly_balance in current_mb %}
           <tr>
             <td>{{ monthly_balance.category.text }}</td>
-            <td>{{ currency}} {{ monthly_balance.amount | intcomma }}</td>
+            <td>{{ currency}} 
+              {% if monthly_balance.actual_amount %}
+                  {{ monthly_balance.actual_amount | intcomma }}</td>
+              {% else %}
+                  {{ monthly_balance.ammount | intcomma }}</td>
+              {% endif %}
           </tr>
         {% endfor %}
 
@@ -162,7 +167,7 @@
 
   {% if prev_mb %}
   <div  class="col">
-    <h6>Previous month situation</h6>
+    <h6><b>Previous</b> month situation</h6>
     <table class="table table-responsive-md table-sm" id="id_monthly_balances">
       <tr>
         <th>Category</th>
@@ -172,7 +177,12 @@
       {% for monthly_balance in prev_mb %}
         <tr>
           <td>{{ monthly_balance.category.text }}</td>
-          <td>{{ currency}} {{ monthly_balance.amount | intcomma }}</td>
+          <td>{{ currency}} 
+            {% if monthly_balance.actual_amount %}
+                {{ monthly_balance.actual_amount | intcomma }}</td>
+            {% else %}
+                {{ monthly_balance.amount | intcomma }}</td>
+            {% endif %}
         </tr>
       {% endfor %}
 

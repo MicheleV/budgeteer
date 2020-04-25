@@ -8,13 +8,19 @@ import math
 import os
 
 from django.core.exceptions import ValidationError
-from django.db.models import Sum, F, Case, When
+from django.db.models import Sum
+from django.db.models import F
+from django.db.models import Case
+from django.db.models import When
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
-
 from django.urls import reverse
+from django.urls import reverse_lazy
 from django.views.decorators.http import require_http_methods
+from django.views.generic import CreateView
+from django.views.generic import ListView
+from django.views.generic import DetailView
 from dotenv import load_dotenv
 from graphs import plot
 from rest_framework.decorators import api_view
@@ -24,7 +30,7 @@ import budgets.forms as f
 import budgets.models as m
 from budgets.serializers import CategorySerializer
 
-# NOTE: is this really needed? Check whether to do load_dotenv() inside urls.py
+# TODO: is this really needed? Check whether to do load_dotenv() inside urls.py
 # once is enough or not
 load_dotenv()
 
@@ -612,6 +618,19 @@ def monthly_balances_edit_page(request, id=None):
       'form': form,
       'errors': errors
     })
+
+###############################################################################
+# Class based views
+###############################################################################
+
+
+class GoalListView(ListView):
+    model = m.Goal
+    template_name = 'goal_list.html'
+
+
+class GoalDetailView(DetailView):
+    model = m.Goal
 
 
 # TODO: move me inside a namespace

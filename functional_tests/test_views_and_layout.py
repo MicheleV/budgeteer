@@ -19,6 +19,7 @@ def test_home_page_has_links_in_nav(self):
      reverse('incomes'),
      reverse('monthly_balance_categories'),
      reverse('monthly_balances'),
+     reverse('goals'),
     ]
 
     for url in urls:

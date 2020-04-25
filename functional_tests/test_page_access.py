@@ -23,4 +23,5 @@ def test_access_to_all_pages(self):
     test_can_access_page(self, 'monthly_budgets', 'Monthly budgets')
     test_can_access_page(self, 'income_categories', 'Income Categories')
     test_can_access_page(self, 'incomes', 'Incomes')
+    test_can_access_page(self, 'goals', 'Goals')
     test_cant_access_admin_page(self)

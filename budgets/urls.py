@@ -7,6 +7,7 @@ from django.urls import re_path
 from budgets import views
 
 urlpatterns = [
+    # Function based routes #
     path('', views.home_page, name='home'),
 
     path('categories', views.categories_page, name='categories'),
@@ -53,7 +54,10 @@ urlpatterns = [
     path('delete_monthly_balance/<int:id>', views.delete_monthly_balance_page,
          name='delete_monthly_balance'),
 
-    # TODO: add goal related urls
+    # Class based routes #
+    path('goals', views.GoalListView.as_view(), name='goals'),
+    path('goals/<int:pk>', views.GoalDetailView.as_view(), name='goals_detail'),
 
+    # API #
     path('api/categories', views.api_categories, name='api')
 ]

@@ -7,11 +7,12 @@ from dateutil.relativedelta import relativedelta
 import math
 import os
 
-from django.db.models import Sum, F, Case, When
 from django.core.exceptions import ValidationError
+from django.db.models import Sum, F, Case, When
+from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
-from django.shortcuts import get_object_or_404
+
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from dotenv import load_dotenv
@@ -31,7 +32,7 @@ load_dotenv()
 # TODO: move these methods to an utility class
 def get_previous_month_first_day_date(date):
     """
-    Return a date object, which is the first day of the month before the input
+    Return the first day of the previous month
     """
     return (date - relativedelta(months=1)).replace(day=1)
 
@@ -101,7 +102,7 @@ def generate_monthly_balance_graph(data, goals):
             dates.append(val['date'])
             try:
                 amounts.append(val['actual_amount'])
-            except (AttributeError, NameError) as e:
+            except (AttributeError, NameError, KeyError) as e:
                 print("You've forgot to add actual_amount somewhere (bar)")
                 amounts.append(val['amount'])
         return plot.generateGraph(dates, amounts, goals)

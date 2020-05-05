@@ -265,7 +265,7 @@ def home_page(request):
     for inc_c in income_categories:
         income = m.Income.objects.filter(category_id=inc_c.id). \
             filter(date__range=(start, end))
-        income_sum = expenses.aggregate(Sum('amount'))['amount__sum']
+        income_sum = income.aggregate(Sum('amount'))['amount__sum']
         inc_c.total = income_sum
 
     return render(request, 'home.html', {

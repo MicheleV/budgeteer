@@ -14,21 +14,8 @@
       <a href="{% url 'expenses' %}?delete=1">Show delete buttons</a>
     {% endif %}
     <hr>
-    <form method="POST" action="{% url 'new_expense' %}">
-      {% csrf_token %}
-      <!-- FIXME: As this form contains the previously entered data
-           We need to hide the errors, in order to be able
-          to show them all at once, after the submit button -->
-      {% for field in form %}
-            {{ field.label_tag }} {{ field }}
-      {% endfor %}
-      <input type="submit" id="id_submit" value="Submit">
-    </form>
-      {% if errors %}
-          <div>{{ errors }}</div>
-      {% endif %}
-
-      {% csrf_token %}
+    <!-- TODO: fix layout -->
+    <a href="{% url 'expenses_create' %}">Create expense</a>
   </div>
 </div>
 
@@ -65,7 +52,7 @@
           <td>{{ expense.note }}</td>
           {% if show_delete %}
             <td>
-              <form method="POST" action="{% url 'delete_expense' id=expense.id %}">
+              <form method="POST" action="{% url 'expenses_delete' pk=expense.id %}">
                 {% csrf_token %}
                 <input type="submit" id="id_submit" value="Yes, DELETE">
               </form>

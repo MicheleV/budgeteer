@@ -1,5 +1,51 @@
-{% extends 'category_common.html' %}
+<!-- TODO: This template heavily resemble category_common.html -->
+{% extends 'base.html' %}
 
 {% block title %}Monthly Balance Categories{% endblock %}
 
-{% block action %}{% url 'new_monthly_balance_category' %}{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <div>
+        <form method="POST" action="{% url 'new_monthly_balance_category' %}">
+          <div class="form-group">
+            {{ form.text }}
+          </div>
+          <!-- TODO: this is the first difference -->
+          <div class="form-check">
+            {{ form.is_foreign_currency }}
+            <label class="form-check-label" for="exampleCheck1">Foreign currency</label>
+          </div>
+
+          {% if errors %}
+              <div>{{ errors }}</div>
+          {% endif %}
+
+          {% csrf_token %}
+        </form>
+
+        <div class="table-responsive-md table-sm">
+          <table class="table" id="id_categories">
+            <tr>
+              <th>Category ID</th>
+              <th>Category name</th>
+              <th>Foreign currency?</th>
+            </tr>
+            {% for category in categories %}
+              <tr>
+                <td>{{ category.id }}</td>
+                <td>{{ category.text }}</td>
+                <!-- TODO: this is the second, and last, difference -->
+                <td>{{ category.is_foreign_currency }}</td>
+              </tr>
+            {% endfor %}
+          </table>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

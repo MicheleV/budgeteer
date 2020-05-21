@@ -19,6 +19,7 @@ from django.urls import reverse
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView
+from django.views.generic import DeleteView
 from django.views.generic import ListView
 from django.views.generic import DetailView
 from dotenv import load_dotenv
@@ -177,6 +178,112 @@ def generate_current_month_expenses_pie_graph(data):
     return False
 
 
+###############################################################################
+# Class based views
+###############################################################################
+
+
+class CategoryListView(ListView):
+    model = m.Category
+
+    # TODO: find out how to decorate Classes as_view() function
+    # https://jsatt.com/blog/decorators-vs-mixins-for-django-class-based-views
+    # @require_http_methods(["GET"])
+    # def dispatch(self, request, *args, **kwargs):
+    #     return super(CategoryListView, self).dispatch(request, *args, **kwargs)
+
+
+class CategoryCreateView(CreateView):
+    model = m.Category
+    form_class = f.CategoryForm
+
+    def get_success_url(self):
+        return reverse('categories')
+
+
+class ExpenseListView(ListView):
+    model = m.Expense
+
+
+class ExpenseCreateView(CreateView):
+    model = m.Expense
+    form_class = f.ExpenseForm
+
+    def get_success_url(self):
+        return reverse('expenses')
+
+
+class ExpenseDeleteView(DeleteView):
+    model = m.Expense
+
+    def get_success_url(self):
+        return reverse('expenses')
+
+
+class GoalListView(ListView):
+    model = m.Goal
+
+
+class GoalDetailView(DetailView):
+    model = m.Goal
+
+
+class GoalCreateView(CreateView):
+    model = m.Goal
+    form_class = f.GoalForm
+
+
+class IncomeCategoryView(ListView):
+    model = m.IncomeCategory
+
+
+class IncomeCategoryDetailView(DetailView):
+    model = m.IncomeCategory
+
+
+class IncomeCategoryCreateView(CreateView):
+    model = m.IncomeCategory
+    form_class = f.IncomeCategoryForm
+
+    def get_success_url(self):
+        return reverse('income_categories')
+
+
+class MonthlyBalanceCategoryView(ListView):
+    model = m.MonthlyBalanceCategory
+
+
+class MonthlyBalanceCategoryDetailView(DetailView):
+    model = m.MonthlyBalanceCategory
+
+
+class MonthlyBalanceCategoryCreateView(CreateView):
+    model = m.MonthlyBalanceCategory
+    form_class = f.MonthlyBalanceCategoryForm
+
+    def get_success_url(self):
+        return reverse('monthly_balance_categories')
+
+###############################################################################
+# API
+###############################################################################
+
+# TODO: move me inside a namespace
+@api_view(['GET'])
+# @renderer_classes([JSONRenderer])
+def api_categories(request):
+    """
+    List all categories
+    """
+    categories = m.Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)
+
+###############################################################################
+# Function based classes
+###############################################################################
+
+
 @require_http_methods(["GET"])
 def home_page(request):
     """
@@ -294,33 +401,6 @@ def home_page(request):
 
 
 @require_http_methods(["GET", "POST"])
-def categories_page(request):
-    """
-    Display the categories page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.CategoryForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('categories')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            errors = form.errors
-
-    categories = m.Category.objects.all()
-    return render(request,
-                  'categories.html',
-                  {'categories': categories,
-                   'errors': errors,
-                   'form': f.CategoryForm()})# TODO: this should be 'form': form, otherwise on error, we clean the user input
-
-
-@require_http_methods(["GET", "POST"])
 def expenses_page(request, start=None, end=None):
     """
     Display the expenses page
@@ -373,17 +453,6 @@ def expenses_page(request, start=None, end=None):
         'month': start.strftime("%Y-%m"),
         'show_delete': show_delete,
     })
-
-
-@require_http_methods(["POST"])
-def delete_expense_page(request, id):
-    """
-    Delete an expense
-    """
-    errors = None
-    mb = get_object_or_404(m.Expense, pk=id)
-    mb.delete()
-    return redirect('expenses')
 
 
 @require_http_methods(["GET", "POST"])
@@ -481,33 +550,6 @@ def incomes_page(request, date=None):
         'form': f.IncomeForm(),
         'errors': errors,
     })
-
-
-@require_http_methods(["GET", "POST"])
-def monthly_balance_categories_page(request):
-    """
-    Display the mohtly balance category page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.MonthlyBalanceCategoryForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('monthly_balance_categories')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            errors = form.errors
-
-    categories = m.MonthlyBalanceCategory.objects.all().order_by('-id')
-    return render(request,
-                  'monthly_balance_categories.html',
-                  {'categories': categories,
-                   'errors': errors,
-                   'form': f.MonthlyBalanceCategoryForm()})
 
 
 @require_http_methods(["GET", "POST"])
@@ -619,27 +661,3 @@ def monthly_balances_edit_page(request, id=None):
       'errors': errors
     })
 
-###############################################################################
-# Class based views
-###############################################################################
-
-
-class GoalListView(ListView):
-    model = m.Goal
-    template_name = 'goal_list.html'
-
-
-class GoalDetailView(DetailView):
-    model = m.Goal
-
-
-# TODO: move me inside a namespace
-@api_view(['GET'])
-# @renderer_classes([JSONRenderer])
-def api_categories(request):
-    """
-    List all categories
-    """
-    categories = m.Category.objects.all()
-    serializer = CategorySerializer(categories, many=True)
-    return Response(serializer.data)

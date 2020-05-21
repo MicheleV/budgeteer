@@ -10,9 +10,6 @@ urlpatterns = [
     # Function based routes #
     path('', views.home_page, name='home'),
 
-    path('categories', views.categories_page, name='categories'),
-    path('new_category', views.categories_page, name='new_category'),
-
     path('expenses', views.expenses_page, name='expenses'),
     re_path(r'expenses/(?P<start>(19|20)[0-9]{2}-(0[1-9]|1[012]))$',
             views.expenses_page, name='expenses'),
@@ -20,8 +17,7 @@ urlpatterns = [
     re_path(r'expenses/(?P<start>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))/(?P<end>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))$',
             views.expenses_page, name='expenses_filtered'),
     path('new_expense', views.expenses_page, name='new_expense'),
-    path('delete_expense/<int:id>', views.delete_expense_page,
-         name='delete_expense'),
+
 
     path('monthly_budgets',
          views.monthly_budgets_page, name='monthly_budgets'),
@@ -30,18 +26,9 @@ urlpatterns = [
     path('new_monthly_budget',
          views.monthly_budgets_page, name='new_monthly_budget'),
 
-    path('income_categories', views.income_categories_page,
-         name='income_categories'),
-    path('new_income_category', views.income_categories_page,
-         name='new_income_category'),
 
     path('incomes', views.incomes_page, name='incomes'),
     path('new_income', views.incomes_page, name='new_income'),
-
-    path('monthly_balance_categories', views.monthly_balance_categories_page,
-         name='monthly_balance_categories'),
-    path('new_monthly_balance_category', views.monthly_balance_categories_page,
-         name='new_monthly_balance_category'),
 
     path('monthly_balances', views.monthly_balances_page,
          name='monthly_balances'),
@@ -55,8 +42,37 @@ urlpatterns = [
          name='delete_monthly_balance'),
 
     # Class based routes #
+    path('categories', views.CategoryListView.as_view(), name='categories'),
+    path('categories/create', views.CategoryCreateView.as_view(), name='categories_create'),
+
+
+    # re_path(r'expenses/(?P<start>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))/(?P<end>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))$',
+    #         views.expenses_page, name='expenses_filtered'),
+    # path('expenses/create', views.ExpenseListView.as_view(), name='expenses_create'),
+    path('expenses/create', views.ExpenseCreateView.as_view(), name='expenses_create'),
+    path('expenses/delete/<int:pk>', views.ExpenseDeleteView.as_view(),
+         name='expenses_delete'),
+
+    path('goals/create', views.GoalCreateView.as_view(), name='goals_create'),
     path('goals', views.GoalListView.as_view(), name='goals'),
-    path('goals/<int:pk>', views.GoalDetailView.as_view(), name='goals_detail'),
+    path('goals/<int:pk>', views.GoalDetailView.as_view(),
+         name='goals_detail'),
+
+
+    path('monthly_balance_categories',
+         views.MonthlyBalanceCategoryView.as_view(),
+         name='monthly_balance_categories'),
+    path('monthly_balance_categories/<int:pk>',
+         views.MonthlyBalanceCategoryDetailView.as_view(),
+         name='monthly_balance_categories_details'),
+    path('monthly_balance_categories/create',
+         views.MonthlyBalanceCategoryCreateView.as_view(),
+         name='new_monthly_balance_category'),
+
+    path('income_categories/create', views.IncomeCategoryCreateView.as_view(),
+         name='income_categories_create'),
+    path('income_categories', views.IncomeCategoryView.as_view(),
+         name='income_categories'),
 
     # API #
     path('api/categories', views.api_categories, name='api')

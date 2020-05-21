@@ -29,7 +29,7 @@ def test_home_page_has_links_in_nav(self):
 # Credits http://www.obeythetestinggoat.com/book/
 #         chapter_prettification.html#_static_files_in_django
 # Verify css is properly loaded
-def test_layout_and_styling(self):
+def test_layout_and_styling(self): 
     # Frank loads the page
     url = reverse('home')
     self.browser.get(f"{self.live_server_url}{url}")
@@ -47,9 +47,9 @@ def test_layout_and_styling(self):
 def check_autofocus(self):
 
     urls = [
-     reverse('categories'),
-     reverse('income_categories'),
-     reverse('monthly_balance_categories'),
+     reverse('categories_create'),
+     reverse('income_categories_create'),
+     reverse('new_monthly_balance_category'),
     ]
 
     for url in urls:

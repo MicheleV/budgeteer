@@ -9,18 +9,19 @@ from budgets import views
 urlpatterns = [
     # Class based routes #
     path('categories', views.CategoryListView.as_view(), name='categories'),
-    path('categories/create', views.CategoryCreateView.as_view(), name='categories_create'),
+    path('categories/create', views.CategoryCreateView.as_view(),
+         name='categories_create'),
 
-    # re_path(r'expenses/(?P<start>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))/(?P<end>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))$',
-    #         views.expenses_page, name='expenses_filtered'),
+    path('expenses/create', views.ExpenseCreateView.as_view(),
+         name='expenses_create'),
+    # Show all expenses
     path('expenses', views.ExpenseListView.as_view(), name='expenses'),
+    # Show expensece since YYYY-mm
     re_path(r'expenses/(?P<start>(19|20)[0-9]{2}-(0[1-9]|1[012]))$',
-            views.expenses_page, name='expenses'),
-
+            views.ExpenseListView.as_view(), name='expenses'),
+    # Show expensece between YYYY-mm-dd and YYYY-mm-dd
     re_path(r'expenses/(?P<start>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))/(?P<end>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))$',
-            views.expenses_page, name='expenses_filtered'),
-
-    path('expenses/create', views.ExpenseCreateView.as_view(), name='expenses_create'),
+            views.ExpenseListView.as_view(), name='expenses_filtered'),
     path('expenses/delete/<int:pk>', views.ExpenseDeleteView.as_view(),
          name='expenses_delete'),
 

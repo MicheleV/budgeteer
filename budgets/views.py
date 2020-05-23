@@ -219,10 +219,46 @@ class ExpenseListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        start = yymm_date = self.kwargs.get('start', None)
+        end = yymm_date = self.kwargs.get('end', None)
+
         # Toggle delete buttons
         show_delete = self.request.GET.get('delete', False) == '1'
         context['show_delete'] = show_delete
+
+        if end is None:
+            (start, end) = get_month_boundaries(start)
+        else:
+            format_str = '%Y-%m-%d'
+            start = datetime.datetime.strptime(start, format_str).date()
+
+        # TODO: this cose is exactly the same as get_queryset(), memoized it!
+        # TODO refactor these queries after reading Django annotation docs
+        # and aggregation
+        expenses = m.Expense.objects.filter(date__range=(start, end)) \
+                    .order_by('-date', '-id')
+        expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
+        pie_graph = generate_current_month_expenses_pie_graph(expenses)
+        context['pie_graph'] = pie_graph
         return context
+
+    def get_queryset(self):
+        start = yymm_date = self.kwargs.get('start', None)
+        end = yymm_date = self.kwargs.get('end', None)
+
+        # TODO: this cose is exactly the same as get_context_data(),memoized it
+        if end is None:
+            (start, end) = get_month_boundaries(start)
+        else:
+            format_str = '%Y-%m-%d'
+            start = datetime.datetime.strptime(start, format_str).date()
+        # TODO: refactor these queries after reading Django annotation docs
+        # and aggregation
+        expenses = m.Expense.objects.filter(date__range=(start, end)) \
+                    .order_by('-date', '-id')
+        expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
+
+        return expenses
 
 
 class ExpenseCreateView(CreateView):
@@ -442,61 +478,6 @@ def home_page(request):
         'two_months_diff': two_months_diff,
         'two_months_diff_perc': two_months_diff_perc,
         'goals': goals,
-    })
-
-
-@require_http_methods(["GET", "POST"])
-def expenses_page(request, start=None, end=None):
-    """
-    Display the expenses page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.ExpenseForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('expenses')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            # NOTE: we save errors in here as we're going to display them
-            # separately from the form
-            errors = form.errors
-    else:
-        form = f.ExpenseForm()
-
-    # Toggle delete buttons
-    show_delete = request.GET.get('delete', False) == '1'
-
-    # Filter out archived categories
-    categories = m.Category.objects.filter(is_archived=False)
-    form.fields['category'].queryset = categories
-
-    if end is None:
-        (start, end) = get_month_boundaries(start)
-    else:
-        format_str = '%Y-%m-%d'
-        start = datetime.datetime.strptime(start, format_str).date()
-    # TODO refactor these queries after reading Django docs about annotation
-    # and aggregation
-    expenses = m.Expense.objects.filter(date__range=(start, end)) \
-                .order_by('-date', '-id')
-    expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
-
-    pie_graph = generate_current_month_expenses_pie_graph(expenses)
-
-    return render(request, 'expenses.html', {
-        'categories': categories,
-        'expenses': expenses,
-        'expenses_sum': expenses_sum,
-        'pie_graph': pie_graph,
-        'form': form,
-        'errors': errors,
-        'month': start.strftime("%Y-%m"),
-        'show_delete': show_delete,
     })
 
 

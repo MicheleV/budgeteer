@@ -46,6 +46,10 @@ urlpatterns = [
     path('income_categories', views.IncomeCategoryView.as_view(),
          name='income_categories'),
 
+    path('incomes/create', views.IncomCreateView.as_view(), name='incomes_create'),
+    path('incomes', views.IncomeView.as_view(), name='incomes'),
+
+
     path('monthly_budgets',
          views.MonthlyBudgetListView.as_view(), name='monthly_budgets'),
     # Monthly budgets for a given month
@@ -61,9 +65,6 @@ urlpatterns = [
 
     # Function based routes #
     path('', views.home_page, name='home'),
-
-    path('incomes', views.incomes_page, name='incomes'),
-    path('new_income', views.incomes_page, name='new_income'),
 
     path('monthly_balances', views.monthly_balances_page,
          name='monthly_balances'),

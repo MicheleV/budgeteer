@@ -195,6 +195,13 @@ def append_year_and_month_to_url(obj, named_url, delete=False):
 # Class based views
 ###############################################################################
 
+class CategoryCreateView(CreateView):
+    model = m.Category
+    form_class = f.CategoryForm
+
+    def get_success_url(self):
+        return reverse('categories')
+
 
 class CategoryListView(ListView):
     model = m.Category
@@ -206,12 +213,12 @@ class CategoryListView(ListView):
     #     return super(CategoryListView, self).dispatch(request, *args, **kwargs)
 
 
-class CategoryCreateView(CreateView):
-    model = m.Category
-    form_class = f.CategoryForm
+class ExpenseCreateView(CreateView):
+    model = m.Expense
+    form_class = f.ExpenseForm
 
     def get_success_url(self):
-        return reverse('categories')
+        return reverse('expenses')
 
 
 class ExpenseListView(ListView):
@@ -261,19 +268,19 @@ class ExpenseListView(ListView):
         return expenses
 
 
-class ExpenseCreateView(CreateView):
-    model = m.Expense
-    form_class = f.ExpenseForm
-
-    def get_success_url(self):
-        return reverse('expenses')
-
-
 class ExpenseDeleteView(DeleteView):
     model = m.Expense
 
     def get_success_url(self):
         return reverse('expenses')
+
+
+class MonthlyBudgetsCreateView(CreateView):
+    model = m.MonthlyBudget
+    form_class = f.MonthlyBudgetForm
+
+    def get_success_url(self):
+        return reverse('monthly_budgets')
 
 
 class MonthlyBudgetListView(ListView):
@@ -289,16 +296,13 @@ class MonthlyBudgetListView(ListView):
         return monthly_budgets
 
 
-class MonthlyBudgetsCreateView(CreateView):
-    model = m.MonthlyBudget
-    form_class = f.MonthlyBudgetForm
-
-    def get_success_url(self):
-        return reverse('monthly_budgets')
-
-
 class MonthlyBudgetDetailView(DetailView):
     model = m.MonthlyBudget
+
+
+class GoalCreateView(CreateView):
+    model = m.Goal
+    form_class = f.GoalForm
 
 
 class GoalListView(ListView):
@@ -309,9 +313,12 @@ class GoalDetailView(DetailView):
     model = m.Goal
 
 
-class GoalCreateView(CreateView):
-    model = m.Goal
-    form_class = f.GoalForm
+class IncomeCategoryCreateView(CreateView):
+    model = m.IncomeCategory
+    form_class = f.IncomeCategoryForm
+
+    def get_success_url(self):
+        return reverse('income_categories')
 
 
 class IncomeCategoryView(ListView):
@@ -322,20 +329,29 @@ class IncomeCategoryDetailView(DetailView):
     model = m.IncomeCategory
 
 
-class IncomeCategoryCreateView(CreateView):
-    model = m.IncomeCategory
-    form_class = f.IncomeCategoryForm
+class IncomCreateView(CreateView):
+    model = m.Income
+    form_class = f.IncomeForm
 
     def get_success_url(self):
-        return reverse('income_categories')
+        return reverse('incomes')
 
 
-class MonthlyBalanceCategoryView(ListView):
-    model = m.MonthlyBalanceCategory
+class IncomeView(ListView):
+    model = m.Income
 
+    def get_queryset(self):
+        start = yymm_date = self.kwargs.get('start', None)
+        end = yymm_date = self.kwargs.get('end', None)
 
-class MonthlyBalanceCategoryDetailView(DetailView):
-    model = m.MonthlyBalanceCategory
+        # TODO: use the date parameter if present to filter
+        if end is None:
+            (start, end) = get_month_boundaries(start)
+        else:
+            format_str = '%Y-%m-%d'
+            start = datetime.datetime.strptime(start, format_str).date()
+        incomes = m.Income.objects.filter(date__range=(start, end))
+        return incomes
 
 
 class MonthlyBalanceCategoryCreateView(CreateView):
@@ -344,6 +360,14 @@ class MonthlyBalanceCategoryCreateView(CreateView):
 
     def get_success_url(self):
         return reverse('monthly_balance_categories')
+
+
+class MonthlyBalanceCategoryView(ListView):
+    model = m.MonthlyBalanceCategory
+
+
+class MonthlyBalanceCategoryDetailView(DetailView):
+    model = m.MonthlyBalanceCategory
 
 ###############################################################################
 # API
@@ -515,39 +539,6 @@ def monthly_budgets_page(request, date=None):
       'form': f.MonthlyBudgetForm(),
       'show_delete': show_delete,
       'errors': errors
-    })
-
-
-@require_http_methods(["GET", "POST"])
-def incomes_page(request, date=None):
-    """
-    Display the incomes page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.IncomeForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('incomes')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            errors = form.errors
-
-    # TODO: use the date parameter if present to filter
-    (start, end) = current_month_boundaries()
-    # TODO refactor these queries after reading Django docs about annotation
-    # and aggregation
-    categories = m.IncomeCategory.objects.all()
-    incomes = m.Income.objects.filter(date__range=(start, end))
-    return render(request, 'incomes.html', {
-        'categories': categories,
-        'incomes': incomes,
-        'form': f.IncomeForm(),
-        'errors': errors,
     })
 
 

@@ -195,6 +195,12 @@ def append_year_and_month_to_url(obj, named_url, delete=False):
 # Class based views
 ###############################################################################
 
+# TODO: find out how to decorate Classes as_view() function
+# https://jsatt.com/blog/decorators-vs-mixins-for-django-class-based-views
+# @require_http_methods(["GET"])
+# def dispatch(self, request, *args, **kwargs):
+#     return super(CategoryListView, self).dispatch(request, *args, **kwargs)
+
 class CategoryCreateView(CreateView):
     model = m.Category
     form_class = f.CategoryForm
@@ -205,12 +211,6 @@ class CategoryCreateView(CreateView):
 
 class CategoryListView(ListView):
     model = m.Category
-
-    # TODO: find out how to decorate Classes as_view() function
-    # https://jsatt.com/blog/decorators-vs-mixins-for-django-class-based-views
-    # @require_http_methods(["GET"])
-    # def dispatch(self, request, *args, **kwargs):
-    #     return super(CategoryListView, self).dispatch(request, *args, **kwargs)
 
 
 class ExpenseCreateView(CreateView):
@@ -233,6 +233,7 @@ class ExpenseListView(ListView):
         show_delete = self.request.GET.get('delete', False) == '1'
         context['show_delete'] = show_delete
 
+        # TODO: this cose is exactly the same as get_queryset(),memoized it
         if end is None:
             (start, end) = get_month_boundaries(start)
         else:
@@ -502,43 +503,6 @@ def home_page(request):
         'two_months_diff': two_months_diff,
         'two_months_diff_perc': two_months_diff_perc,
         'goals': goals,
-    })
-
-
-@require_http_methods(["GET", "POST"])
-def monthly_budgets_page(request, date=None):
-    """
-    Display the mohtly budgets page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.MonthlyBudgetForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('monthly_budgets')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            errors = form.errors
-
-    # Toggle delete buttons
-    show_delete = request.GET.get('delete', False) == '1'
-
-    categories = m.Category.objects.all()
-    if date is None:
-        monthly_budgets = m.MonthlyBudget.objects.all()
-    else:
-        complete_date = f"{date}-01"
-        monthly_budgets = m.MonthlyBudget.objects.filter(date=complete_date)
-    return render(request, 'monthly_budgets.html', {
-      'categories': categories,
-      'monthly_budgets': monthly_budgets,
-      'form': f.MonthlyBudgetForm(),
-      'show_delete': show_delete,
-      'errors': errors
     })
 
 

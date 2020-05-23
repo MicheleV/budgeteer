@@ -302,7 +302,7 @@ class IncomePageTest(BaseTest):
         text = self.generateString(10)
         cat = self.create_income_category(text)
 
-        url = reverse('new_income')
+        url = reverse('incomes_create')
         redirect_url = reverse('incomes')
         amount = random.randint(1, 90000)
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")

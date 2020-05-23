@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Categories{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid">
+  <!-- TODO: This page layout is completely different from the rest of the site. Fix it -->
+  <div class="row">
+    <div class="col-md-12">
+      <h3>Categories</h3>
+      <a href="{% url 'categories_create' %}">Create category</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div>
+
+        <div class="table-responsive-md table-sm">
+          <table class="table" id="id_categories">
+            <tr>
+              <th>Category ID</th>
+              <th>Category name</th>
+            </tr>
+            {% for category in object_list %}
+              <tr>
+                <td>{{ category.id }}</td>
+                <td>{{ category.text }}</td>
+              </tr>
+            {% endfor %}
+          </table>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

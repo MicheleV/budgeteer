@@ -178,6 +178,19 @@ def generate_current_month_expenses_pie_graph(data):
     return False
 
 
+def append_year_and_month_to_url(obj, named_url, delete=False):
+    """
+    Return an url with obj's date appended in YYYY-mm format
+    """
+    format_str = '%Y-%m'
+    date_ym = obj.date.strftime(format_str)
+    view_url = reverse(named_url)
+    redirect_url = f"{view_url}/{date_ym}"
+    if delete:
+        redirect_url = f"{redirect_url}?delete=1"
+    return redirect_url
+
+
 ###############################################################################
 # Class based views
 ###############################################################################
@@ -204,6 +217,13 @@ class CategoryCreateView(CreateView):
 class ExpenseListView(ListView):
     model = m.Expense
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Toggle delete buttons
+        show_delete = self.request.GET.get('delete', False) == '1'
+        context['show_delete'] = show_delete
+        return context
+
 
 class ExpenseCreateView(CreateView):
     model = m.Expense
@@ -218,6 +238,31 @@ class ExpenseDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse('expenses')
+
+
+class MonthlyBudgetListView(ListView):
+    model = m.MonthlyBudget
+
+    def get_queryset(self):
+        yymm_date = self.kwargs.get('date', None)
+        if yymm_date is None:
+            monthly_budgets = m.MonthlyBudget.objects.all()
+        else:
+            complete_date = f"{yymm_date}-01"
+            monthly_budgets = m.MonthlyBudget.objects.filter(date=complete_date)
+        return monthly_budgets
+
+
+class MonthlyBudgetsCreateView(CreateView):
+    model = m.MonthlyBudget
+    form_class = f.MonthlyBudgetForm
+
+    def get_success_url(self):
+        return reverse('monthly_budgets')
+
+
+class MonthlyBudgetDetailView(DetailView):
+    model = m.MonthlyBudget
 
 
 class GoalListView(ListView):
@@ -493,33 +538,6 @@ def monthly_budgets_page(request, date=None):
 
 
 @require_http_methods(["GET", "POST"])
-def income_categories_page(request):
-    """
-    Display the income categories page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.IncomeCategoryForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('income_categories')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            errors = form.errors
-
-    categories = m.IncomeCategory.objects.all()
-    return render(request,
-                  'income_categories.html',
-                  {'categories': categories,
-                   'errors': errors,
-                   'form': f.IncomeCategoryForm()})
-
-
-@require_http_methods(["GET", "POST"])
 def incomes_page(request, date=None):
     """
     Display the incomes page
@@ -604,19 +622,6 @@ def monthly_balances_page(request, date=None):
     })
 
 
-def append_year_and_month_to_url(obj, named_url, delete=False):
-    """
-    Return an url with obj's date appended in YYYY-mm format
-    """
-    format_str = '%Y-%m'
-    date_ym = obj.date.strftime(format_str)
-    view_url = reverse(named_url)
-    redirect_url = f"{view_url}/{date_ym}"
-    if delete:
-        redirect_url = f"{redirect_url}?delete=1"
-    return redirect_url
-
-
 @require_http_methods(["POST"])
 def delete_monthly_balance_page(request, id=None):
     """
@@ -660,4 +665,3 @@ def monthly_balances_edit_page(request, id=None):
       'form': form,
       'errors': errors
     })
-

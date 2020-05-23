@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Income Categories{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <!-- FIX ME: THIS LINK IS WRONG, CREATE CreateView and its route! -->
+      <h3>Income Balance Categories</h3>
+      <a href="{% url 'income_categories_create' %}">Create Income Category</a>
+      </div>
+    </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div>
+        <div class="table-responsive-md table-sm">
+          <table class="table" id="id_categories">
+            <tr>
+              <th>Category ID</th>
+              <th>Category name</th>
+              <th>Foreign currency?</th>
+            </tr>
+            {% for category in object_list %}
+                <!-- FIX ME: THIS LINK IS WRONG, CREATE CreateView and its route! -->
+                <td><a href="{% url "monthly_balance_categories_details" category.pk %}">{{ category.id }}</a></td>
+                <td>{{ category.text }}</td>
+                <td>{{ category.is_foreign_currency }}</td>
+              </tr>
+            {% endfor %}
+          </table>
+
+          {% include "paginator.html" %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

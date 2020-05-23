@@ -72,7 +72,7 @@ class MonthlyBudgetForm(forms.models.ModelForm):
           'category': forms.fields.Select,
         }
 
-    # Make monthlybudgets be on the first day of the month
+    # On save, make monthlybudgets be on the first day of the month
     def clean(self):
         self.cleaned_data = super(MonthlyBudgetForm, self).clean()
         if 'date' in self.cleaned_data:

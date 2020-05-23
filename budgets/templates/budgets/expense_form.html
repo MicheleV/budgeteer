@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Create expense{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="col-md-12">
+      <h3>New Expense</h3>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <form method="post">{% csrf_token %}
+          {{ form.as_p }}
+          <input type="submit" value="Save">
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

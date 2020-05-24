@@ -72,7 +72,7 @@ class MonthlyBudgetForm(forms.models.ModelForm):
           'category': forms.fields.Select,
         }
 
-    # Make monthlybudgets be on the first day of the month
+    # On save, make monthlybudgets be on the first day of the month
     def clean(self):
         self.cleaned_data = super(MonthlyBudgetForm, self).clean()
         if 'date' in self.cleaned_data:
@@ -119,10 +119,10 @@ class MonthlyBalanceCategoryForm(forms.models.ModelForm):
 
     class Meta:
         model = m.MonthlyBalanceCategory
-        fields = ('text','is_foreign_currency')
+        fields = ('text', 'is_foreign_currency')
         widgets = {
             'text': forms.fields.TextInput(attrs={
-                'placeholder': 'Enter a new category of balance (i.e. savings, cash)',
+                'placeholder': 'Enter a new balance category (i.e. savings, cash)',
                 'class': 'form-control input-lg',
                 'autofocus': 'autofocus',
             }),
@@ -156,12 +156,16 @@ class GoalForm(forms.models.ModelForm):
         widgets = {
             'amount': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter the amount',
+                'class': 'form-control input-lg',
             }),
             'text': forms.fields.TextInput(attrs={
                 'placeholder': 'Name of the goal (Shows in the graphs)',
+                'class': 'form-control input-lg',
+                'autofocus': 'autofocus',
             }),
             'note': forms.fields.TextInput(attrs={
                 'placeholder': 'Description of what you are trying to achieve',
+                'class': 'form-control input-lg',
             }),
             'is_archived': forms.fields.CheckboxInput,
         }

@@ -7,53 +7,76 @@ from django.urls import re_path
 from budgets import views
 
 urlpatterns = [
-    path('', views.home_page, name='home'),
+    # Class based routes #
+    path('categories', views.CategoryListView.as_view(), name='categories'),
+    path('categories/create', views.CategoryCreateView.as_view(),
+         name='categories_create'),
 
-    path('categories', views.categories_page, name='categories'),
-    path('new_category', views.categories_page, name='new_category'),
-
-    path('expenses', views.expenses_page, name='expenses'),
+    path('expenses/create', views.ExpenseCreateView.as_view(),
+         name='expenses_create'),
+    # Show all expenses
+    path('expenses', views.ExpenseListView.as_view(), name='expenses'),
+    # Show expensece since YYYY-mm
     re_path(r'expenses/(?P<start>(19|20)[0-9]{2}-(0[1-9]|1[012]))$',
-            views.expenses_page, name='expenses'),
-
+            views.ExpenseListView.as_view(), name='expenses'),
+    # Show expensece between YYYY-mm-dd and YYYY-mm-dd
     re_path(r'expenses/(?P<start>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))/(?P<end>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))$',
-            views.expenses_page, name='expenses_filtered'),
-    path('new_expense', views.expenses_page, name='new_expense'),
-    path('delete_expense/<int:id>', views.delete_expense_page,
-         name='delete_expense'),
+            views.ExpenseListView.as_view(), name='expenses_filtered'),
+    path('expenses/delete/<int:pk>', views.ExpenseDeleteView.as_view(),
+         name='expenses_delete'),
 
-    path('monthly_budgets',
-         views.monthly_budgets_page, name='monthly_budgets'),
-    re_path(r'monthly_budgets/(?P<date>(19|20)[0-9]{2}-(0[1-9]|1[012]))$',
-            views.monthly_budgets_page, name='monthly_budgets'),
-    path('new_monthly_budget',
-         views.monthly_budgets_page, name='new_monthly_budget'),
+    path('goals/create', views.GoalCreateView.as_view(), name='goals_create'),
+    path('goals', views.GoalListView.as_view(), name='goals'),
+    path('goals/<int:pk>', views.GoalDetailView.as_view(),
+         name='goals_detail'),
 
-    path('income_categories', views.income_categories_page,
-         name='income_categories'),
-    path('new_income_category', views.income_categories_page,
-         name='new_income_category'),
 
-    path('incomes', views.incomes_page, name='incomes'),
-    path('new_income', views.incomes_page, name='new_income'),
-
-    path('monthly_balance_categories', views.monthly_balance_categories_page,
+    path('monthly_balance_categories',
+         views.MonthlyBalanceCategoryView.as_view(),
          name='monthly_balance_categories'),
-    path('new_monthly_balance_category', views.monthly_balance_categories_page,
+    path('monthly_balance_categories/<int:pk>',
+         views.MonthlyBalanceCategoryDetailView.as_view(),
+         name='monthly_balance_categories_details'),
+    path('monthly_balance_categories/create',
+         views.MonthlyBalanceCategoryCreateView.as_view(),
          name='new_monthly_balance_category'),
 
-    path('monthly_balances', views.monthly_balances_page,
+    path('income_categories/create', views.IncomeCategoryCreateView.as_view(),
+         name='income_categories_create'),
+    path('income_categories', views.IncomeCategoryView.as_view(),
+         name='income_categories'),
+
+    path('incomes/create', views.IncomCreateView.as_view(), name='incomes_create'),
+    path('incomes', views.IncomeView.as_view(), name='incomes'),
+
+
+    path('monthly_budgets',
+         views.MonthlyBudgetListView.as_view(), name='monthly_budgets'),
+    # Monthly budgets for a given month
+    re_path(r'monthly_budgets/(?P<date>(19|20)[0-9]{2}-(0[1-9]|1[012]))$',
+            views.MonthlyBudgetListView.as_view(), name='monthly_budgets'),
+    path('monthly_budgets/create',
+         views.MonthlyBudgetsCreateView.as_view(), name='monthly_budgets_create'),
+    path('monthly_budgets/<int:pk>', views.MonthlyBudgetDetailView.as_view(),
+         name='monthly_budgets_detail'),
+
+    path('monthly_balances/create', views.MonthlyBalancesCreateView.as_view(),
+         name='monthly_balances_create'),
+    path('monthly_balances', views.MonthlyBalancesView.as_view(),
          name='monthly_balances'),
+
+    # Show monthly balances breakdonw by date (YYYY-mm)
     re_path('monthly_balances/(?P<date>(19|20)[0-9]{2}-(0[1-9]|1[012]))$',
-            views.monthly_balances_page, name='monthly_balances'),
-    path('new_monthly_balance', views.monthly_balances_page,
-         name='new_monthly_balance'),
+            views.MonthlyBalancesSingleMonthView.as_view(), name='monthly_balances'),
+
+
+    # API #
+    path('api/categories', views.api_categories, name='api'),
+
+    # Function based routes #
+    path('', views.home_page, name='home'),
     path('edit_monthly_balance/<int:id>', views.monthly_balances_edit_page,
          name='edit_monthly_balance'),
     path('delete_monthly_balance/<int:id>', views.delete_monthly_balance_page,
          name='delete_monthly_balance'),
-
-    # TODO: add goal related urls
-
-    path('api/categories', views.api_categories, name='api')
 ]

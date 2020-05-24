@@ -16,15 +16,20 @@ def test_cant_create_an_empty_expense_category(self):
 
     # Frank does not follows the browser instruction, and stares at the screen
     # in disdain. He thought he could create an empty expense Category
-    table = self.browser.find_element_by_id('id_categories')
-    Helpers.assert_text_is_not_inside_table(self, '1', table)
+    should_cat_exist = False
+    Helpers.visit_and_verify_categories(self, category_text, should_cat_exist)
+    # print(self.browser.find_element_by_tag_name('html').text)
+    # table = self.browser.find_element_by_id('id_categories')
+    # Helpers.assert_text_is_not_inside_table(self, '1', table)
 
 
 def test_can_create_multiple_expense_categories(self):
     # Frank can create a category to log expenses related to his rent
-    Helpers.create_a_category(self, 'Rent')
+    cat_name1 = Helpers.generateString()
+    Helpers.create_a_category(self, cat_name1)
     # Frank can create a category to log his food expenses
-    Helpers.create_a_category(self, 'Food')
+    cat_name2 = Helpers.generateString()
+    Helpers.create_a_category(self, cat_name2)
 
 
 def test_cant_create_duplicate_expense_categories(self):
@@ -33,8 +38,7 @@ def test_cant_create_duplicate_expense_categories(self):
 
     # Frank is not paying attention to what he is doing, and he tries
     # to create the same category
-    Helpers.create_a_category(self, 'Rent')
-    Helpers.find_error(self, 'Category with this Text already exists')
+    Helpers.create_a_category(self, 'Rent', True, False)
 
 
 def test_cant_create_an_empty_income_category(self):

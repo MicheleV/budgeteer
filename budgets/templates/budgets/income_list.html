@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Incomes{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid">
+  <!-- TODO: This page layout is completely different from the rest of the site. Fix it -->
+  <div class="row">
+    <div class="col-md-12">
+      <h3>Incomes</h3>
+      <a href="{% url 'incomes_create' %}">Create Income</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div>
+        <div class="table-responsive-md table-sm">
+          <table class="table" id="id_incomes">
+            <tr>
+              <th>ID</th>
+              <th>Amount</th>
+              <th>Category</th>
+              <th>Date</th>
+              <th>Note</th>
+            </tr>
+            {% for income in object_list %}
+              <tr>
+                <td>{{ income.id }}</td>
+                <td>{{ income.amount | intcomma }}</td>
+                <td>{{ income.category.text }}</td>
+                <td>{{ income.date }}</td>
+                <td>{{ income.note }}</td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

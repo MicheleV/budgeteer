@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Monhtly Balances{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid">
+  <!-- TODO: This page layout is completely different from the rest of the site. Fix it -->
+  <div class="row">
+    <div class="col">
+      <h3>Monthly Balances</h3>
+      <a href="{% url 'monthly_balances_create' %}">Create Monhtly Balance</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Display only if we have some data -->
+    {% if bar_graph %}
+      <div class="col">
+        <div >
+          <img src="data:image/png;base64,{{ bar_graph }}" class="img-fluid" alt="Bar graph">
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="col">
+      <div>
+        <div class="table-responsive-md table-sm">
+          <table class="table table-responsive-md table-sm" id="id_monthly_balances">
+            <!-- TODO: fix the above id (and check other templates as well)-->
+            <tr>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Month details</th>
+            </tr>
+            {% for monthly_balance in monthly_balance reversed %}
+              <tr>
+              <td>{{ monthly_balance.date | date:'Y-m' }}</td>
+              <td>{{ monthly_balance.amount | intcomma }}</td>
+              {% with ym_date=monthly_balance.date|date:'Y-m' %}
+                <td><a href={% url 'monthly_balances' ym_date %}>See details</a></td>
+              {% endwith %}
+              </tr>
+            {% endfor %}
+          </table>
+
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

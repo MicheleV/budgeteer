@@ -8,13 +8,20 @@ import math
 import os
 
 from django.core.exceptions import ValidationError
-from django.db.models import Sum, F, Case, When
+from django.db.models import Sum
+from django.db.models import F
+from django.db.models import Case
+from django.db.models import When
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
-
 from django.urls import reverse
+from django.urls import reverse_lazy
 from django.views.decorators.http import require_http_methods
+from django.views.generic import CreateView
+from django.views.generic import DeleteView
+from django.views.generic import ListView
+from django.views.generic import DetailView
 from dotenv import load_dotenv
 from graphs import plot
 from rest_framework.decorators import api_view
@@ -24,7 +31,7 @@ import budgets.forms as f
 import budgets.models as m
 from budgets.serializers import CategorySerializer
 
-# NOTE: is this really needed? Check whether to do load_dotenv() inside urls.py
+# TODO: is this really needed? Check whether to do load_dotenv() inside urls.py
 # once is enough or not
 load_dotenv()
 
@@ -171,6 +178,288 @@ def generate_current_month_expenses_pie_graph(data):
     return False
 
 
+def append_year_and_month_to_url(obj, named_url, delete=False):
+    """
+    Return an url with obj's date appended in YYYY-mm format
+    """
+    format_str = '%Y-%m'
+    date_ym = obj.date.strftime(format_str)
+    view_url = reverse(named_url)
+    redirect_url = f"{view_url}/{date_ym}"
+    if delete:
+        redirect_url = f"{redirect_url}?delete=1"
+    return redirect_url
+
+
+###############################################################################
+# Class based views
+###############################################################################
+
+# TODO: find out how to decorate Classes as_view() function
+# https://jsatt.com/blog/decorators-vs-mixins-for-django-class-based-views
+# @require_http_methods(["GET"])
+# def dispatch(self, request, *args, **kwargs):
+#     return super(CategoryListView, self).dispatch(request, *args, **kwargs)
+
+class CategoryCreateView(CreateView):
+    model = m.Category
+    form_class = f.CategoryForm
+
+    def get_success_url(self):
+        return reverse('categories')
+
+
+class CategoryListView(ListView):
+    model = m.Category
+
+
+class ExpenseCreateView(CreateView):
+    model = m.Expense
+    form_class = f.ExpenseForm
+
+    def get_success_url(self):
+        return reverse('expenses')
+
+
+class ExpenseListView(ListView):
+    model = m.Expense
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        start = yymm_date = self.kwargs.get('start', None)
+        end = yymm_date = self.kwargs.get('end', None)
+
+        # Toggle delete buttons
+        show_delete = self.request.GET.get('delete', False) == '1'
+        context['show_delete'] = show_delete
+
+        # TODO: this cose is exactly the same as get_queryset(),memoized it
+        if end is None:
+            (start, end) = get_month_boundaries(start)
+        else:
+            format_str = '%Y-%m-%d'
+            start = datetime.datetime.strptime(start, format_str).date()
+
+        # TODO: this cose is exactly the same as get_queryset(), memoized it!
+        # TODO refactor these queries after reading Django annotation docs
+        # and aggregation
+        expenses = m.Expense.objects.filter(date__range=(start, end)) \
+                    .order_by('-date', '-id')
+        expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
+        pie_graph = generate_current_month_expenses_pie_graph(expenses)
+        context['pie_graph'] = pie_graph
+        context['expenses_sum'] = expenses_sum
+        return context
+
+    def get_queryset(self):
+        start = yymm_date = self.kwargs.get('start', None)
+        end = yymm_date = self.kwargs.get('end', None)
+
+        # TODO: this cose is exactly the same as get_context_data(),memoized it
+        if end is None:
+            (start, end) = get_month_boundaries(start)
+        else:
+            format_str = '%Y-%m-%d'
+            start = datetime.datetime.strptime(start, format_str).date()
+        # TODO: refactor these queries after reading Django annotation docs
+        # and aggregation
+        expenses = m.Expense.objects.filter(date__range=(start, end)) \
+                    .order_by('-date', '-id')
+        expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
+
+        return expenses
+
+
+class ExpenseDeleteView(DeleteView):
+    model = m.Expense
+
+    def get_success_url(self):
+        return reverse('expenses')
+
+
+class MonthlyBudgetsCreateView(CreateView):
+    model = m.MonthlyBudget
+    form_class = f.MonthlyBudgetForm
+
+    def get_success_url(self):
+        return reverse('monthly_budgets')
+
+
+class MonthlyBudgetListView(ListView):
+    model = m.MonthlyBudget
+
+    def get_queryset(self):
+        yymm_date = self.kwargs.get('date', None)
+        if yymm_date is None:
+            monthly_budgets = m.MonthlyBudget.objects.all()
+        else:
+            complete_date = f"{yymm_date}-01"
+            monthly_budgets = m.MonthlyBudget.objects.filter(date=complete_date)
+        return monthly_budgets
+
+
+class MonthlyBudgetDetailView(DetailView):
+    model = m.MonthlyBudget
+
+
+class GoalCreateView(CreateView):
+    model = m.Goal
+    form_class = f.GoalForm
+
+
+class GoalListView(ListView):
+    model = m.Goal
+
+
+class GoalDetailView(DetailView):
+    model = m.Goal
+
+
+class IncomeCategoryCreateView(CreateView):
+    model = m.IncomeCategory
+    form_class = f.IncomeCategoryForm
+
+    def get_success_url(self):
+        return reverse('income_categories')
+
+
+class IncomeCategoryView(ListView):
+    model = m.IncomeCategory
+
+
+class IncomeCategoryDetailView(DetailView):
+    model = m.IncomeCategory
+
+
+class IncomCreateView(CreateView):
+    model = m.Income
+    form_class = f.IncomeForm
+
+    def get_success_url(self):
+        return reverse('incomes')
+
+
+class IncomeView(ListView):
+    model = m.Income
+
+    def get_queryset(self):
+        start = yymm_date = self.kwargs.get('start', None)
+        end = yymm_date = self.kwargs.get('end', None)
+
+        # TODO: use the date parameter if present to filter
+        if end is None:
+            (start, end) = get_month_boundaries(start)
+        else:
+            format_str = '%Y-%m-%d'
+            start = datetime.datetime.strptime(start, format_str).date()
+        incomes = m.Income.objects.filter(date__range=(start, end))
+        return incomes
+
+
+class MonthlyBalanceCategoryCreateView(CreateView):
+    model = m.MonthlyBalanceCategory
+    form_class = f.MonthlyBalanceCategoryForm
+
+    def get_success_url(self):
+        return reverse('monthly_balance_categories')
+
+
+class MonthlyBalanceCategoryView(ListView):
+    model = m.MonthlyBalanceCategory
+
+
+class MonthlyBalanceCategoryDetailView(DetailView):
+    model = m.MonthlyBalanceCategory
+
+
+class MonthlyBalancesCreateView(CreateView):
+    model = m.MonthlyBalance
+    form_class = f.MonthlyBalanceForm
+
+    def get_success_url(self):
+        return reverse('monthly_balances')
+
+
+class MonthlyBalancesView(ListView):
+    model = m.MonthlyBalance
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Toggle delete buttons
+        show_delete = self.request.GET.get('delete', False) == '1'
+
+        rate = os.getenv("EXCHANGE_RATE")
+        total = None
+        bar_graph = False
+
+        mb = m.MonthlyBalance.objects.select_related('category'). \
+            values('date').order_by('date'). \
+            annotate(amount=Sum(Case(
+              When(category__is_foreign_currency=False, then='amount'),
+              When(category__is_foreign_currency=True, then=F('amount') * rate)
+            )))
+
+        # Display only not archived goals
+        goals = m.Goal.objects.filter(is_archived=False)
+        if len(mb) > 0:
+            bar_graph = generate_monthly_balance_graph(mb, goals)
+
+        total = mb.aggregate(Sum('amount'))['amount__sum']
+        context['monthly_balance'] = mb
+        context['bar_graph'] = bar_graph
+        context['total'] = total
+        context['show_delete'] = show_delete
+        return context
+
+
+# Show monhtly balances for a given month
+class MonthlyBalancesSingleMonthView(ListView):
+    model = m.MonthlyBalance
+    template_name = 'budgets/monthlybalance_singlemonth_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Toggle delete buttons
+        show_delete = self.request.GET.get('delete', False) == '1'
+        date = self.kwargs.get('date', None)
+        complete_date = f"{date}-01"
+        rate = os.getenv("EXCHANGE_RATE")
+
+        # Do NOT converto to local currency in here
+        mb = m.MonthlyBalance.objects.select_related('category'). \
+            filter(date=complete_date).order_by('date')
+
+        # FIX ME: this total should factor in is_foreign and multiply
+        # by currency_rate!
+        total = mb.aggregate(Sum('amount'))['amount__sum']
+
+        context['monthly_balance'] = mb
+        context['total'] = total
+        context['show_delete'] = show_delete
+        return context
+
+
+###############################################################################
+# API
+###############################################################################
+
+# TODO: move me inside a namespace
+@api_view(['GET'])
+# @renderer_classes([JSONRenderer])
+def api_categories(request):
+    """
+    List all categories
+    """
+    categories = m.Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)
+
+###############################################################################
+# Function based classes
+###############################################################################
+
+
 @require_http_methods(["GET"])
 def home_page(request):
     """
@@ -287,288 +576,6 @@ def home_page(request):
     })
 
 
-@require_http_methods(["GET", "POST"])
-def categories_page(request):
-    """
-    Display the categories page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.CategoryForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('categories')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            errors = form.errors
-
-    categories = m.Category.objects.all()
-    return render(request,
-                  'categories.html',
-                  {'categories': categories,
-                   'errors': errors,
-                   'form': f.CategoryForm()})# TODO: this should be 'form': form, otherwise on error, we clean the user input
-
-
-@require_http_methods(["GET", "POST"])
-def expenses_page(request, start=None, end=None):
-    """
-    Display the expenses page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.ExpenseForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('expenses')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            # NOTE: we save errors in here as we're going to display them
-            # separately from the form
-            errors = form.errors
-    else:
-        form = f.ExpenseForm()
-
-    # Toggle delete buttons
-    show_delete = request.GET.get('delete', False) == '1'
-
-    # Filter out archived categories
-    categories = m.Category.objects.filter(is_archived=False)
-    form.fields['category'].queryset = categories
-
-    if end is None:
-        (start, end) = get_month_boundaries(start)
-    else:
-        format_str = '%Y-%m-%d'
-        start = datetime.datetime.strptime(start, format_str).date()
-    # TODO refactor these queries after reading Django docs about annotation
-    # and aggregation
-    expenses = m.Expense.objects.filter(date__range=(start, end)) \
-                .order_by('-date', '-id')
-    expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
-
-    pie_graph = generate_current_month_expenses_pie_graph(expenses)
-
-    return render(request, 'expenses.html', {
-        'categories': categories,
-        'expenses': expenses,
-        'expenses_sum': expenses_sum,
-        'pie_graph': pie_graph,
-        'form': form,
-        'errors': errors,
-        'month': start.strftime("%Y-%m"),
-        'show_delete': show_delete,
-    })
-
-
-@require_http_methods(["POST"])
-def delete_expense_page(request, id):
-    """
-    Delete an expense
-    """
-    errors = None
-    mb = get_object_or_404(m.Expense, pk=id)
-    mb.delete()
-    return redirect('expenses')
-
-
-@require_http_methods(["GET", "POST"])
-def monthly_budgets_page(request, date=None):
-    """
-    Display the mohtly budgets page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.MonthlyBudgetForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('monthly_budgets')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            errors = form.errors
-
-    # Toggle delete buttons
-    show_delete = request.GET.get('delete', False) == '1'
-
-    categories = m.Category.objects.all()
-    if date is None:
-        monthly_budgets = m.MonthlyBudget.objects.all()
-    else:
-        complete_date = f"{date}-01"
-        monthly_budgets = m.MonthlyBudget.objects.filter(date=complete_date)
-    return render(request, 'monthly_budgets.html', {
-      'categories': categories,
-      'monthly_budgets': monthly_budgets,
-      'form': f.MonthlyBudgetForm(),
-      'show_delete': show_delete,
-      'errors': errors
-    })
-
-
-@require_http_methods(["GET", "POST"])
-def income_categories_page(request):
-    """
-    Display the income categories page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.IncomeCategoryForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('income_categories')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            errors = form.errors
-
-    categories = m.IncomeCategory.objects.all()
-    return render(request,
-                  'income_categories.html',
-                  {'categories': categories,
-                   'errors': errors,
-                   'form': f.IncomeCategoryForm()})
-
-
-@require_http_methods(["GET", "POST"])
-def incomes_page(request, date=None):
-    """
-    Display the incomes page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.IncomeForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('incomes')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            errors = form.errors
-
-    # TODO: use the date parameter if present to filter
-    (start, end) = current_month_boundaries()
-    # TODO refactor these queries after reading Django docs about annotation
-    # and aggregation
-    categories = m.IncomeCategory.objects.all()
-    incomes = m.Income.objects.filter(date__range=(start, end))
-    return render(request, 'incomes.html', {
-        'categories': categories,
-        'incomes': incomes,
-        'form': f.IncomeForm(),
-        'errors': errors,
-    })
-
-
-@require_http_methods(["GET", "POST"])
-def monthly_balance_categories_page(request):
-    """
-    Display the mohtly balance category page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.MonthlyBalanceCategoryForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('monthly_balance_categories')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            errors = form.errors
-
-    categories = m.MonthlyBalanceCategory.objects.all().order_by('-id')
-    return render(request,
-                  'monthly_balance_categories.html',
-                  {'categories': categories,
-                   'errors': errors,
-                   'form': f.MonthlyBalanceCategoryForm()})
-
-
-@require_http_methods(["GET", "POST"])
-def monthly_balances_page(request, date=None):
-    """
-    Display the monthly balance page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.MonthlyBalanceForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('monthly_balances')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            errors = form.errors
-
-    # Toggle delete buttons
-    show_delete = request.GET.get('delete', False) == '1'
-    rate = os.getenv("EXCHANGE_RATE")
-    total = None
-    bar_graph = False
-    if date is None:
-        mb = m.MonthlyBalance.objects.select_related('category'). \
-            values('date').order_by('date'). \
-            annotate(amount=Sum(Case(
-              When(category__is_foreign_currency=False, then='amount'),
-              When(category__is_foreign_currency=True, then=F('amount') * rate)
-            )))
-        # Display only not archived goals
-        goals = m.Goal.objects.filter(is_archived=False)
-        bar_graph = generate_monthly_balance_graph(mb, goals)
-    else:
-        complete_date = f"{date}-01"
-        # Do NOT converto to local currency in here
-        mb = m.MonthlyBalance.objects.select_related('category'). \
-            filter(date=complete_date).order_by('date')
-
-    total = mb.aggregate(Sum('amount'))['amount__sum']
-
-    return render(request, 'monthly_balances.html', {
-      'monthly_balance': mb,
-      'bar_graph': bar_graph,
-      'form': f.MonthlyBalanceForm(),
-      'total': total,
-      'show_delete': show_delete,
-      'errors': errors
-    })
-
-
-def append_year_and_month_to_url(obj, named_url, delete=False):
-    """
-    Return an url with obj's date appended in YYYY-mm format
-    """
-    format_str = '%Y-%m'
-    date_ym = obj.date.strftime(format_str)
-    view_url = reverse(named_url)
-    redirect_url = f"{view_url}/{date_ym}"
-    if delete:
-        redirect_url = f"{redirect_url}?delete=1"
-    return redirect_url
-
-
 @require_http_methods(["POST"])
 def delete_monthly_balance_page(request, id=None):
     """
@@ -612,15 +619,3 @@ def monthly_balances_edit_page(request, id=None):
       'form': form,
       'errors': errors
     })
-
-
-# TODO: move me inside a namespace
-@api_view(['GET'])
-# @renderer_classes([JSONRenderer])
-def api_categories(request):
-    """
-    List all categories
-    """
-    categories = m.Category.objects.all()
-    serializer = CategorySerializer(categories, many=True)
-    return Response(serializer.data)

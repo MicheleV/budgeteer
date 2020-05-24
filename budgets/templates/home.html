@@ -8,11 +8,8 @@
 {% block content %}
 
 <div class="row">
-    <h3>General recap</h3>
-</div>
-
-<div class="row">
     <div  class="col">
+      <h3>General recap</h3>
       <h5>Last two months</h5>
       <div class="table-responsive-md table-sm">
         <table class="table" id="id_recap">
@@ -40,7 +37,8 @@
     </div>
     {% if goals %}
       <div  class="col">
-        <h5>Goals</h5>
+        <h3>Goals</h3>
+        <h5>&nbsp;</h5> <!-- HACK: Empty line to line up vertically the two tables -->
         <div class="table-responsive-md table-sm">
           <table class="table" id="id_recap">
             <tr>
@@ -152,7 +150,7 @@
               {% if monthly_balance.actual_amount %}
                   {{ monthly_balance.actual_amount | intcomma }}</td>
               {% else %}
-                  {{ monthly_balance.ammount | intcomma }}</td>
+                  {{ monthly_balance.amount | intcomma }}</td>
               {% endif %}
           </tr>
         {% endfor %}

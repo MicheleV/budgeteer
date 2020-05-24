@@ -2,6 +2,7 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.db import models
+from django.urls import reverse
 
 # TODO: when we''ll have multiple users, we should expose UUID instead of ID
 # in the urls/API
@@ -77,6 +78,9 @@ class MonthlyBalanceCategory(models.Model):
 
     def __str__(self):
         return f"{self.text}"
+
+    def get_absolute_url(self):
+        return reverse('monthly_balance_categories_details', args=[str(self.id)])
 
 
 class MonthlyBalance(models.Model):

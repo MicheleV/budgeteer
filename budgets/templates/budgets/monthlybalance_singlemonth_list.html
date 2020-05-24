@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Monhtly Balances{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid">
+  <!-- TODO: This page layout is completely different from the rest of the site. Fix it -->
+  <div class="row">
+    <div class="col">
+      <h3>Monhtly Balances</h3>
+      <a href="{% url 'monthly_balances_create' %}">Create Monhtly Balance</a>
+      {% if show_delete %}
+        <a href="?delete=0">Hide delete buttons</a>
+      {% else %}
+        <a href="?delete=1">Show delete buttons</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="col">
+      <div>
+        <div class="table-responsive-md table-sm">
+          <table class="table table-responsive-md table-sm" id="id_monthly_balances">
+            <!-- TODO: fix the above id (and check other templates as well)-->
+            <tr>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Category</th>
+              <th>Is foreign currency?</th>
+              <th>ID</th>
+              {% if show_delete %}
+                <th><b>Delete</b></th>
+              {% endif %}
+            </tr>
+            {% for monthly_balance in monthly_balance reversed %}
+              <tr>
+                <td>{{ monthly_balance.date | date:'Y-m' }}</td>
+                <td>{{ monthly_balance.amount | intcomma }}</td>
+                <td>{{ monthly_balance.category.text }}</td>
+                <td>{{ monthly_balance.category.is_foreign_currency }}</td>
+                <td>
+                  <a href={% url 'edit_monthly_balance' monthly_balance.id %}>Edit</a>
+                </td>
+                {% if show_delete %}
+                   <td>
+                    <form method="POST" action="{% url 'delete_monthly_balance' id=monthly_balance.id %}">
+                      {% csrf_token %}
+                      <input type="submit" id="id_submit" value="Yes, DELETE">
+                    </form>
+                  </td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+            {% if total > 0 %}
+              <tr>
+                <td>Total</td>
+                <td>{{ total | intcomma }}</td>
+                <td> - </td>
+                <td> - </td>
+                <td> - </td>
+                {% if show_delete %}
+                  <td> - </td>
+                {% endif %}
+              </tr>
+            {% endif %}
+          </table>
+
+          {% include "paginator.html" %}
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

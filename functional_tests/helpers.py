@@ -5,7 +5,8 @@
 from datetime import date
 from datetime import timedelta
 import locale
-
+import string
+import random
 # Docs at https://seleniumhq.github.io/selenium/docs/api/py/webdriver_support/
 #  selenium.webdriver.support.expected_conditions.html
 from django.urls import resolve, reverse
@@ -14,8 +15,18 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 
+
 locale.setlocale(locale.LC_ALL, '')
 MAX_DELAY = 3
+
+
+# TODO: duplicate code from unit tests
+def generateString(length=10):
+    """
+    Generate a random string of a given length
+    """
+    char = string.ascii_lowercase
+    return ''.join(random.choice(char) for i in range(length))
 
 
 def check_amount_and_cat_name(self, amount, category_name):
@@ -86,16 +97,14 @@ def find_error(self, errorText, printErrors=False):
 
 
 def create_a_category(self, category_name,
-                      is_income=False, verify_creation=True):
-    url = reverse('categories')
+                      is_income=False, create_check=True, midway_check=False):
+    url = reverse('categories_create')
 
     if is_income:
-        url = reverse('income_categories')
-        is_income = True
+        url = reverse('income_categories_create')
 
     # Frank creates a category
     self.browser.get(f"{self.live_server_url}{url}")
-
     inputbox = self.browser.find_element_by_id('id_text')
     self.assertEqual(
         inputbox.get_attribute('placeholder'),
@@ -107,12 +116,17 @@ def create_a_category(self, category_name,
         inputbox.send_keys(Keys.ENTER)
         wait_for_page_to_reload(self)
 
-    if verify_creation:
-        verify_category_was_created(self, category_name)
+    # Check for error right after submitting the form
+    if midway_check:
+        find_error(self, 'Category with this Text already exists')
+
+    # Check if the categoy page is showing created category
+    if create_check:
+        visit_and_verify_categories(self, category_name)
 
 
 def create_a_monthly_budget(self, category_name, amount, date,
-                            verify_creation=True):
+                            create_check=True):
     # Frank visits the monthly expenses page
     url = reverse('monthly_budgets')
     self.browser.get(f"{self.live_server_url}{url}")
@@ -220,12 +234,25 @@ def create_category_and_two_expenses(self, first_item, second_item,
     )
 
 
+def visit_and_verify_categories(self, category_name, should_exist=True):
+    url = reverse('categories')
+    self.browser.get(f"{self.live_server_url}{url}")
+    table = self.browser.find_element_by_id('id_categories')
+    if should_exist:
+        find_text_inside_table(self, category_name, table)
+    else:
+        # HACK: we check for ID 1, instead of category name
+        assert_text_is_not_inside_table(self, '1', table)
+
+
+# NOTE: deprecated
 def verify_category_was_created(self, category_name):
     # Frank sees the category name is present on the page
     table = self.browser.find_element_by_id('id_categories')
     find_text_inside_table(self, category_name, table)
 
 
+# NOTE: to be deprecated
 def verify_expense_was_created(self, amount, category_name, note):
     # Frank sees all the details about the expense displayed on the page
     table = self.browser.find_element_by_id('id_expenses')
@@ -236,6 +263,7 @@ def verify_expense_was_created(self, amount, category_name, note):
     # find_text_inside_table('2019-08-04', table)
 
 
+# NOTE: to be deprecated
 def verify_monthly_expense_was_created(self, category_name, amount, date):
     # Frank sees all the details about the monghtly budget displayed on the
     # page

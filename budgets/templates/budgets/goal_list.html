@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Goals{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <h3>Goals</h3>
+      <a href="{% url 'goals_create' %}">Create goal</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div>
+        <div class="table-responsive-md table-sm">
+          <table class="table" id="id_categories">
+            <tr>
+              <th>ID</th>
+              <th>Amount</th>
+              <th>Text</th>
+              <th>Note</th>
+              <th>Archived?</th>
+            </tr>
+            {% for goal in goal_list %}
+              <tr>
+                <td><a href="{% url "goals_detail" goal.pk %}">{{ goal.id }}</a></td>
+                <td>{{ goal.amount | intcomma }}</td>
+                <td>{{ goal.text }}</td>
+                <td>{{ goal.note }}</td>
+                <td>{{ goal.is_archived }}</td>
+              </tr>
+            {% endfor %}
+          </table>
+
+          {% include "paginator.html" %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Expenses{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid">
+  <!-- TODO: This page layout is completely different from the rest of the site. Fix it -->
+  <div class="row">
+    <div class="col">
+      <h3>Expenses</h3>
+      <a href="{% url 'expenses_create' %}">Create expense</a>
+      {% if show_delete %}
+        <a href="{% url 'expenses' %}">Hide delete buttons</a>
+      {% else %}
+        <a href="{% url 'expenses' %}?delete=1">Show delete buttons</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div>
+        <div class="table-responsive-md table-sm">
+          <table class="table" id="id_expenses">
+          <tr>
+            <th>Spended date</th>
+            <th>Amount</th>
+            <th>Category</th>
+            <th>Note</th>
+            {% if show_delete %}
+              <th>Delete</th>
+            {% endif %}
+          </tr>
+          {% if expenses_sum %}
+            <tr>
+              <td> - </td>
+              <td><b>{{ expenses_sum | intcomma }}</b></td>
+              <td><b>Total</b></td>
+              <td> - </td>
+              {% if show_delete %}
+                <td> - </td>
+              {% endif %}
+
+            </tr>
+          {% endif %}
+          {% for expense in object_list %}
+            <tr>
+              <td>{{ expense.date }}</td>
+              <td>{{ expense.amount | intcomma }}</td>
+              <td>{{ expense.category.text }}</td>
+              <td>{{ expense.note }}</td>
+              {% if show_delete %}
+                <td>
+                  <form method="POST" action="{% url 'expenses_delete' pk=expense.id %}">
+                    {% csrf_token %}
+                    <input type="submit" id="id_submit" value="Yes, DELETE">
+                  </form>
+                </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+          </table>
+
+          {% include "paginator.html" %}
+
+        </div>
+      </div>
+    </div>
+
+    {% if pie_graph %}
+      <div class="col">
+        <img src="data:image/png;base64,{{ pie_graph }}" class="img-fluid" alt="Pie graph">
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

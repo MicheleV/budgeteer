@@ -78,7 +78,7 @@ class MonthlyBalanceCategoryFormTest(BaseTest):
 
     def test_form_renders_correctly(self):
         form = f.MonthlyBalanceCategoryForm()
-        t = 'placeholder="Enter a new category of balance (i.e. savings, cash)'
+        t = 'placeholder="Enter a new balance category (i.e. savings, cash)'
         self.assertIn(t, form.as_p())
         self.assertIn('class="form-control input-lg"', form.as_p())
 

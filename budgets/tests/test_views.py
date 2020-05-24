@@ -361,10 +361,9 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         mb = self.create_monthly_balance(new_category, 42000, date)
 
         show_delete = True
-        url = 'monthly_balances'
-        redirect_url = utils.append_year_and_month_to_url(mb, url, show_delete)
-        arg = {'id': mb.id}
-        response = self.get_response_from_named_url('delete_monthly_balance',
+        redirect_url = reverse('monthly_balances')
+        arg = {'pk': mb.id}
+        response = self.get_response_from_named_url('monthly_balances_delete',
                                                     arg)
 
         self.assertEqual(response.status_code, 302)
@@ -428,7 +427,7 @@ class MonthlyBalanceTest(BaseTest):
         url = f"{reverse('monthly_balances')}/{date_ym}?delete=1"
         response = second_response = self.client.get(url)
 
-        form = 'form method="POST" action="/delete_monthly_balance/'
+        form = 'form method="POST" action="/monthly_balances/delete/'
         button = '<input type="submit" id="id_submit" value="Yes, DELETE">'
         self.assertContains(response, form)
         self.assertContains(response, button)

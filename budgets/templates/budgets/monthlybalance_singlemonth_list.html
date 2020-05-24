@@ -46,7 +46,7 @@
                 </td>
                 {% if show_delete %}
                    <td>
-                    <form method="POST" action="{% url 'delete_monthly_balance' id=monthly_balance.id %}">
+                    <form method="POST" action="{% url 'monthly_balances_delete' pk=monthly_balance.id %}">
                       {% csrf_token %}
                       <input type="submit" id="id_submit" value="Yes, DELETE">
                     </form>

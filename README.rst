@@ -22,7 +22,7 @@ Budgeteer
 About the project
 =================
 
-Budgeteer is a barebone web application used to build a household budget.
+Budgeteer is a barebone web application for managing household budgets.
 
 Built with:
 ---------------------

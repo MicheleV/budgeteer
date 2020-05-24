@@ -285,6 +285,12 @@ class MonthlyBalancesSingleMonthView(ListView):
         return context
 
 
+class MonthlyBalanceDeleteView(DeleteView):
+    model = m.MonthlyBalance
+
+    def get_success_url(self):
+        return reverse('monthly_balances')
+
 ###############################################################################
 # API
 ###############################################################################
@@ -419,21 +425,6 @@ def home_page(request):
         'two_months_diff_perc': two_months_diff_perc,
         'goals': goals,
     })
-
-
-@require_http_methods(["POST"])
-def delete_monthly_balance_page(request, id=None):
-    """
-    Delete a monthly balance
-    """
-    errors = None
-    mb = get_object_or_404(m.MonthlyBalance, pk=id)
-    # Since we delete a monthly balance, the previous page was showing buttons
-    show_delete = True
-    url = 'monthly_balances'
-    redirect_url = utils.append_year_and_month_to_url(mb, url, show_delete)
-    mb.delete()
-    return redirect(redirect_url)
 
 
 @require_http_methods(["GET", "POST"])

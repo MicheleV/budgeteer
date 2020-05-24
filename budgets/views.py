@@ -399,9 +399,11 @@ class MonthlyBalancesView(ListView):
               When(category__is_foreign_currency=False, then='amount'),
               When(category__is_foreign_currency=True, then=F('amount') * rate)
             )))
+
         # Display only not archived goals
         goals = m.Goal.objects.filter(is_archived=False)
-        bar_graph = generate_monthly_balance_graph(mb, goals)
+        if len(mb) > 0:
+            bar_graph = generate_monthly_balance_graph(mb, goals)
 
         total = mb.aggregate(Sum('amount'))['amount__sum']
         context['monthly_balance'] = mb
@@ -418,15 +420,12 @@ class MonthlyBalancesSingleMonthView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        date = yymm_date = self.kwargs.get('date', None)
-
         # Toggle delete buttons
         show_delete = self.request.GET.get('delete', False) == '1'
-
-        rate = os.getenv("EXCHANGE_RATE")
-        total = None
-
+        date = self.kwargs.get('date', None)
         complete_date = f"{date}-01"
+        rate = os.getenv("EXCHANGE_RATE")
+
         # Do NOT converto to local currency in here
         mb = m.MonthlyBalance.objects.select_related('category'). \
             filter(date=complete_date).order_by('date')
@@ -434,7 +433,7 @@ class MonthlyBalancesSingleMonthView(ListView):
         # FIX ME: this total should factor in is_foreign and multiply
         # by currency_rate!
         total = mb.aggregate(Sum('amount'))['amount__sum']
-        print(total, date, complete_date)
+
         context['monthly_balance'] = mb
         context['total'] = total
         context['show_delete'] = show_delete

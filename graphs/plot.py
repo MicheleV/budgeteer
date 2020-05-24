@@ -110,7 +110,7 @@ def generatePieGraph(labels, values):
     """
     generatePie(labels, values)
     buf = BytesIO()
-    plt.savefig(buf, format="png", bbox_inches="tight", dpi=130)
+    plt.savefig(buf, format="png", bbox_inches="tight", dpi=230)
     # Embed the result in the html output.
     return base64.b64encode(buf.getbuffer()).decode("ascii")
 
@@ -123,6 +123,6 @@ def generateGraph(x, y, goals):
     """
     prepareGraphData(x, y, goals)
     buf = BytesIO()
-    plt.savefig(buf, format="png", bbox_inches="tight", dpi=130)
+    plt.savefig(buf, format="png", bbox_inches="tight", dpi=230)
     # Embed the result in the html output.
     return base64.b64encode(buf.getbuffer()).decode("ascii")

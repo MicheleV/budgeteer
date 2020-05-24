@@ -248,6 +248,7 @@ class ExpenseListView(ListView):
         expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
         pie_graph = generate_current_month_expenses_pie_graph(expenses)
         context['pie_graph'] = pie_graph
+        context['expenses_sum'] = expenses_sum
         return context
 
     def get_queryset(self):
@@ -369,6 +370,126 @@ class MonthlyBalanceCategoryView(ListView):
 
 class MonthlyBalanceCategoryDetailView(DetailView):
     model = m.MonthlyBalanceCategory
+
+
+class MonthlyBalancesCreateView(CreateView):
+    model = m.MonthlyBalance
+    form_class = f.MonthlyBalanceForm
+
+    def get_success_url(self):
+        return reverse('monthly_balances')
+
+
+class MonthlyBalancesView(ListView):
+    model = m.MonthlyBalance
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Toggle delete buttons
+        show_delete = self.request.GET.get('delete', False) == '1'
+
+        rate = os.getenv("EXCHANGE_RATE")
+        total = None
+        bar_graph = False
+
+        mb = m.MonthlyBalance.objects.select_related('category'). \
+            values('date').order_by('date'). \
+            annotate(amount=Sum(Case(
+              When(category__is_foreign_currency=False, then='amount'),
+              When(category__is_foreign_currency=True, then=F('amount') * rate)
+            )))
+        # Display only not archived goals
+        goals = m.Goal.objects.filter(is_archived=False)
+        bar_graph = generate_monthly_balance_graph(mb, goals)
+
+        total = mb.aggregate(Sum('amount'))['amount__sum']
+        context['monthly_balance'] = mb
+        context['bar_graph'] = bar_graph
+        context['total'] = total
+        context['show_delete'] = show_delete
+        return context
+
+
+# Show monhtly balances for a given month
+class MonthlyBalancesSingleMonthView(ListView):
+    model = m.MonthlyBalance
+    template_name = 'budgets/monthlybalance_singlemonth_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        date = yymm_date = self.kwargs.get('date', None)
+
+        # Toggle delete buttons
+        show_delete = self.request.GET.get('delete', False) == '1'
+
+        rate = os.getenv("EXCHANGE_RATE")
+        total = None
+
+        complete_date = f"{date}-01"
+        # Do NOT converto to local currency in here
+        mb = m.MonthlyBalance.objects.select_related('category'). \
+            filter(date=complete_date).order_by('date')
+
+        # FIX ME: this total should factor in is_foreign and multiply
+        # by currency_rate!
+        total = mb.aggregate(Sum('amount'))['amount__sum']
+        print(total, date, complete_date)
+        context['monthly_balance'] = mb
+        context['total'] = total
+        context['show_delete'] = show_delete
+        return context
+
+# @require_http_methods(["GET", "POST"])
+# def monthly_balances_page(request, date=None):
+#     """
+#     Display the monthly balance page
+#     """
+#     errors = None
+#     if request.method == 'POST':
+#         try:
+#             form = f.MonthlyBalanceForm(data=request.POST)
+#             if form.is_valid():
+#                 form.full_clean()
+#                 form.save()
+#                 redirect_url = reverse('monthly_balances')
+#                 return redirect(redirect_url)
+#             else:
+#                 errors = form.errors
+#         except ValidationError:
+#             errors = form.errors
+
+#     # Toggle delete buttons
+#     show_delete = request.GET.get('delete', False) == '1'
+#     rate = os.getenv("EXCHANGE_RATE")
+#     total = None
+#     bar_graph = False
+#     if date is None:
+#         mb = m.MonthlyBalance.objects.select_related('category'). \
+#             values('date').order_by('date'). \
+#             annotate(amount=Sum(Case(
+#               When(category__is_foreign_currency=False, then='amount'),
+#               When(category__is_foreign_currency=True, then=F('amount') * rate)
+#             )))
+#         # Display only not archived goals
+#         goals = m.Goal.objects.filter(is_archived=False)
+#         bar_graph = generate_monthly_balance_graph(mb, goals)
+#     else:
+#         complete_date = f"{date}-01"
+#         # Do NOT converto to local currency in here
+#         mb = m.MonthlyBalance.objects.select_related('category'). \
+#             filter(date=complete_date).order_by('date')
+
+#     total = mb.aggregate(Sum('amount'))['amount__sum']
+
+#     return render(request, 'monthly_balances.html', {
+#       'monthly_balance': mb,
+#       'bar_graph': bar_graph,
+#       'form': f.MonthlyBalanceForm(),
+#       'total': total,
+#       'show_delete': show_delete,
+#       'errors': errors
+#     })
 
 ###############################################################################
 # API

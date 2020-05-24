@@ -60,18 +60,26 @@ urlpatterns = [
     path('monthly_budgets/<int:pk>', views.MonthlyBudgetDetailView.as_view(),
          name='monthly_budgets_detail'),
 
+    path('monthly_balances/create', views.MonthlyBalancesCreateView.as_view(),
+         name='monthly_balances_create'),
+    path('monthly_balances', views.MonthlyBalancesView.as_view(),
+         name='monthly_balances'),
+
+    # Show monthly balances breakdonw by date (YYYY-mm)
+    re_path('monthly_balances/(?P<date>(19|20)[0-9]{2}-(0[1-9]|1[012]))$',
+            views.MonthlyBalancesSingleMonthView.as_view(), name='monthly_balances'),
+
+
     # API #
     path('api/categories', views.api_categories, name='api'),
 
     # Function based routes #
     path('', views.home_page, name='home'),
 
-    path('monthly_balances', views.monthly_balances_page,
-         name='monthly_balances'),
-    re_path('monthly_balances/(?P<date>(19|20)[0-9]{2}-(0[1-9]|1[012]))$',
-            views.monthly_balances_page, name='monthly_balances'),
-    path('new_monthly_balance', views.monthly_balances_page,
-         name='new_monthly_balance'),
+
+
+    # path('new_monthly_balance', views.monthly_balances_page,
+         # name='new_monthly_balance'),
     path('edit_monthly_balance/<int:id>', views.monthly_balances_edit_page,
          name='edit_monthly_balance'),
     path('delete_monthly_balance/<int:id>', views.delete_monthly_balance_page,

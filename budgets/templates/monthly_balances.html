@@ -5,16 +5,18 @@
 
 
 {% block content %}
-  <form method="POST" action="{% url 'new_monthly_balance' %}">
-    {{ form }}
-    <input type="submit" id="id_submit" value="Submit">
-    {% csrf_token %}
-  </form>
 
-  {% if errors %}
-      <div>{{ errors }}</div>
-  {% endif %}
-  {% csrf_token %}
+  <div class="row">
+    <div class="col">
+      <h3>Monhtly Balance</h3>
+      <a href="{% url 'monthly_balances_create' %}">Create Monhtly balance</a>
+      {% if show_delete %}
+        <a href="{% url 'expenses' %}">Hide delete buttons</a>
+      {% else %}
+        <a href="{% url 'expenses' %}?delete=1">Show delete buttons</a>
+      {% endif %}
+    </div>
+  </div>
 
   {% if bar_graph %}
     <div >

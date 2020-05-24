@@ -439,56 +439,6 @@ class MonthlyBalancesSingleMonthView(ListView):
         context['show_delete'] = show_delete
         return context
 
-# @require_http_methods(["GET", "POST"])
-# def monthly_balances_page(request, date=None):
-#     """
-#     Display the monthly balance page
-#     """
-#     errors = None
-#     if request.method == 'POST':
-#         try:
-#             form = f.MonthlyBalanceForm(data=request.POST)
-#             if form.is_valid():
-#                 form.full_clean()
-#                 form.save()
-#                 redirect_url = reverse('monthly_balances')
-#                 return redirect(redirect_url)
-#             else:
-#                 errors = form.errors
-#         except ValidationError:
-#             errors = form.errors
-
-#     # Toggle delete buttons
-#     show_delete = request.GET.get('delete', False) == '1'
-#     rate = os.getenv("EXCHANGE_RATE")
-#     total = None
-#     bar_graph = False
-#     if date is None:
-#         mb = m.MonthlyBalance.objects.select_related('category'). \
-#             values('date').order_by('date'). \
-#             annotate(amount=Sum(Case(
-#               When(category__is_foreign_currency=False, then='amount'),
-#               When(category__is_foreign_currency=True, then=F('amount') * rate)
-#             )))
-#         # Display only not archived goals
-#         goals = m.Goal.objects.filter(is_archived=False)
-#         bar_graph = generate_monthly_balance_graph(mb, goals)
-#     else:
-#         complete_date = f"{date}-01"
-#         # Do NOT converto to local currency in here
-#         mb = m.MonthlyBalance.objects.select_related('category'). \
-#             filter(date=complete_date).order_by('date')
-
-#     total = mb.aggregate(Sum('amount'))['amount__sum']
-
-#     return render(request, 'monthly_balances.html', {
-#       'monthly_balance': mb,
-#       'bar_graph': bar_graph,
-#       'form': f.MonthlyBalanceForm(),
-#       'total': total,
-#       'show_delete': show_delete,
-#       'errors': errors
-#     })
 
 ###############################################################################
 # API
@@ -623,58 +573,6 @@ def home_page(request):
         'two_months_diff': two_months_diff,
         'two_months_diff_perc': two_months_diff_perc,
         'goals': goals,
-    })
-
-
-@require_http_methods(["GET", "POST"])
-def monthly_balances_page(request, date=None):
-    """
-    Display the monthly balance page
-    """
-    errors = None
-    if request.method == 'POST':
-        try:
-            form = f.MonthlyBalanceForm(data=request.POST)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-                redirect_url = reverse('monthly_balances')
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            errors = form.errors
-
-    # Toggle delete buttons
-    show_delete = request.GET.get('delete', False) == '1'
-    rate = os.getenv("EXCHANGE_RATE")
-    total = None
-    bar_graph = False
-    if date is None:
-        mb = m.MonthlyBalance.objects.select_related('category'). \
-            values('date').order_by('date'). \
-            annotate(amount=Sum(Case(
-              When(category__is_foreign_currency=False, then='amount'),
-              When(category__is_foreign_currency=True, then=F('amount') * rate)
-            )))
-        # Display only not archived goals
-        goals = m.Goal.objects.filter(is_archived=False)
-        bar_graph = generate_monthly_balance_graph(mb, goals)
-    else:
-        complete_date = f"{date}-01"
-        # Do NOT converto to local currency in here
-        mb = m.MonthlyBalance.objects.select_related('category'). \
-            filter(date=complete_date).order_by('date')
-
-    total = mb.aggregate(Sum('amount'))['amount__sum']
-
-    return render(request, 'monthly_balances.html', {
-      'monthly_balance': mb,
-      'bar_graph': bar_graph,
-      'form': f.MonthlyBalanceForm(),
-      'total': total,
-      'show_delete': show_delete,
-      'errors': errors
     })
 
 

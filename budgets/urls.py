@@ -75,11 +75,6 @@ urlpatterns = [
 
     # Function based routes #
     path('', views.home_page, name='home'),
-
-
-
-    # path('new_monthly_balance', views.monthly_balances_page,
-         # name='new_monthly_balance'),
     path('edit_monthly_balance/<int:id>', views.monthly_balances_edit_page,
          name='edit_monthly_balance'),
     path('delete_monthly_balance/<int:id>', views.delete_monthly_balance_page,

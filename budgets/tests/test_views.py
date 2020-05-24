@@ -11,6 +11,7 @@ import budgets.forms as f
 import budgets.models as m
 from budgets.tests.base import BaseTest
 import budgets.views as v
+import budgets.views_utils as utils
 
 
 class HomePageTest(BaseTest):
@@ -133,7 +134,7 @@ class MonthlyBudgetPageTest(BaseTest):
         mb = self.create_monthly_budgets(cat1, amount1, date)
         mb = self.create_monthly_budgets(cat2, amount2, date)
 
-        url = v.append_year_and_month_to_url(mb, 'monthly_budgets')
+        url = utils.append_year_and_month_to_url(mb, 'monthly_budgets')
         response = self.client.get(url)
 
         self.assertContains(response, text1)
@@ -224,12 +225,12 @@ class ExpensesPageTest(BaseTest):
         url = f"{reverse('expenses')}?delete=1"
         response = second_response = self.client.get(url)
 
-        delete_form_html = f"form method=\"POST\" action=\"/expenses/delete/{exp.id}\""
-        delete_form_html_2 = f"form method=\"POST\" action=\"/expenses/delete/{exp2.id}\""
-        button_html = '<input type="submit" id="id_submit" value="Yes, DELETE">'
-        self.assertContains(response, delete_form_html)
-        self.assertContains(response, delete_form_html_2)
-        self.assertContains(response, button_html)
+        form = f"form method=\"POST\" action=\"/expenses/delete/{exp.id}\""
+        form2 = f"form method=\"POST\" action=\"/expenses/delete/{exp2.id}\""
+        button = '<input type="submit" id="id_submit" value="Yes, DELETE">'
+        self.assertContains(response, form)
+        self.assertContains(response, form2)
+        self.assertContains(response, button)
 
     def test_delete_button_missing_without_param(self):
         text = self.generateString(10)
@@ -241,10 +242,10 @@ class ExpensesPageTest(BaseTest):
         url = f"{reverse('expenses')}?delete=0"
         response = second_response = self.client.get(url)
 
-        delete_form_html = 'form method="POST" action="/expenses_delete/'
-        button_html = '<input type="submit" id="id_submit" value="Yes, DELETE">'
-        self.assertNotContains(response, delete_form_html)
-        self.assertNotContains(response, button_html)
+        form = 'form method="POST" action="/expenses_delete/'
+        button = '<input type="submit" id="id_submit" value="Yes, DELETE">'
+        self.assertNotContains(response, form)
+        self.assertNotContains(response, button)
 
     # TODO
     def test_creating_malformed_expenses_throw_errors(self):
@@ -360,8 +361,8 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         mb = self.create_monthly_balance(new_category, 42000, date)
 
         show_delete = True
-        redirect_url = v.append_year_and_month_to_url(mb, 'monthly_balances',
-                                                      show_delete)
+        url = 'monthly_balances'
+        redirect_url = utils.append_year_and_month_to_url(mb, url, show_delete)
         arg = {'id': mb.id}
         response = self.get_response_from_named_url('delete_monthly_balance',
                                                     arg)
@@ -387,7 +388,8 @@ class MonthlyBalanceCategoriesTest(BaseTest):
     def test_uses_correct_template(self):
         named_url = 'monthly_balance_categories'
         response = self.get_response_from_named_url(named_url)
-        self.assertTemplateUsed(response, 'budgets/monthlybalancecategory_list.html')
+        template_name = 'budgets/monthlybalancecategory_list.html'
+        self.assertTemplateUsed(response, template_name)
 
 
 class MonthlyBalanceTest(BaseTest):
@@ -426,10 +428,10 @@ class MonthlyBalanceTest(BaseTest):
         url = f"{reverse('monthly_balances')}/{date_ym}?delete=1"
         response = second_response = self.client.get(url)
 
-        delete_form_html = 'form method="POST" action="/delete_monthly_balance/'
-        button_html = '<input type="submit" id="id_submit" value="Yes, DELETE">'
-        self.assertContains(response, delete_form_html)
-        self.assertContains(response, button_html)
+        form = 'form method="POST" action="/delete_monthly_balance/'
+        button = '<input type="submit" id="id_submit" value="Yes, DELETE">'
+        self.assertContains(response, form)
+        self.assertContains(response, button)
 
     # TODO: write me
     def test_delete_button_missing_without_param(self):
@@ -442,8 +444,8 @@ class MonthlyBalanceTest(BaseTest):
     # TODO: comment out as we can't compare functions with assertEquals().
     # Need some looking up
     # def test_uses_correct_view(self):
-    #     self.check_if_correct_view('monthly_balances', v.monthly_balances_page)
-    #     response = self.get_response_from_named_url('monthly_balances')
+    #   self.check_if_correct_view('monthly_balances', v.monthly_balances_page)
+    #   response = self.get_response_from_named_url('monthly_balances')
 
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('monthly_balances')

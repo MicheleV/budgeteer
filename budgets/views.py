@@ -30,165 +30,10 @@ from rest_framework.response import Response
 import budgets.forms as f
 import budgets.models as m
 from budgets.serializers import CategorySerializer
-
+import budgets.views_utils as utils
 # TODO: is this really needed? Check whether to do load_dotenv() inside urls.py
 # once is enough or not
 load_dotenv()
-
-
-# TODO: move these methods to an utility class
-def get_previous_month_first_day_date(date):
-    """
-    Return the first day of the previous month
-    """
-    return (date - relativedelta(months=1)).replace(day=1)
-
-
-def get_total_of_monthly_balances(date):
-    """
-    Return the sum of the monthly balances for the input date
-    """
-    rate = os.getenv("EXCHANGE_RATE")
-    balances = m.MonthlyBalance.objects.select_related('category').filter(date=date)
-    return balances.aggregate(correct_sum=Sum(Case(
-      When(category__is_foreign_currency=False, then='amount'),
-      When(category__is_foreign_currency=True, then=F('amount') * rate)
-    )))['correct_sum']
-
-
-def get_month_boundaries(date):
-    """
-    Return a tuple composed of the first and the last day
-    of month passed as parameter, as datetime objects
-
-    Note: set timezone when providing! Otherwise efault timezone will be UTC
-    If th server is actually in a different time zone, beware off-by-one
-    month errors when using this function
-    """
-    if not date:
-        start = datetime.date.today().replace(day=1)
-    else:
-        complete_date = f"{date}-01"
-        format_str = '%Y-%m-%d'
-        start = datetime.datetime.strptime(complete_date, format_str).date()
-
-    month_range = calendar.monthrange(start.year, start.month)
-    last_day_of_month = month_range[1]
-    end = datetime.date(start.year, start.month, last_day_of_month)
-    return (start, end)
-
-
-def current_month_boundaries():
-    """
-    Return a tuple composed of the first and the last day
-    of the current month, as datetime objects
-
-    Note: set timezone when providing! Otherwise efault timezone will be UTC
-    If th server is actually in a different time zone, beware off-by-one
-    month errors when using this function
-    """
-    start = datetime.date.today().replace(day=1)
-    month_range = calendar.monthrange(start.year, start.month)
-    last_day_of_month = month_range[1]
-    end = datetime.date(start.year, start.month, last_day_of_month)
-    return (start, end)
-
-
-def generate_monthly_balance_graph(data, goals):
-    """
-    Write syncronously the graph to a file
-    Return the graph representing whether a graph was generated or not
-    """
-    if len(data) > 1:
-        # Write graph to file
-        # NOTE: this is syncrous!
-        # NOTE: require static/images folder to exist, have privileges, etc
-        dates = []
-        amounts = []
-        for val in data:
-            dates.append(val['date'])
-            try:
-                amounts.append(val['actual_amount'])
-            except (AttributeError, NameError, KeyError) as e:
-                print("You've forgot to add actual_amount somewhere (bar)")
-                amounts.append(val['amount'])
-        return plot.generateGraph(dates, amounts, goals)
-
-    return False
-
-
-def generate_current_monthly_balance_pie_graph(data):
-    """
-    Return the graph and returns the data in base64
-    Return boolean representing whether a graph was generated or not
-    """
-    if len(data) > 1:
-        # Write graph to file
-        # NOTE: this is syncrous!
-        # NOTE: require static/images folder to exist, have privileges, etc
-        labels = []
-        values = []
-        for mb in filter(lambda y: y.amount > 0, data):
-            labels.append(mb.category.text)
-            # TODO: remove this once all places calling this function are
-            # passing monthly budgets with actual_ammount attribute
-            try:
-                values.append(mb.actual_amount)
-            except AttributeError as e:
-                print("You've forgot to add actual_amount somewhere (pie)")
-                values.append(mb.amount)
-
-        return plot.generatePieGraph(labels, values)
-    return False
-
-
-# Credits https://stackoverflow.com/a/58612038
-def findInList(List, item):
-    """
-    Return the index of item inside List, or -1 if not found
-    """
-    try:
-        return List.index(item)
-    except ValueError:
-        return -1
-
-
-def generate_current_month_expenses_pie_graph(data):
-    """
-    Return the graph and returns the data in base64
-    Return boolean representing whether a graph was generated or not
-    """
-    if len(data) > 1:
-        # Write graph to file
-        # NOTE: this is syncrous!
-        # NOTE: require static/images folder to exist, have privileges, etc
-        labels = []
-        values = []
-
-        # NOTE: this ugly block saves us one query... is it worth it?
-        for mb in filter(lambda y: y.amount > 0, data):
-            index = findInList(labels, mb.category.text)
-            if index == -1:
-                labels.append(mb.category.text)
-                values.append(mb.amount)
-            else:
-                values[index] = values[index] + mb.amount
-
-        return plot.generatePieGraph(labels, values)
-    return False
-
-
-def append_year_and_month_to_url(obj, named_url, delete=False):
-    """
-    Return an url with obj's date appended in YYYY-mm format
-    """
-    format_str = '%Y-%m'
-    date_ym = obj.date.strftime(format_str)
-    view_url = reverse(named_url)
-    redirect_url = f"{view_url}/{date_ym}"
-    if delete:
-        redirect_url = f"{redirect_url}?delete=1"
-    return redirect_url
 
 
 ###############################################################################
@@ -235,7 +80,7 @@ class ExpenseListView(ListView):
 
         # TODO: this cose is exactly the same as get_queryset(),memoized it
         if end is None:
-            (start, end) = get_month_boundaries(start)
+            (start, end) = utils.get_month_boundaries(start)
         else:
             format_str = '%Y-%m-%d'
             start = datetime.datetime.strptime(start, format_str).date()
@@ -246,7 +91,7 @@ class ExpenseListView(ListView):
         expenses = m.Expense.objects.filter(date__range=(start, end)) \
                     .order_by('-date', '-id')
         expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
-        pie_graph = generate_current_month_expenses_pie_graph(expenses)
+        pie_graph = utils.generate_current_month_expenses_pie_graph(expenses)
         context['pie_graph'] = pie_graph
         context['expenses_sum'] = expenses_sum
         return context
@@ -257,7 +102,7 @@ class ExpenseListView(ListView):
 
         # TODO: this cose is exactly the same as get_context_data(),memoized it
         if end is None:
-            (start, end) = get_month_boundaries(start)
+            (start, end) = utils.get_month_boundaries(start)
         else:
             format_str = '%Y-%m-%d'
             start = datetime.datetime.strptime(start, format_str).date()
@@ -293,8 +138,8 @@ class MonthlyBudgetListView(ListView):
         if yymm_date is None:
             monthly_budgets = m.MonthlyBudget.objects.all()
         else:
-            complete_date = f"{yymm_date}-01"
-            monthly_budgets = m.MonthlyBudget.objects.filter(date=complete_date)
+            full_date = f"{yymm_date}-01"
+            monthly_budgets = m.MonthlyBudget.objects.filter(date=full_date)
         return monthly_budgets
 
 
@@ -348,7 +193,7 @@ class IncomeView(ListView):
 
         # TODO: use the date parameter if present to filter
         if end is None:
-            (start, end) = get_month_boundaries(start)
+            (start, end) = utils.get_month_boundaries(start)
         else:
             format_str = '%Y-%m-%d'
             start = datetime.datetime.strptime(start, format_str).date()
@@ -403,7 +248,7 @@ class MonthlyBalancesView(ListView):
         # Display only not archived goals
         goals = m.Goal.objects.filter(is_archived=False)
         if len(mb) > 0:
-            bar_graph = generate_monthly_balance_graph(mb, goals)
+            bar_graph = utils.generate_monthly_balance_graph(mb, goals)
 
         total = mb.aggregate(Sum('amount'))['amount__sum']
         context['monthly_balance'] = mb
@@ -466,12 +311,12 @@ def home_page(request):
     Display the home page
     """
     currency = os.getenv("CURRENCY")
-    (start, end) = current_month_boundaries()
+    (start, end) = utils.current_month_boundaries()
     rate = os.getenv("EXCHANGE_RATE")
     # Get current and preivous month balances
-    current_balance = get_total_of_monthly_balances(start)
-    prev_month = get_previous_month_first_day_date(start)
-    starting_balance = get_total_of_monthly_balances(prev_month)
+    current_balance = utils.get_total_of_monthly_balances(start)
+    prev_month = utils.get_previous_month_first_day_date(start)
+    starting_balance = utils.get_total_of_monthly_balances(prev_month)
 
     # Fetch previous month data to comapre it with the current month's
     prev_mb = m.MonthlyBalance.objects.select_related('category'). \
@@ -501,7 +346,7 @@ def home_page(request):
       When(category__is_foreign_currency=True, then=F('amount') * rate)
     )))['correct_sum']
 
-    pie_graph = generate_current_monthly_balance_pie_graph(current_mb)
+    pie_graph = utils.generate_current_monthly_balance_pie_graph(current_mb)
 
     if current_mb_total is None:
         current_mb_total = 0
@@ -538,7 +383,7 @@ def home_page(request):
           When(category__is_foreign_currency=False, then='amount'),
           When(category__is_foreign_currency=True, then=F('amount') * rate)
         ))).order_by('date')
-    bar_graph = generate_monthly_balance_graph(mb, goals)
+    bar_graph = utils.generate_monthly_balance_graph(mb, goals)
 
     # Fetch expenses and related categories
     categories = m.Category.objects.all()
@@ -585,8 +430,8 @@ def delete_monthly_balance_page(request, id=None):
     mb = get_object_or_404(m.MonthlyBalance, pk=id)
     # Since we delete a monthly balance, the previous page was showing buttons
     show_delete = True
-    redirect_url = append_year_and_month_to_url(mb, 'monthly_balances',
-                                                show_delete)
+    url = 'monthly_balances'
+    redirect_url = utils.append_year_and_month_to_url(mb, url, show_delete)
     mb.delete()
     return redirect(redirect_url)
 
@@ -603,8 +448,8 @@ def monthly_balances_edit_page(request, id=None):
                 form.full_clean()
                 form.save()
 
-                redirect_url = append_year_and_month_to_url(mb,
-                                                            'monthly_balances')
+                url = 'monthly_balances'
+                redirect_url = utils.append_year_and_month_to_url(mb, url)
                 return redirect(redirect_url)
             else:
                 errors = form.errors

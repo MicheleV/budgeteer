@@ -193,6 +193,7 @@ class IncomeView(ListView):
         end = yymm_date = self.kwargs.get('end', None)
 
         # TODO: use the date parameter if present to filter
+        #       (add url to grab start and end)
         if end is None:
             (start, end) = utils.get_month_boundaries(start)
         else:

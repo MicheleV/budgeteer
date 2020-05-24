@@ -5,17 +5,22 @@ import os
 
 from dotenv import load_dotenv
 from matplotlib import use as mpl_use
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 import matplotlib.cm as cmx
 from matplotlib.cm import get_cmap
 from matplotlib.dates import DayLocator
 from matplotlib.dates import HourLocator
 from matplotlib.dates import DateFormatter
 from matplotlib.dates import drange
+from matplotlib.figure import Figure
 import matplotlib.patches as mpatches
+from matplotlib.patches import Circle
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import xticks
 import numpy as np
 import pandas as pd
+
+from graphs.themes import _tab20c_data
 
 # Read env variables from .env file
 load_dotenv()
@@ -24,22 +29,28 @@ load_dotenv()
 # Credits: https://stackoverflow.com/a/51178529
 mpl_use('Agg')
 
+# Address https://github.com/pandas-dev/pandas/issues/18301
+pd.plotting.register_matplotlib_converters()
 
-def generatePie(labels, values):
+
+# Source: https://matplotlib.org/3.1.1/faq/howto_faq.html#how-to-use-matplotlib-in-a-web-application-server
+def generatePieGraph(labels, values):
     """
-    Prepare the data for the pie graph
+    Create the pie graph data
+    Returns the data in base64
+    Return False in case of failure
     """
-    fig1, ax1 = plt.subplots()
+    fig = Figure(dpi=310)
+    canvas = FigureCanvasAgg(fig)
 
     # Credits: https://stackoverflow.com/a/46693008/2535658
     def hide_less_2_perc_pies_labels(pct):
         return ('%1.1f%%' % pct) if pct > 2 else ''
 
-    # Add theme
-    # Credits: https://www.pythonprogramming.in/how-to-pie-chart-with-different-color-themes-in-matplotlib.html
-    theme = plt.get_cmap('tab20c')
-    ax1.set_prop_cycle("color", [theme(1. * i / len(values))
-                             for i in range(len(values))])
+    ax1 = fig.add_subplot(111)
+    theme = _tab20c_data
+
+    ax1.set_prop_cycle("color", _tab20c_data)
 
     explode = tuple([0.05] * len(values))
     # explode = (0.05,0.05,0.05,0.05)
@@ -50,18 +61,24 @@ def generatePie(labels, values):
     # Set aspect ratio to be equal so that pie is drawn as a circle.
     ax1.axis('equal')
 
-    centre_circle = plt.Circle((0, 0), 0.80, fc='white')
-    fig = plt.gcf()
-    fig.gca().add_artist(centre_circle)
+    circle = Circle((0, 0), 0.80, facecolor='white')
+    ax1.add_artist(circle)
 
     # Legend
-    plt.legend(patches, labels, loc="best", facecolor="white", framealpha=0.3)
-    plt.tight_layout()
+    ax1.legend(patches, labels, loc="best", facecolor="white", framealpha=0.3)
+    fig.tight_layout()
+
+    buf = BytesIO()
+    fig.savefig(buf, format="png", bbox_inches="tight", dpi=230)
+    # Embed the result in the html output.
+    return base64.b64encode(buf.getbuffer()).decode("ascii")
 
 
-def prepareGraphData(x, y, goals=None):
+def generateGraph(x, y, goals):
     """
-    Prepare the data for the bar graph
+    Create the bar graph data
+    Returns the data in base64
+    Return False in case of failure
     """
     currency = os.getenv("CURRENCY")
     # The blue color used in the examples on matplot docs
@@ -100,28 +117,6 @@ def prepareGraphData(x, y, goals=None):
             legend_items.append(red_patch)
         plt.legend(handles=legend_items, loc="center left")
 
-
-# Source: https://matplotlib.org/3.1.1/faq/howto_faq.html#how-to-use-matplotlib-in-a-web-application-server
-def generatePieGraph(labels, values):
-    """
-    Create the pie graph data
-    Returns the data in base64
-    Return False in case of failure
-    """
-    generatePie(labels, values)
-    buf = BytesIO()
-    plt.savefig(buf, format="png", bbox_inches="tight", dpi=230)
-    # Embed the result in the html output.
-    return base64.b64encode(buf.getbuffer()).decode("ascii")
-
-
-def generateGraph(x, y, goals):
-    """
-    Create the bar graph data
-    Returns the data in base64
-    Return False in case of failure
-    """
-    prepareGraphData(x, y, goals)
     buf = BytesIO()
     plt.savefig(buf, format="png", bbox_inches="tight", dpi=230)
     # Embed the result in the html output.

@@ -20,8 +20,9 @@ from django.urls import reverse_lazy
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
-from django.views.generic import ListView
 from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic import UpdateView
 from dotenv import load_dotenv
 from graphs import plot
 from rest_framework.decorators import api_view
@@ -285,6 +286,15 @@ class MonthlyBalancesSingleMonthView(ListView):
         return context
 
 
+# This class is reusing the same template as MonthlyBalancesCreateView
+class MonthlyBalanceUpdateView(UpdateView):
+    model = m.MonthlyBalance
+    form_class = f.MonthlyBalanceForm
+
+    def get_success_url(self):
+        return reverse('monthly_balances')
+
+
 class MonthlyBalanceDeleteView(DeleteView):
     model = m.MonthlyBalance
 
@@ -424,34 +434,4 @@ def home_page(request):
         'two_months_diff': two_months_diff,
         'two_months_diff_perc': two_months_diff_perc,
         'goals': goals,
-    })
-
-
-@require_http_methods(["GET", "POST"])
-def monthly_balances_edit_page(request, id=None):
-    errors = None
-    mb = get_object_or_404(m.MonthlyBalance, pk=id)
-
-    if request.method == 'POST':
-        try:
-            form = f.MonthlyBalanceForm(data=request.POST, instance=mb)
-            if form.is_valid():
-                form.full_clean()
-                form.save()
-
-                url = 'monthly_balances'
-                redirect_url = utils.append_year_and_month_to_url(mb, url)
-                return redirect(redirect_url)
-            else:
-                errors = form.errors
-        except ValidationError:
-            errors = form.errors
-    else:
-        form = f.MonthlyBalanceForm(instance=mb)
-        print(type(form.errors))
-
-    return render(request, 'edit_monthly_balances.html', {
-      'id': id,
-      'form': form,
-      'errors': errors
     })

@@ -12,6 +12,7 @@ from django.db.models import Sum
 from django.db.models import F
 from django.db.models import Case
 from django.db.models import When
+from django.forms import formset_factory
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -320,6 +321,24 @@ def api_categories(request):
 ###############################################################################
 # Function based classes
 ###############################################################################
+
+
+@require_http_methods(["GET", "POST"])
+def multiple_new_product(request):
+    MBFormSet = formset_factory(form=f.MonthlyBalanceForm, extra=2, max_num=3)
+
+    if request.method == 'POST':
+        formset = MBFormSet(data=request.POST)
+        if formset.is_valid():
+            for form in formset:
+                form.save()
+            return redirect('monthly_balances')
+    else:
+        formset = MBFormSet()
+
+    return render(request, 'budgets/multiple_monthly_budget_form.html', {'formset': formset})
+
+
 
 
 @require_http_methods(["GET"])

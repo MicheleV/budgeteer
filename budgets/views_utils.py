@@ -44,7 +44,7 @@ def get_total_of_monthly_balances(date):
     )))['correct_sum']
 
 
-def get_month_boundaries(date):
+def get_month_boundaries(date=None):
     """
     Return a tuple composed of the first and the last day
     of month passed as parameter, as datetime objects

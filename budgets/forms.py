@@ -144,7 +144,10 @@ class MonthlyBalanceForm(forms.models.ModelForm):
             'date': forms.fields.TextInput(attrs={
                 'placeholder': '%Y-%m-%d format',
             }),
-            'category': forms.fields.Select,
+            # TODO: write a test case to check for autocomplete to be there
+            # Workaround for Firefox
+            # https://stackoverflow.com/questions/4831848/firefox-ignores-option-selected-selected
+            'category': forms.fields.Select(attrs={'autocomplete': 'off'}),
         }
 
 

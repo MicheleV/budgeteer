@@ -324,8 +324,11 @@ def api_categories(request):
 
 
 @require_http_methods(["GET", "POST"])
-def multiple_new_product(request):
-    MBFormSet = formset_factory(form=f.MonthlyBalanceForm, extra=2, max_num=3)
+def multiple_new_mohtly_balance(request):
+    categories = m.MonthlyBalanceCategory.objects.filter()
+    cats = categories.count()
+    MBFormSet = formset_factory(form=f.MonthlyBalanceForm, extra=cats,
+                                max_num=cats)
 
     if request.method == 'POST':
         formset = MBFormSet(data=request.POST)
@@ -334,11 +337,21 @@ def multiple_new_product(request):
                 form.save()
             return redirect('monthly_balances')
     else:
-        formset = MBFormSet()
+        intial_data = []
+        date = utils.get_month_boundaries()[1]
+        print(utils.get_month_boundaries())
+        for c in categories:
+            intial_data.append({'date':'2020-06-01', 'category': c.id})
+        formset = MBFormSet(initial=intial_data)
 
-    return render(request, 'budgets/multiple_monthly_budget_form.html', {'formset': formset})
+    return render(request, 'budgets/multiple_monthly_budget_form.html',
+                  {'formset': formset})
 
 
+# TODO: write me
+@require_http_methods(["GET", "POST"])
+def edit_new_monthly_balance(request):
+    pass
 
 
 @require_http_methods(["GET"])

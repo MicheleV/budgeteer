@@ -74,7 +74,7 @@ def generatePieGraph(labels, values):
     return base64.b64encode(buf.getbuffer()).decode("ascii")
 
 
-def generateGraph(x, y, goals):
+def generateBarGraph(x, y, goals):
     """
     Create the bar graph data
     Returns the data in base64

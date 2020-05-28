@@ -82,15 +82,11 @@ def current_month_boundaries():
     return (start, end)
 
 
-def generate_monthly_balance_graph(data, goals):
+def generate_monthly_balance_bar_graph(data, goals):
     """
-    Write syncronously the graph to a file
-    Return the graph representing whether a graph was generated or not
+    Return a base64 string making up the graph or false
     """
     if len(data) > 1:
-        # Write graph to file
-        # NOTE: this is syncrous!
-        # NOTE: require static/images folder to exist, have privileges, etc
         dates = []
         amounts = []
         for val in data:
@@ -100,15 +96,14 @@ def generate_monthly_balance_graph(data, goals):
             except (AttributeError, NameError, KeyError) as e:
                 print("You've forgot to add actual_amount somewhere (bar)")
                 amounts.append(val['amount'])
-        return plot.generateGraph(dates, amounts, goals)
+        return plot.generateBarGraph(dates, amounts, goals)
 
     return False
 
 
 def generate_current_monthly_balance_pie_graph(data):
     """
-    Return the graph and returns the data in base64
-    Return boolean representing whether a graph was generated or not
+    Return a base64 string making up the graph or false
     """
     if len(data) > 1:
         labels = []

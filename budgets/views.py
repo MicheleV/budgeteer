@@ -251,7 +251,7 @@ class MonthlyBalancesView(ListView):
         # Display only not archived goals
         goals = m.Goal.objects.filter(is_archived=False)
         if len(mb) > 0:
-            bar_graph = utils.generate_monthly_balance_graph(mb, goals)
+            bar_graph = utils.generate_monthly_bar_balance_graph(mb, goals)
 
         total = mb.aggregate(Sum('amount'))['amount__sum']
         context['monthly_balance'] = mb
@@ -432,7 +432,7 @@ def home_page(request):
           When(category__is_foreign_currency=False, then='amount'),
           When(category__is_foreign_currency=True, then=F('amount') * rate)
         ))).order_by('date')
-    bar_graph = utils.generate_monthly_balance_graph(mb, goals)
+    bar_graph = utils.generate_monthly_balance_bar_graph(mb, goals)
 
     # Fetch expenses and related categories
     categories = m.Category.objects.all()

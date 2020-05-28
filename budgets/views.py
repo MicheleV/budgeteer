@@ -12,6 +12,7 @@ from django.db.models import Sum
 from django.db.models import F
 from django.db.models import Case
 from django.db.models import When
+from django.forms import formset_factory
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -193,6 +194,7 @@ class IncomeView(ListView):
         end = yymm_date = self.kwargs.get('end', None)
 
         # TODO: use the date parameter if present to filter
+        #       (add url to grab start and end)
         if end is None:
             (start, end) = utils.get_month_boundaries(start)
         else:
@@ -319,6 +321,37 @@ def api_categories(request):
 ###############################################################################
 # Function based classes
 ###############################################################################
+
+
+@require_http_methods(["GET", "POST"])
+def multiple_new_mohtly_balance(request):
+    categories = m.MonthlyBalanceCategory.objects.filter()
+    cats = categories.count()
+    MBFormSet = formset_factory(form=f.MonthlyBalanceForm, extra=cats,
+                                max_num=cats)
+
+    if request.method == 'POST':
+        formset = MBFormSet(data=request.POST)
+        if formset.is_valid():
+            for form in formset:
+                form.save()
+            return redirect('monthly_balances')
+    else:
+        intial_data = []
+        date = utils.get_month_boundaries()[1]
+        print(utils.get_month_boundaries())
+        for c in categories:
+            intial_data.append({'date':'2020-06-01', 'category': c.id})
+        formset = MBFormSet(initial=intial_data)
+
+    return render(request, 'budgets/multiple_monthly_budget_form.html',
+                  {'formset': formset})
+
+
+# TODO: write me
+@require_http_methods(["GET", "POST"])
+def edit_new_monthly_balance(request):
+    pass
 
 
 @require_http_methods(["GET"])

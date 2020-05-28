@@ -44,7 +44,7 @@ def get_total_of_monthly_balances(date):
     )))['correct_sum']
 
 
-def get_month_boundaries(date):
+def get_month_boundaries(date=None):
     """
     Return a tuple composed of the first and the last day
     of month passed as parameter, as datetime objects
@@ -111,9 +111,6 @@ def generate_current_monthly_balance_pie_graph(data):
     Return boolean representing whether a graph was generated or not
     """
     if len(data) > 1:
-        # Write graph to file
-        # NOTE: this is syncrous!
-        # NOTE: require static/images folder to exist, have privileges, etc
         labels = []
         values = []
         for mb in filter(lambda y: y.amount > 0, data):
@@ -125,7 +122,6 @@ def generate_current_monthly_balance_pie_graph(data):
             except AttributeError as e:
                 print("You've forgot to add actual_amount somewhere (pie)")
                 values.append(mb.amount)
-
         return plot.generatePieGraph(labels, values)
     return False
 
@@ -147,9 +143,6 @@ def generate_current_month_expenses_pie_graph(data):
     Return boolean representing whether a graph was generated or not
     """
     if len(data) > 1:
-        # Write graph to file
-        # NOTE: this is syncrous!
-        # NOTE: require static/images folder to exist, have privileges, etc
         labels = []
         values = []
 

@@ -21,7 +21,6 @@ class Category(models.Model):
 class Expense(models.Model):
 
     def __str__(self):
-        # Shortening params to fit into 79 chars (PEP8)
         id = self.category.id
         amount = self.amount
         note = self.note

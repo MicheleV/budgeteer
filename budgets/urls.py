@@ -33,6 +33,10 @@ urlpatterns = [
          name='goals_detail'),
 
     # Monthly balance categories
+    path('monthly_balance_categories/create',
+         views.MonthlyBalanceCategoryCreateView.as_view(),
+         name='new_monthly_balance_category'),
+
     path('monthly_balance_categories',
          views.MonthlyBalanceCategoryView.as_view(),
          name='monthly_balance_categories'),
@@ -41,13 +45,13 @@ urlpatterns = [
          views.MonthlyBalanceCategoryDetailView.as_view(),
          name='monthly_balance_categories_details'),
 
-    path('monthly_balance_categories/create',
-         views.MonthlyBalanceCategoryCreateView.as_view(),
-         name='new_monthly_balance_category'),
-
     # Monthly balances
     path('monthly_balances/create', views.MonthlyBalancesCreateView.as_view(),
          name='monthly_balances_create'),
+
+    path('monthly_balances/multiple_create', views.multiple_new_mohtly_balance,
+         name='monthly_balances_multiple_create'),
+
 
     path('monthly_balances', views.MonthlyBalancesView.as_view(),
          name='monthly_balances'),

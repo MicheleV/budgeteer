@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+ 
+{% block content %}
+  <h1>Multiple new monthly balances</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ formset.as_p }}
+    <input type="submit" value="Create all monthly balances">
+    <a href="{% url 'monthly_balances' %}">cancel</a>
+  </form>
+{% endblock %}

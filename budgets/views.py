@@ -68,6 +68,7 @@ class ExpenseCreateView(CreateView):
         return reverse('expenses')
 
 
+# FIXME: Aggregate manually as Django ORM is issuing LOTS of duplicated queries
 class ExpenseListView(ListView):
     model = m.Expense
 
@@ -138,11 +139,13 @@ class MonthlyBudgetListView(ListView):
     def get_queryset(self):
         yymm_date = self.kwargs.get('date', None)
         if yymm_date is None:
-            monthly_budgets = m.MonthlyBudget.objects.all()
+            mb = m.MonthlyBudget.objects. \
+                              select_related('category').all()
         else:
             full_date = f"{yymm_date}-01"
-            monthly_budgets = m.MonthlyBudget.objects.filter(date=full_date)
-        return monthly_budgets
+            mb = m.MonthlyBudget.objects.select_related('category'). \
+                filter(date=full_date)
+        return mb
 
 
 class MonthlyBudgetDetailView(DetailView):
@@ -229,6 +232,8 @@ class MonthlyBalancesCreateView(CreateView):
 
 
 class MonthlyBalancesView(ListView):
+    # TODO: find out if we can avoid using a model inside ListView
+    # inside get_context_data(), we're re-issuing the same query!
     model = m.MonthlyBalance
 
     def get_context_data(self, **kwargs):
@@ -237,7 +242,7 @@ class MonthlyBalancesView(ListView):
         # Toggle delete buttons
         show_delete = self.request.GET.get('delete', False) == '1'
 
-        rate = os.getenv("EXCHANGE_RATE")
+        rate = int(os.getenv("EXCHANGE_RATE"))
         total = None
         bar_graph = False
 
@@ -251,7 +256,7 @@ class MonthlyBalancesView(ListView):
         # Display only not archived goals
         goals = m.Goal.objects.filter(is_archived=False)
         if len(mb) > 0:
-            bar_graph = utils.generate_monthly_bar_balance_graph(mb, goals)
+            bar_graph = utils.generate_monthly_balance_bar_graph(mb, goals)
 
         total = mb.aggregate(Sum('amount'))['amount__sum']
         context['monthly_balance'] = mb
@@ -264,6 +269,7 @@ class MonthlyBalancesView(ListView):
 # Show monhtly balances for a given month
 class MonthlyBalancesSingleMonthView(ListView):
     model = m.MonthlyBalance
+
     template_name = 'budgets/monthlybalance_singlemonth_list.html'
 
     def get_context_data(self, **kwargs):
@@ -272,19 +278,25 @@ class MonthlyBalancesSingleMonthView(ListView):
         show_delete = self.request.GET.get('delete', False) == '1'
         date = self.kwargs.get('date', None)
         complete_date = f"{date}-01"
-        rate = os.getenv("EXCHANGE_RATE")
+        rate = int(os.getenv("EXCHANGE_RATE"))
+        currency = os.getenv("CURRENCY")
 
-        # Do NOT converto to local currency in here
         mb = m.MonthlyBalance.objects.select_related('category'). \
             filter(date=complete_date).order_by('date')
 
-        # FIX ME: this total should factor in is_foreign and multiply
-        # by currency_rate!
-        total = mb.aggregate(Sum('amount'))['amount__sum']
+        # NOTE: not using Django's ORM annotate to avoid issuing a second query
+        total = 0
+        for a in mb:
+            if a.category.is_foreign_currency:
+                a.real_amount = a.amount * rate
+            else:
+                a.real_amount = a.amount
+            total += a.real_amount
 
-        context['monthly_balance'] = mb
+        context['monthly_balances'] = mb
         context['total'] = total
         context['show_delete'] = show_delete
+        context['currency'] = currency
         return context
 
 
@@ -360,72 +372,26 @@ def home_page(request):
     Display the home page
     """
     currency = os.getenv("CURRENCY")
+    rate = int(os.getenv("EXCHANGE_RATE"))
     (start, end) = utils.current_month_boundaries()
-    rate = os.getenv("EXCHANGE_RATE")
+
     # Get current and preivous month balances
     current_balance = utils.get_total_of_monthly_balances(start)
     prev_month = utils.get_previous_month_first_day_date(start)
     starting_balance = utils.get_total_of_monthly_balances(prev_month)
 
-    # Fetch previous month data to comapre it with the current month's
-    prev_mb = m.MonthlyBalance.objects.select_related('category'). \
-        annotate(actual_amount=Case(
-          # The annotation 'amount' conflicts with a field on the model.
-          When(category__is_foreign_currency=False, then='amount'),
-          When(category__is_foreign_currency=True, then=F('amount') * rate)
-        )).filter(date=prev_month).order_by('category_id')
-
-    prev_mb_total = prev_mb.aggregate(correct_sum=Sum(Case(
-      When(category__is_foreign_currency=False, then='amount'),
-      When(category__is_foreign_currency=True, then=F('amount') * rate)
-    )))['correct_sum']
+    # Fetch previous month data to compare it with the current month's
+    prev_mb, prev_mb_total = utils.get_month_balance_stats(prev_month, rate)
+    current_mb, current_mb_total = utils.get_month_balance_stats(start, rate)
 
     # Display pie graph
-    # TODO: we could turn "actual_amount" into amount if we find how to
-    #       overwrite/shadow the amount field
-    current_mb = m.MonthlyBalance.objects.select_related('category'). \
-        annotate(actual_amount=Case(
-          # The annotation 'amount' conflicts with a field on the model.
-          When(category__is_foreign_currency=False, then='amount'),
-          When(category__is_foreign_currency=True, then=F('amount') * rate)
-        )).filter(date=start).order_by('category_id')
-
-    current_mb_total = current_mb.aggregate(correct_sum=Sum(Case(
-      When(category__is_foreign_currency=False, then='amount'),
-      When(category__is_foreign_currency=True, then=F('amount') * rate)
-    )))['correct_sum']
-
     pie_graph = utils.generate_current_monthly_balance_pie_graph(current_mb)
 
-    if current_mb_total is None:
-        current_mb_total = 0
-        two_months_diff = 0
-        two_months_diff_perc = 0
-    elif prev_mb_total is None:
-        two_months_diff = current_mb_total
-        two_months_diff_perc = None
-    else:
-        two_months_diff = current_mb_total - prev_mb_total
-        two_months_diff_perc = (current_mb_total / prev_mb_total * 100) - 100
-        # Truncate to two decimals
-        two_months_diff_perc = '%.2f' % (two_months_diff_perc)
+    # TODO: rename variables (make them shorter: sum_curr, sum_prev)
+    current_mb_total, two_months_diff, two_months_diff_perc = utils.calculate_increase_perc(current_mb_total, prev_mb_total)
 
     # Display bar graph (only draw "active" goals)
-    goals = m.Goal.objects.filter(is_archived=False)
-    # Calculate time to complete each goal given the last two months difference
-    for goal in goals:
-        if current_mb_total >= goal.amount:
-            goal.months_to_go = 0
-        elif two_months_diff < 0:
-            # Handle case where the balance has decreased
-            goal.months_to_go = None
-        else:
-            diff = goal.amount - current_mb_total
-            try:
-                months_to_go = diff / two_months_diff
-            except ZeroDivisionError:
-                months_to_go = 0
-            goal.months_to_go = math.ceil(months_to_go)
+    goals = utils.get_goals_and_time_to_completions(current_mb_total, two_months_diff)
 
     mb = m.MonthlyBalance.objects.select_related('category').values('date'). \
         annotate(actual_amount=Sum(Case(
@@ -444,12 +410,7 @@ def home_page(request):
         cat.mb = cat.monthlybudget_set.filter(date=start).first()
 
     # Fetch income and related categories
-    income_categories = m.IncomeCategory.objects.all()
-    for inc_c in income_categories:
-        income = m.Income.objects.filter(category_id=inc_c.id). \
-            filter(date__range=(start, end))
-        income_sum = income.aggregate(Sum('amount'))['amount__sum']
-        inc_c.total = income_sum
+    income_categories = utils.get_incomes_grouped_by_month(start, end)
 
     return render(request, 'home.html', {
         'categories': categories,

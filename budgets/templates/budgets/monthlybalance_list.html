@@ -34,7 +34,7 @@
               <th>Amount</th>
               <th>Month details</th>
             </tr>
-            {% for monthly_balance in monthly_balance reversed %}
+            {% for monthly_balance in monthly_balances reversed %}
               <tr>
               <td>{{ monthly_balance.date | date:'Y-m' }}</td>
               <td>{{ monthly_balance.amount | intcomma }}</td>

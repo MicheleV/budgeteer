@@ -35,12 +35,22 @@
                 <th><b>Delete</b></th>
               {% endif %}
             </tr>
-            {% for monthly_balance in monthly_balance reversed %}
+            {% for monthly_balance in monthly_balances reversed %}
               <tr>
                 <td>{{ monthly_balance.date | date:'Y-m' }}</td>
-                <td>{{ monthly_balance.amount | intcomma }}</td>
+                <td>{{ monthly_balance.amount | intcomma }}
+                    {% if monthly_balance.category.is_foreign_currency %}
+                    ({{ monthly_balance.real_amount | intcomma }} {{currency}})
+                    {% endif %}
+                </td>
                 <td>{{ monthly_balance.category.text }}</td>
-                <td>{{ monthly_balance.category.is_foreign_currency }}</td>
+                <td>
+                {% if monthly_balance.category.is_foreign_currency %}
+                <b>{{ monthly_balance.category.is_foreign_currency }}</b>
+                {% else %}
+                {{ monthly_balance.category.is_foreign_currency }}
+                {% endif %}
+                </td>
                 <td>
                   <a href={% url 'edit_monthly_balance' monthly_balance.id %}>Edit</a>
                 </td>

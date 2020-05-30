@@ -4,6 +4,7 @@
 import calendar
 import datetime
 from dateutil.relativedelta import relativedelta
+import math
 import os
 
 from django.core.exceptions import ValidationError
@@ -36,7 +37,7 @@ def get_total_of_monthly_balances(date):
     """
     Return the sum of the monthly balances for the input date
     """
-    rate = os.getenv("EXCHANGE_RATE")
+    rate = int(os.getenv("EXCHANGE_RATE"))
     balances = m.MonthlyBalance.objects.select_related('category').filter(date=date)
     return balances.aggregate(correct_sum=Sum(Case(
       When(category__is_foreign_currency=False, then='amount'),
@@ -165,3 +166,78 @@ def append_year_and_month_to_url(obj, named_url, delete=False):
     if delete:
         redirect_url = f"{redirect_url}?delete=1"
     return redirect_url
+
+
+def get_goals_and_time_to_completions(current_mb_total, two_months_diff):
+    """
+    Returns non archived goals with how many months will it take to complete
+    """
+    # Display bar graph (only draw "active" goals)
+    goals = m.Goal.objects.filter(is_archived=False)
+    # Calculate time to complete each goal given the last two months difference
+    for goal in goals:
+        if current_mb_total >= goal.amount:
+            goal.months_to_go = 0
+        elif two_months_diff < 0:
+            # Handle case where the balance has decreased
+            goal.months_to_go = None
+        else:
+            diff = goal.amount - current_mb_total
+            try:
+                months_to_go = diff / two_months_diff
+            except ZeroDivisionError:
+                months_to_go = 0
+            goal.months_to_go = math.ceil(months_to_go)
+    return goals
+
+
+def get_incomes_grouped_by_month(start, end):
+    """
+    Fetch income and related categories for a given period
+    """
+    income_categories = m.IncomeCategory.objects.all()
+    for inc_c in income_categories:
+        income = m.Income.objects.filter(category_id=inc_c.id). \
+            filter(date__range=(start, end))
+        income_sum = income.aggregate(Sum('amount'))['amount__sum']
+        inc_c.total = income_sum
+    return income_categories
+
+
+def get_month_balance_stats(date, rate):
+    """
+    Return monthly balances and their sum (adjusted to local currency)
+    """
+    prev_mb = m.MonthlyBalance.objects.select_related('category'). \
+        annotate(actual_amount=Case(
+          # TODO: we could turn "actual_amount" into amount if we find how to
+          # overwrite/shadow the amount field
+          When(category__is_foreign_currency=False, then='amount'),
+          When(category__is_foreign_currency=True, then=F('amount') * rate)
+        )).filter(date=date).order_by('category_id')
+
+    prev_mb_total = prev_mb.aggregate(correct_sum=Sum(Case(
+      When(category__is_foreign_currency=False, then='amount'),
+      When(category__is_foreign_currency=True, then=F('amount') * rate)
+    )))['correct_sum']
+
+    return prev_mb, prev_mb_total
+
+
+def calculate_increase_perc(current_mb_total, prev_mb_total):
+    """
+    TODO write me
+    """
+    if current_mb_total is None:
+        current_mb_total = 0
+        two_months_diff = 0
+        two_months_diff_perc = 0
+    elif prev_mb_total is None:
+        two_months_diff = current_mb_total
+        two_months_diff_perc = None
+    else:
+        two_months_diff = current_mb_total - prev_mb_total
+        two_months_diff_perc = (current_mb_total / prev_mb_total * 100) - 100
+        # Truncate to two decimals
+        two_months_diff_perc = '%.2f' % (two_months_diff_perc)
+    return current_mb_total, two_months_diff, two_months_diff_perc

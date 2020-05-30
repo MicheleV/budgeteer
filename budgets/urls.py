@@ -3,9 +3,9 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.urls import path
 from django.urls import re_path
-
+import debug_toolbar
 from budgets import views
-
+from django.urls import include, path
 urlpatterns = [
     # Class based routes #
     path('categories', views.CategoryListView.as_view(), name='categories'),
@@ -95,7 +95,7 @@ urlpatterns = [
 
     # API #
     path('api/categories', views.api_categories, name='api'),
-
+    path('__debug__/', include(debug_toolbar.urls)),
     # Function based routes #
     path('', views.home_page, name='home'),
 ]

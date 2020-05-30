@@ -23,26 +23,6 @@ DEFAULT_RENDERER_CLASSES = (
     'rest_framework.renderers.JSONRenderer',
 )
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
-if 'y' in os.getenv("DJANGO_DEBUG_MODE"):
-    DEBUG = True
-    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + (
-        'rest_framework.renderers.BrowsableAPIRenderer',
-    )
-else:
-    DEBUG = False
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-ALLOWED_HOSTS = [os.getenv("SITENAME")]
-
-
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    ),
-    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
-}
-
 # Application definition
 INSTALLED_APPS = [
     # 'django.contrib.admin',
@@ -53,7 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'budgets',
-    'rest_framework'
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +45,53 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
+if 'y' in os.getenv("DJANGO_DEBUG_MODE"):
+    DEBUG = True
+
+    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + (
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    )
+
+    INSTALLED_APPS.append('debug_toolbar')
+    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+
+    # IPS able to see debug tools inside views
+    INTERNAL_IPS = [
+        '127.0.0.1',
+    ]
+
+    DEBUG_TOOLBAR_PANELS = [
+      'debug_toolbar.panels.versions.VersionsPanel',
+      'debug_toolbar.panels.timer.TimerPanel',
+      'debug_toolbar.panels.settings.SettingsPanel',
+      'debug_toolbar.panels.headers.HeadersPanel',
+      'debug_toolbar.panels.request.RequestPanel',
+      'debug_toolbar.panels.sql.SQLPanel',
+      'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+      'debug_toolbar.panels.templates.TemplatesPanel',
+      'debug_toolbar.panels.cache.CachePanel',
+      'debug_toolbar.panels.signals.SignalsPanel',
+      'debug_toolbar.panels.logging.LoggingPanel',
+      'debug_toolbar.panels.redirects.RedirectsPanel',
+      'debug_toolbar.panels.profiling.ProfilingPanel',
+    ]
+    RENDER_PANELS = True
+else:
+    DEBUG = False
+
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+ALLOWED_HOSTS = [os.getenv("SITENAME")]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ),
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
+}
 
 ROOT_URLCONF = 'budgeteer.urls'
 
@@ -89,7 +116,6 @@ WSGI_APPLICATION = 'budgeteer.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -100,10 +126,9 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+      'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',

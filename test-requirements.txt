@@ -4,13 +4,15 @@ cffi==1.12.3
 coverage==5.0.1
 cryptography==2.7
 cycler==0.10.0
-django==2.2.10
+Django==2.2.10
+django-debug-toolbar==2.2
 djangorestframework==3.11.0
 gunicorn==19.9.0
 Jinja2==2.10.3
 kiwisolver==1.1.0
 MarkupSafe==1.1.1
 matplotlib==3.1.2
+netifaces==0.10.9
 numpy==1.18.0
 pandas==0.25.3
 pycparser==2.19

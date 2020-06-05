@@ -15,15 +15,10 @@ from django.db.models import When
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
-from dotenv import load_dotenv
 from graphs import plot
 
 import budgets.forms as f
 import budgets.models as m
-
-# TODO: is this really needed? Check whether to do load_dotenv() inside urls.py
-# once is enough or not
-load_dotenv()
 
 
 def get_previous_month_first_day_date(date):

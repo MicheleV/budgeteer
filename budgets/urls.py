@@ -21,7 +21,8 @@ urlpatterns = [
     re_path(r'expenses/(?P<start>(19|20)[0-9]{2}-(0[1-9]|1[012]))$',
             views.ExpenseListView.as_view(), name='expenses'),
     # Show expensece between YYYY-mm-dd and YYYY-mm-dd (extremes included)
-    re_path(r'expenses/(?P<start>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))/(?P<end>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))$',
+    re_path(r'expenses/(?P<start>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))'
+            '/(?P<end>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))$',
             views.ExpenseListView.as_view(), name='expenses_filtered'),
     path('expenses/delete/<int:pk>', views.ExpenseDeleteView.as_view(),
          name='expenses_delete'),

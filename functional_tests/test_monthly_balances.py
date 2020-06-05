@@ -41,3 +41,8 @@ def test_specific_month_data_shows_total(self):
 # TODO:write me
 def test_check_whether_image_contains_correct_currency(self):
     pass
+
+
+# TODO:write me
+def test_check_both_graph_and_right_side_table_are_shown(self):
+    pass

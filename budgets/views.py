@@ -18,13 +18,13 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.urls import reverse_lazy
+from django.utils.functional import cached_property
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
-from dotenv import load_dotenv
 from graphs import plot
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -33,9 +33,6 @@ import budgets.forms as f
 import budgets.models as m
 from budgets.serializers import CategorySerializer
 import budgets.views_utils as utils
-# TODO: is this really needed? Check whether to do load_dotenv() inside urls.py
-# once is enough or not
-load_dotenv()
 
 
 ###############################################################################
@@ -68,27 +65,54 @@ class ExpenseCreateView(CreateView):
         return reverse('expenses')
 
 
+# class ProfileContextMixin(generic_base.ContextMixin, generic_view.View):
+#     @cached_property
+#     def profile(self):
+#         return get_object_or_404(Profile, user__username=self.request.user)
+
+#     def get_context_data(self, **kwargs):
+#         context = super(ProfileContextMixin, self).get_context_data(**kwargs)
+#         context['profile'] = self.profile
+#         return context
+
+
 # FIXME: Aggregate manually as Django ORM is issuing LOTS of duplicated queries
+# class ExpenseListView(ProfileContextMixin):
 class ExpenseListView(ListView):
     model = m.Expense
+
+    # Try this instead https://stackoverflow.com/a/37959458/2535658
+    @cached_property
+    def profile(self):
+        pass
+        # expenses = m.Expense.objects.filter(date__range=(start, end)) \
+        # .order_by('-date', '-id')
+        # Do this manually to avoid double queries
+        # expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
+        # return get_object_or_404(Profile, user__username=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         start = yymm_date = self.kwargs.get('start', None)
         end = yymm_date = self.kwargs.get('end', None)
 
+        # TODO: Look into how to share data with get_queryset()
+        # context['xxxx'] = self.get_queryset()
+        # Try this instead https://stackoverflow.com/a/37959458/2535658
+        # context['expenses, adding garbage to prevent overwrite']=self.profile
+
         # Toggle delete buttons
         show_delete = self.request.GET.get('delete', False) == '1'
         context['show_delete'] = show_delete
 
-        # TODO: this cose is exactly the same as get_queryset(),memoized it
+        # TODO: this code is exactly the same as get_queryset(),memoized it
         if end is None:
             (start, end) = utils.get_month_boundaries(start)
         else:
             format_str = '%Y-%m-%d'
             start = datetime.datetime.strptime(start, format_str).date()
 
-        # TODO: this cose is exactly the same as get_queryset(), memoized it!
+        # TODO: this code is exactly the same as get_queryset(), memoized it!
         # TODO refactor these queries after reading Django annotation docs
         # and aggregation
         expenses = m.Expense.objects.filter(date__range=(start, end)) \
@@ -103,7 +127,7 @@ class ExpenseListView(ListView):
         start = yymm_date = self.kwargs.get('start', None)
         end = yymm_date = self.kwargs.get('end', None)
 
-        # TODO: this cose is exactly the same as get_context_data(),memoized it
+        # TODO: this code is exactly the same as get_context_data(),memoized it
         if end is None:
             (start, end) = utils.get_month_boundaries(start)
         else:
@@ -259,7 +283,7 @@ class MonthlyBalancesView(ListView):
             bar_graph = utils.generate_monthly_balance_bar_graph(mb, goals)
 
         total = mb.aggregate(Sum('amount'))['amount__sum']
-        context['monthly_balance'] = mb
+        context['monthly_balances'] = mb
         context['bar_graph'] = bar_graph
         context['total'] = total
         context['show_delete'] = show_delete
@@ -353,7 +377,7 @@ def multiple_new_mohtly_balance(request):
         date = utils.get_month_boundaries()[1]
         print(utils.get_month_boundaries())
         for c in categories:
-            intial_data.append({'date':'2020-06-01', 'category': c.id})
+            intial_data.append({'date': '2020-06-01', 'category': c.id})
         formset = MBFormSet(initial=intial_data)
 
     return render(request, 'budgets/multiple_monthly_budget_form.html',
@@ -381,40 +405,26 @@ def home_page(request):
     starting_balance = utils.get_total_of_monthly_balances(prev_month)
 
     # Fetch previous month data to compare it with the current month's
-    prev_mb, prev_mb_total = utils.get_month_balance_stats(prev_month, rate)
-    current_mb, current_mb_total = utils.get_month_balance_stats(start, rate)
+    prev_mb, prev_tot = utils.get_month_balance_stats(prev_month, rate)
+    current_mb, curr_tot = utils.get_month_balance_stats(start, rate)
 
     # Display pie graph
     pie_graph = utils.generate_current_monthly_balance_pie_graph(current_mb)
 
-    # TODO: rename variables (make them shorter: sum_curr, sum_prev)
-    current_mb_total, two_months_diff, two_months_diff_perc = utils.calculate_increase_perc(current_mb_total, prev_mb_total)
+    # TODO: use 1 year or 6 months, instead of 2 months
+    curr_tot, diff, diff_perc = utils.calc_increase_perc(curr_tot, prev_tot)
 
     # Display bar graph (only draw "active" goals)
-    goals = utils.get_goals_and_time_to_completions(current_mb_total, two_months_diff)
-
+    goals = utils.get_goals_and_time_to_completions(curr_tot, diff)
     mb = m.MonthlyBalance.objects.select_related('category').values('date'). \
         annotate(actual_amount=Sum(Case(
           When(category__is_foreign_currency=False, then='amount'),
           When(category__is_foreign_currency=True, then=F('amount') * rate)
         ))).order_by('date')
+
     bar_graph = utils.generate_monthly_balance_bar_graph(mb, goals)
 
-    # Fetch expenses and related categories
-    categories = m.Category.objects.all()
-    for cat in categories:
-        expenses = m.Expense.objects.filter(category_id=cat.id). \
-                   filter(date__range=(start, end))
-        expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
-        cat.total = expenses_sum
-        cat.mb = cat.monthlybudget_set.filter(date=start).first()
-
-    # Fetch income and related categories
-    income_categories = utils.get_incomes_grouped_by_month(start, end)
-
     return render(request, 'home.html', {
-        'categories': categories,
-        'income_categories': income_categories,
         'current_balance': current_balance,
         'starting_balance': starting_balance,
         # TODO: do this on the template side
@@ -422,10 +432,10 @@ def home_page(request):
         'bar_graph': bar_graph,
         'pie_graph': pie_graph,
         'current_mb': current_mb,
-        'current_mb_total': current_mb_total,
+        'current_mb_total': curr_tot,
         'prev_mb': prev_mb,
-        'prev_mb_total': prev_mb_total,
-        'two_months_diff': two_months_diff,
-        'two_months_diff_perc': two_months_diff_perc,
+        'prev_mb_total': prev_tot,
+        'two_months_diff': diff,
+        'two_months_diff_perc': diff_perc,
         'goals': goals,
     })

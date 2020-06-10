@@ -186,40 +186,32 @@ def get_goals_and_time_to_completions(current_mb_total, two_months_diff):
     return goals
 
 
-def get_incomes_grouped_by_month(start, end):
-    """
-    Fetch income and related categories for a given period
-    """
-    income_categories = m.IncomeCategory.objects.all()
-    for inc_c in income_categories:
-        income = m.Income.objects.filter(category_id=inc_c.id). \
-            filter(date__range=(start, end))
-        income_sum = income.aggregate(Sum('amount'))['amount__sum']
-        inc_c.total = income_sum
-    return income_categories
-
-
 def get_month_balance_stats(date, rate):
     """
     Return monthly balances and their sum (adjusted to local currency)
     """
-    prev_mb = m.MonthlyBalance.objects.select_related('category'). \
-        annotate(actual_amount=Case(
-          # TODO: we could turn "actual_amount" into amount if we find how to
-          # overwrite/shadow the amount field
-          When(category__is_foreign_currency=False, then='amount'),
-          When(category__is_foreign_currency=True, then=F('amount') * rate)
-        )).filter(date=date).order_by('category_id')
+    import pdb
+    prev_mb = m.MonthlyBalance.objects.select_related('category').filter(date=date).order_by('category_id')
 
-    prev_mb_total = prev_mb.aggregate(correct_sum=Sum(Case(
-      When(category__is_foreign_currency=False, then='amount'),
-      When(category__is_foreign_currency=True, then=F('amount') * rate)
-    )))['correct_sum']
+    # prev_mb = m.MonthlyBalance.objects.select_related('category'). \
+    #     annotate(actual_amount=Case(
+    #       # TODO: we could turn "actual_amount" into amount if we find how to
+    #       # overwrite/shadow the amount field
+    #       When(category__is_foreign_currency=False, then='amount'),
+    #       When(category__is_foreign_currency=True, then=F('amount') * rate)
+    #     )).filter(date=date).order_by('category_id')
 
-    return prev_mb, prev_mb_total
+    total = 0
+    for mv in prev_mb:
+        # pdb.set_trace()
+        if mv.category.is_foreign_currency:
+            total += mv.amount * rate
+        else:
+            total += mv.amount
+    return prev_mb, total
 
 
-def calculate_increase_perc(current_mb_total, prev_mb_total):
+def calc_increase_perc(current_mb_total, prev_mb_total):
     """
     TODO write me
     """

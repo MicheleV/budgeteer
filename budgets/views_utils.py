@@ -219,7 +219,7 @@ def calc_increase_perc(current_mb_total, prev_mb_total):
         current_mb_total = 0
         two_months_diff = 0
         two_months_diff_perc = 0
-    elif prev_mb_total is None:
+    elif prev_mb_total is None or prev_mb_total == 0:
         two_months_diff = current_mb_total
         two_months_diff_perc = None
     else:

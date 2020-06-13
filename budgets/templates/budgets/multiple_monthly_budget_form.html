@@ -1,11 +1,16 @@
 {% extends 'base.html' %}
  
 {% block content %}
-  <h1>Multiple new monthly balances</h1>
-  <form method="post">
+  <h1>Multiple new monthly budgets</h1>
+  <form method="POST" class="post-form">
     {% csrf_token %}
-    {{ formset.as_p }}
-    <input type="submit" value="Create all monthly balances">
-    <a href="{% url 'monthly_balances' %}">cancel</a>
+    {{ formset.management_form }}
+    {% for field in formset %}
+      <div class="form-group">
+          {{ field }}
+      </div>
+    {% endfor %}
+    <input type="submit" value="Create all monthly budgets">
+    <a href="{% url 'monthly_budgets' %}">cancel</a>
   </form>
 {% endblock %}

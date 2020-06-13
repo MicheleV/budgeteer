@@ -50,7 +50,7 @@ urlpatterns = [
     path('monthly_balances/create', views.MonthlyBalancesCreateView.as_view(),
          name='monthly_balances_create'),
 
-    path('monthly_balances/multiple_create', views.multiple_new_mohtly_balance,
+    path('monthly_balances/multiple_create', views.multiple_new_monthly_balance,
          name='monthly_balances_multiple_create'),
 
 
@@ -84,6 +84,10 @@ urlpatterns = [
     # Monthly budgets
     path('monthly_budgets',
          views.MonthlyBudgetListView.as_view(), name='monthly_budgets'),
+
+    path('monthly_budgets/multiple_create', views.multiple_new_monthly_budget,
+         name='monthly_budgets_multiple_create'),
+
 
     # Monthly budgets for a given month
     re_path(r'monthly_budgets/(?P<date>(19|20)[0-9]{2}-(0[1-9]|1[012]))$',

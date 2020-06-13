@@ -102,10 +102,22 @@ class ExpenseListView(ListView):
         expenses_sum = 0
         for _ in expenses:
             expenses_sum += _.amount
+        context['expenses_sum'] = expenses_sum
+
+        # Get monthly budgets only for category that have expenses in this month
+        aggregate = utils.aggregate_expenses_by_category(expenses)
+
+        # FIXME: this will display categories that have no monthly_budget for said month
+        cat_with_expenses = list(aggregate.keys())
+        monthly_budgets = m.MonthlyBudget.objects.select_related('category').filter(
+                 category__in=cat_with_expenses, date=start)
+
+        for _ in monthly_budgets:
+            _.total = aggregate[_.category.id]
+        context['monthly_budgets'] = monthly_budgets
 
         pie_graph = utils.generate_current_month_expenses_pie_graph(expenses)
         context['pie_graph'] = pie_graph
-        context['expenses_sum'] = expenses_sum
         return context
 
     def get_queryset(self):
@@ -323,13 +335,37 @@ def api_categories(request):
     serializer = CategorySerializer(categories, many=True)
     return Response(serializer.data)
 
+
 ###############################################################################
 # Function based classes
 ###############################################################################
 
+@require_http_methods(["GET", "POST"])
+def multiple_new_monthly_budget(request):
+    categories = m.Category.objects.filter(is_archived=False)
+    cats = categories.count()
+    MBFormSet = formset_factory(form=f.MonthlyBudgetForm, extra=cats,
+                                max_num=cats)
+
+    if request.method == 'POST':
+        formset = MBFormSet(data=request.POST)
+        if formset.is_valid():
+            for form in formset:
+                form.save()
+            return redirect('monthly_budgets')
+    else:
+        intial_data = []
+        curr_month_start = utils.get_month_boundaries()[0]
+        for c in categories:
+            intial_data.append({'date': curr_month_start, 'category': c.id})
+        formset = MBFormSet(initial=intial_data)
+    print(formset)
+    return render(request, 'budgets/multiple_monthly_budget_form.html',
+                  {'formset': formset})
+
 
 @require_http_methods(["GET", "POST"])
-def multiple_new_mohtly_balance(request):
+def multiple_new_monthly_balance(request):
     categories = m.MonthlyBalanceCategory.objects.filter()
     cats = categories.count()
     MBFormSet = formset_factory(form=f.MonthlyBalanceForm, extra=cats,
@@ -343,13 +379,12 @@ def multiple_new_mohtly_balance(request):
             return redirect('monthly_balances')
     else:
         intial_data = []
-        date = utils.get_month_boundaries()[1]
-        print(utils.get_month_boundaries())
+        curr_month_start = utils.get_month_boundaries()[0]
         for c in categories:
-            intial_data.append({'date': '2020-06-01', 'category': c.id})
+            intial_data.append({'date': curr_month_start, 'category': c.id})
         formset = MBFormSet(initial=intial_data)
 
-    return render(request, 'budgets/multiple_monthly_budget_form.html',
+    return render(request, 'budgets/multiple_monthly_balance_form.html',
                   {'formset': formset})
 
 

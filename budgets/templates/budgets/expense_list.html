@@ -18,11 +18,13 @@
     </div>
   </div>
 
+
+
   <div class="row">
     <div class="col">
       <div>
         <div class="table-responsive-md table-sm">
-          <table class="table" id="id_expenses">
+          <table class="table table-sm" id="id_expenses">
           <tr>
             <th>Spended date</th>
             <th>Amount</th>
@@ -67,6 +69,27 @@
         </div>
       </div>
     </div>
+
+    {% if monthly_budgets %}
+      <div class="row">
+        <div class="col">
+          <table class="table table-sm" id="id_expenses">
+            <tr>
+              <th>Name</th>
+              <th>Budgeted</th>
+              <th>Actual</th>
+            </tr>
+          {% for value in monthly_budgets %}
+              <tr class="{% if value.amount < value.total %}text-danger{% else %}text-success{% endif %}">
+                <td> {{value.category.text}} </td>
+                <td> {{value.amount | intcomma }} </td>
+                <td> <b>{{value.total | intcomma }}</b> </td>
+              </tr>
+          {% endfor %}
+          </table>
+        </div>
+      </div>
+    {% endif %}
 
     {% if pie_graph %}
       <div class="col">

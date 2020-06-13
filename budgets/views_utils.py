@@ -128,6 +128,16 @@ def findInList(List, item):
         return -1
 
 
+def aggregate_expenses_by_category(data):
+    results = {}
+    for mb in filter(lambda y: y.amount > 0, data):
+        if mb.category.id in results:
+            results[mb.category.id] += mb.amount
+        else:
+            results[mb.category.id] = mb.amount
+    return results
+
+
 def generate_current_month_expenses_pie_graph(data):
     """
     Return the graph and returns the data in base64

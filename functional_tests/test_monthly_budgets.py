@@ -16,6 +16,7 @@ def test_cant_create_an_empty_monthly_budget(self):
     # ...Nothing happens!
     pass
 
+
 @skip
 def test_can_create_multiple_monthly_budgets(self):
     # Frank creates a category to log expenses related his rent
@@ -102,3 +103,9 @@ def test_cant_create_multiple_monthly_budgets_for_same_month(self):
     # However an error promtply notifies him that this is not allowed
     error = 'Monthly budget with this Category and Date already exists.'
     Helpers.find_error(self, error)
+
+
+# TODO: add a test to verify the monthly budgets are displayed
+# in date desc order
+
+# TODO: add tests for mass creation

@@ -62,8 +62,8 @@ class ExpenseCreateView(CreateView):
     form_class = f.ExpenseForm
 
     def get_success_url(self):
-        return reverse('expenses')
-
+        return reverse('expenses_create')
+# TODO change tests to account for this new redirect
 
 # class ProfileContextMixin(generic_base.ContextMixin, generic_view.View):
 #     @cached_property

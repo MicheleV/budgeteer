@@ -63,82 +63,53 @@ class ExpenseCreateView(CreateView):
 
     def get_success_url(self):
         return reverse('expenses_create')
-# TODO change tests to account for this new redirect
-
-# class ProfileContextMixin(generic_base.ContextMixin, generic_view.View):
-#     @cached_property
-#     def profile(self):
-#         return get_object_or_404(Profile, user__username=self.request.user)
-
-#     def get_context_data(self, **kwargs):
-#         context = super(ProfileContextMixin, self).get_context_data(**kwargs)
-#         context['profile'] = self.profile
-#         return context
 
 
-# FIXME: Aggregate manually as Django ORM is issuing LOTS of duplicated queries
-# class ExpenseListView(ProfileContextMixin):
 class ExpenseListView(ListView):
     model = m.Expense
 
-    # Try this instead https://stackoverflow.com/a/37959458/2535658
     @cached_property
     def profile(self):
-        pass
-        # expenses = m.Expense.objects.filter(date__range=(start, end)) \
-        # .order_by('-date', '-id')
-        # Do this manually to avoid double queries
-        # expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
-        # return get_object_or_404(Profile, user__username=self.request.user)
+        start = yymm_date = self.kwargs.get('start', None)
+        end = yymm_date = self.kwargs.get('end', None)
+        if end is None:
+            (start, end) = utils.get_month_boundaries(start)
+        else:
+            format_str = '%Y-%m-%d'
+            start = datetime.datetime.strptime(start, format_str).date()
+
+        expenses = m.Expense.objects.select_related('category').filter(
+                   date__range=(start, end)).order_by('-date', '-id')
+        return expenses
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         start = yymm_date = self.kwargs.get('start', None)
         end = yymm_date = self.kwargs.get('end', None)
 
-        # TODO: Look into how to share data with get_queryset()
-        # context['xxxx'] = self.get_queryset()
-        # Try this instead https://stackoverflow.com/a/37959458/2535658
-        # context['expenses, adding garbage to prevent overwrite']=self.profile
-
-        # Toggle delete buttons
-        show_delete = self.request.GET.get('delete', False) == '1'
-        context['show_delete'] = show_delete
-
-        # TODO: this code is exactly the same as get_queryset(),memoized it
+        # TODO: this block is repeated inside profile(), merge it
         if end is None:
             (start, end) = utils.get_month_boundaries(start)
         else:
             format_str = '%Y-%m-%d'
             start = datetime.datetime.strptime(start, format_str).date()
 
-        # TODO: this code is exactly the same as get_queryset(), memoized it!
-        # TODO refactor these queries after reading Django annotation docs
-        # and aggregation
-        expenses = m.Expense.objects.filter(date__range=(start, end)) \
-                    .order_by('-date', '-id')
-        expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
+        # Toggle delete buttons
+        show_delete = self.request.GET.get('delete', False) == '1'
+        context['show_delete'] = show_delete
+
+        expenses = self.profile
+        expenses_sum = 0
+        for exp in expenses:
+            expenses_sum += exp.amount
+
         pie_graph = utils.generate_current_month_expenses_pie_graph(expenses)
         context['pie_graph'] = pie_graph
         context['expenses_sum'] = expenses_sum
         return context
 
     def get_queryset(self):
-        start = yymm_date = self.kwargs.get('start', None)
-        end = yymm_date = self.kwargs.get('end', None)
-
-        # TODO: this code is exactly the same as get_context_data(),memoized it
-        if end is None:
-            (start, end) = utils.get_month_boundaries(start)
-        else:
-            format_str = '%Y-%m-%d'
-            start = datetime.datetime.strptime(start, format_str).date()
-        # TODO: refactor these queries after reading Django annotation docs
-        # and aggregation
-        expenses = m.Expense.objects.filter(date__range=(start, end)) \
-                    .order_by('-date', '-id')
-        expenses_sum = expenses.aggregate(Sum('amount'))['amount__sum']
-
+        expenses = self.profile
         return expenses
 
 

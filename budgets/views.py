@@ -100,8 +100,8 @@ class ExpenseListView(ListView):
 
         expenses = self.profile
         expenses_sum = 0
-        for exp in expenses:
-            expenses_sum += exp.amount
+        for _ in expenses:
+            expenses_sum += _.amount
 
         pie_graph = utils.generate_current_month_expenses_pie_graph(expenses)
         context['pie_graph'] = pie_graph
@@ -134,12 +134,11 @@ class MonthlyBudgetListView(ListView):
     def get_queryset(self):
         yymm_date = self.kwargs.get('date', None)
         if yymm_date is None:
-            mb = m.MonthlyBudget.objects. \
-                              select_related('category').all()
+            mb = m.MonthlyBudget.objects.select_related('category').all()
         else:
             full_date = f"{yymm_date}-01"
-            mb = m.MonthlyBudget.objects.select_related('category'). \
-                filter(date=full_date)
+            mb = m.MonthlyBudget.objects.select_related('category').filter(
+                 date=full_date)
         return mb
 
 
@@ -227,8 +226,6 @@ class MonthlyBalancesCreateView(CreateView):
 
 
 class MonthlyBalancesView(ListView):
-    # TODO: find out if we can avoid using a model inside ListView
-    # inside get_context_data(), we're re-issuing the same query!
     model = m.MonthlyBalance
 
     def get_context_data(self, **kwargs):
@@ -247,13 +244,15 @@ class MonthlyBalancesView(ListView):
               When(category__is_foreign_currency=False, then='amount'),
               When(category__is_foreign_currency=True, then=F('amount') * rate)
             )))
+        total = 0
+        for _ in mb:
+            total += _['amount']
 
         # Display only not archived goals
         goals = m.Goal.objects.filter(is_archived=False)
         if len(mb) > 0:
             bar_graph = utils.generate_monthly_balance_bar_graph(mb, goals)
 
-        total = mb.aggregate(Sum('amount'))['amount__sum']
         context['monthly_balances'] = mb
         context['bar_graph'] = bar_graph
         context['total'] = total
@@ -276,17 +275,16 @@ class MonthlyBalancesSingleMonthView(ListView):
         rate = int(os.getenv("EXCHANGE_RATE"))
         currency = os.getenv("CURRENCY")
 
-        mb = m.MonthlyBalance.objects.select_related('category'). \
-            filter(date=complete_date).order_by('date')
+        mb = m.MonthlyBalance.objects.select_related('category').filter(
+             date=complete_date).order_by('date')
 
-        # NOTE: not using Django's ORM annotate to avoid issuing a second query
         total = 0
-        for a in mb:
-            if a.category.is_foreign_currency:
-                a.real_amount = a.amount * rate
+        for _ in mb:
+            if _.category.is_foreign_currency:
+                _.real_amount = _.amount * rate
             else:
-                a.real_amount = a.amount
-            total += a.real_amount
+                _.real_amount = _.amount
+            total += _.real_amount
 
         context['monthly_balances'] = mb
         context['total'] = total

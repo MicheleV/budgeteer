@@ -191,19 +191,10 @@ def get_month_balance_stats(date, rate):
     Return monthly balances and their sum (adjusted to local currency)
     """
     import pdb
-    prev_mb = m.MonthlyBalance.objects.select_related('category').filter(date=date).order_by('category_id')
-
-    # prev_mb = m.MonthlyBalance.objects.select_related('category'). \
-    #     annotate(actual_amount=Case(
-    #       # TODO: we could turn "actual_amount" into amount if we find how to
-    #       # overwrite/shadow the amount field
-    #       When(category__is_foreign_currency=False, then='amount'),
-    #       When(category__is_foreign_currency=True, then=F('amount') * rate)
-    #     )).filter(date=date).order_by('category_id')
-
+    prev_mb = m.MonthlyBalance.objects.select_related('category').filter(
+              date=date).order_by('category_id')
     total = 0
     for mv in prev_mb:
-        # pdb.set_trace()
         if mv.category.is_foreign_currency:
             total += mv.amount * rate
         else:

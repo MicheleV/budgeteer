@@ -1,11 +1,32 @@
 {% extends 'base.html' %}
+{% load budgets_tags %}
 
 {% block content %}
   <h1>Multiple new monthly balances</h1>
-  <form method="post">
+  <form class="form-horizontal" method="post">
     {% csrf_token %}
     {{ formset.management_form }}
-    {{ formset.as_p }}
+    {% for form in formset %}
+        <div class="row form-row spacer">
+            <div class="col-2">
+                {{ form.as_p }}
+            </div>
+            <div class="col-4">
+                <!-- Empty row to allign the following to the amount input -->
+                <div class="input-group">
+                    <div class="input-group-append">
+                        <button class="btn add-form-row">&nbsp;</button>
+                    </div>
+                </div>
+                <!-- TODO look up how to this properly with bootstrap :)  -->
+                <div class="input-group" style="margin-top: 1rem;">
+                    {% if form.category.value in previous_budgets and previous_budgets|lookup:form.category.value > 0 %}
+                      Previous month amount: {{ previous_budgets|lookup:form.category.value }}&nbsp;
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
     <input type="submit" value="Create all monthly balances">
     <a href="{% url 'monthly_balances' %}">cancel</a>
   </form>

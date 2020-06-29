@@ -50,7 +50,8 @@ urlpatterns = [
     path('monthly_balances/create', views.MonthlyBalancesCreateView.as_view(),
          name='monthly_balances_create'),
 
-    path('monthly_balances/multiple_create', views.multiple_new_monthly_balance,
+    path('monthly_balances/multiple_create',
+         views.multiple_new_monthly_balance,
          name='monthly_balances_multiple_create'),
 
 

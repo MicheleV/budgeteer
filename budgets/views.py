@@ -98,6 +98,7 @@ class ExpenseListView(ListView):
         show_delete = self.request.GET.get('delete', False) == '1'
         context['show_delete'] = show_delete
 
+        expenses = self.profile
         expenses_sum = 0
         for _ in expenses:
             expenses_sum += _.amount
@@ -386,6 +387,8 @@ def multiple_new_monthly_balance(request):
     MBFormSet = formset_factory(form=f.MonthlyBalanceForm, extra=cats,
                                 max_num=cats)
 
+    curr_month_start = utils.get_month_boundaries()[0]
+    prev_month_start = utils.get_previous_month_first_day_date(curr_month_start)
     if request.method == 'POST':
         formset = MBFormSet(data=request.POST)
         if formset.is_valid():
@@ -394,13 +397,18 @@ def multiple_new_monthly_balance(request):
             return redirect('monthly_balances')
     else:
         intial_data = []
-        curr_month_start = utils.get_month_boundaries()[0]
         for c in categories:
             intial_data.append({'date': curr_month_start, 'category': c.id})
         formset = MBFormSet(initial=intial_data)
 
+    prev_month_monthly_balances = m.MonthlyBalance.objects.filter(date=prev_month_start)
+    prev_month_dic = {}
+    for _ in prev_month_monthly_balances:
+        prev_month_dic[int(_.category.id)] = _.amount
+
     return render(request, 'budgets/multiple_monthly_balance_form.html',
-                  {'formset': formset})
+                  {'formset': formset,
+                   'previous_budgets': prev_month_dic})
 
 
 # TODO: write me

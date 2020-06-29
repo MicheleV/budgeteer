@@ -131,10 +131,10 @@ def findInList(List, item):
 def aggregate_expenses_by_category(data):
     results = {}
     for mb in filter(lambda y: y.amount > 0, data):
-        if mb.category.id in results:
-            results[mb.category.id] += mb.amount
+        if mb.category.text in results:
+            results[mb.category.text] += mb.amount
         else:
-            results[mb.category.id] = mb.amount
+            results[mb.category.text] = mb.amount
     return results
 
 

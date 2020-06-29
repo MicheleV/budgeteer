@@ -7,7 +7,7 @@ import debug_toolbar
 from budgets import views
 from django.urls import include, path
 urlpatterns = [
-    # Class based routes #
+    # Class based routes ######################################################
     path('categories', views.CategoryListView.as_view(), name='categories'),
     path('categories/create', views.CategoryCreateView.as_view(),
          name='categories_create'),
@@ -98,9 +98,9 @@ urlpatterns = [
     path('monthly_budgets/<int:pk>', views.MonthlyBudgetDetailView.as_view(),
          name='monthly_budgets_detail'),
 
-    # API #
+    # API #####################################################################
     path('api/categories', views.api_categories, name='api'),
     path('__debug__/', include(debug_toolbar.urls)),
-    # Function based routes #
+    # Function based routes ###################################################
     path('', views.home_page, name='home'),
 ]

@@ -98,23 +98,31 @@ class ExpenseListView(ListView):
         show_delete = self.request.GET.get('delete', False) == '1'
         context['show_delete'] = show_delete
 
-        expenses = self.profile
         expenses_sum = 0
         for _ in expenses:
             expenses_sum += _.amount
         context['expenses_sum'] = expenses_sum
 
-        # Get monthly budgets only for category that have expenses in this month
-        aggregate = utils.aggregate_expenses_by_category(expenses)
+        # Get monthly budgets only for categoris having expenses in that month
+        exp_aggregates = utils.aggregate_expenses_by_category(expenses)
 
-        # FIXME: this will display categories that have no monthly_budget for said month
-        cat_with_expenses = list(aggregate.keys())
-        monthly_budgets = m.MonthlyBudget.objects.select_related('category').filter(
-                 category__in=cat_with_expenses, date=start)
+        monthly_budgets = m.MonthlyBudget.objects.select_related(
+                          'category').filter(date=start)
 
+        # Add budgeted amount to expenses aggregates
         for _ in monthly_budgets:
-            _.total = aggregate[_.category.id]
-        context['monthly_budgets'] = monthly_budgets
+            if _.category.text in exp_aggregates:
+                total = exp_aggregates[_.category.text]
+                exp_aggregates[_.category.text] = {'total': total,
+                                                   'budgeted': _.amount}
+            else:
+                total = _.amount
+                exp_aggregates[_.category.text] = {'total': total,
+                                                   'budgeted': None}
+        context['exp_aggregates'] = exp_aggregates
+
+        # TODO: add a new route that autofills budgets based on get param
+        # e.g. /monthly_budgets/create?cat_id=32&date=2020-06
 
         pie_graph = utils.generate_current_month_expenses_pie_graph(expenses)
         context['pie_graph'] = pie_graph
@@ -136,6 +144,12 @@ class MonthlyBudgetsCreateView(CreateView):
     model = m.MonthlyBudget
     form_class = f.MonthlyBudgetForm
 
+    def get_initial(self):
+        initial = super().get_initial()
+
+        initial['date'] = self.request.GET.get('date', None)
+        return initial
+
     def get_success_url(self):
         return reverse('monthly_budgets')
 
@@ -146,11 +160,12 @@ class MonthlyBudgetListView(ListView):
     def get_queryset(self):
         yymm_date = self.kwargs.get('date', None)
         if yymm_date is None:
-            mb = m.MonthlyBudget.objects.select_related('category').all()
+            mb = m.MonthlyBudget.objects.select_related(
+                 'category').all().order_by('-date')
         else:
             full_date = f"{yymm_date}-01"
             mb = m.MonthlyBudget.objects.select_related('category').filter(
-                 date=full_date)
+                 date=full_date).order_by('-date')
         return mb
 
 
@@ -418,7 +433,7 @@ def home_page(request):
     # TODO: use 1 year or 6 months, instead of 2 months
     curr_tot, diff, diff_perc = utils.calc_increase_perc(curr_tot, prev_tot)
 
-    # Display bar graph (only draw "active" goals)
+    # Display bar graph: only draw active goals
     goals = utils.get_goals_and_time_to_completions(curr_tot, diff)
     mb = m.MonthlyBalance.objects.select_related('category').values('date'). \
         annotate(actual_amount=Sum(Case(

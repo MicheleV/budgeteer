@@ -70,7 +70,7 @@
       </div>
     </div>
 
-    {% if monthly_budgets %}
+    {% if exp_aggregates %}
       <div class="row">
         <div class="col">
           <table class="table table-sm" id="id_expenses">
@@ -79,10 +79,14 @@
               <th>Budgeted</th>
               <th>Actual</th>
             </tr>
-          {% for value in monthly_budgets %}
-              <tr class="{% if value.amount < value.total %}text-danger{% else %}text-success{% endif %}">
-                <td> {{value.category.text}} </td>
-                <td> {{value.amount | intcomma }} </td>
+          {% for key, value in exp_aggregates.items %}
+              <tr class="{% if value.budgeted < value.total %}text-danger{% else %}text-success{% endif %}">
+                <td> {{key}} </td>
+                {% if value.budgeted is not None %}
+                    <td> {{value.budgeted | intcomma }} </td>
+                {% else %}
+                    <td> <a href="{% url 'monthly_budgets_create' %}">Create Budget</a> </td>
+                {% endif %}
                 <td> <b>{{value.total | intcomma }}</b> </td>
               </tr>
           {% endfor %}

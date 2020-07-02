@@ -1,10 +1,10 @@
-ansible==2.8.5
+ansible==2.8.8
 asn1crypto==1.0.1
 cffi==1.12.3
 coverage==5.0.1
 cryptography==2.7
 cycler==0.10.0
-Django==2.2.10
+Django==2.2.13
 django-debug-toolbar==2.2
 djangorestframework==3.11.0
 gunicorn==19.9.0

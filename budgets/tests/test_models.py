@@ -3,6 +3,7 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.db import transaction
 from django.db.utils import IntegrityError
+from django.urls import reverse
 
 from django.core.exceptions import ValidationError
 
@@ -13,7 +14,11 @@ from budgets.tests.base import BaseTest
 class ModelsTest(BaseTest):
 
     def test_models_to_string(self):
-        category = self.create_category('Rent')
+        text = 'Rent'
+        category = self.create_category(text)
+        string_repr = f"{category.text}"
+        self.assertEqual("%s" % category, text)
+
         amount = 5000
         note = 'First month of rent'
         date = '2019-08-04'
@@ -383,5 +388,19 @@ class ModelsTest(BaseTest):
     # TODO: Write me
     def test_duplicates_monthly_balances_triggers_errors(self):
         pass
+
+    def test_absolute_urls(self):
+        b_cat = self.create_monthly_balance_category("Bank")
+        url = b_cat.get_absolute_url()
+        self.assertEqual(url, f"/monthly_balance_categories/{b_cat.id}")
+
+        amount = 42000
+        date = '2019-08-10'
+        m_bal = self.create_monthly_balance(b_cat, amount, date)
+        sec_url = m_bal.get_absolute_url()
+        self.assertEqual(sec_url, f"/edit_monthly_balance/{m_bal.id}")
+
+
+
 
     # TODO: write me Goal related tests

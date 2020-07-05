@@ -52,6 +52,7 @@ def test_expenses_sum_appear_on_home_page(self):
     # displayed
     Helpers.check_current_month(self, curr_mont_amount, category_name)
 
+
 @skip
 def test_expenses_page_can_show_old_expenses(self):
     category_name = 'Rent'
@@ -85,6 +86,78 @@ def test_expenses_page_can_show_old_expenses(self):
     # Frank notices that this URL does not show entries from other months
     Helpers.verify_expense_was_created(self,
                                        amount, category_name, note)
+
+
+def test_only_expenses_in_range_are_shown(self):
+    # Frank creates 2 expenses for January 2020
+    category_name = Helpers.generateString()
+    Helpers.create_a_category(self, category_name)
+
+    # Frank is not going to check if the expenses are created. Frank
+    # believes into this sowftware!
+    is_income = False
+    verify_creation = False
+
+    amount = 4000
+    note = Helpers.generateString()
+    date = "2020-01-01"
+    Helpers.create_entry(self, amount, category_name, note,
+                         date, is_income, verify_creation)
+
+    second_amount = 4200
+    second_date = "2020-01-07"
+    second_note = Helpers.generateString()
+    Helpers.create_entry(self, second_amount, category_name, second_note,
+                         date, is_income, verify_creation)
+
+    # Frank then enters a special URL...but he enters the wrong end date
+    expense_url = reverse('expenses')
+    url = f"{self.live_server_url}{expense_url}/2020-01-01/2020-01-02"
+    self.browser.get(url)
+
+    # Frank notices the firt expenses is shown. Frank is so happy
+    formatted_amount = f'{amount:n}'
+    Helpers.verify_expense_was_created(self, formatted_amount, category_name,
+                                       note)
+
+    # TODO: verify the second expenses is NOT shown
+    # Frank can not see the second expenses! Frank wonders whether the
+    # software has really saved the second expenses or not
+
+    # Frank then gets very anxious... but then Frank breathes, and re-types the
+    # URL. He notices he had typed the wrong one: "Silly me!" he mumbles.
+    expense_url = reverse('expenses')
+    url = f"{self.live_server_url}{expense_url}/2020-01-01/2020-01-07"
+    self.browser.get(url)
+    formatted_second_amount = f'{second_amount:n}'
+
+    # Frank now sees both expenses, he smiles. Frank is so relieved now
+    Helpers.verify_expense_was_created(self, formatted_amount, category_name,
+                                       note)
+    Helpers.verify_expense_was_created(self, formatted_second_amount,
+                                       category_name, second_note)
+
+    # Then, Frank remembers he also bought something during December 2019
+    # He really wants to keep track of all his expenses!
+    third_amount = 4200
+    third_note = Helpers.generateString()
+    older_date = "2019-12-31"
+    Helpers.create_entry(self, third_amount, category_name, third_note,
+                         older_date, is_income, verify_creation)
+
+    # Frank then enters a special URL that allows him to only show expenses
+    # broken down by months
+    expense_url = reverse('expenses')
+    url = f"{self.live_server_url}{expense_url}/2019-12-01/2019-12-31"
+    self.browser.get(url)
+
+    formatted_third_amount = f'{third_amount:n}'
+    Helpers.verify_expense_was_created(self, formatted_third_amount,
+                                       category_name, third_note)
+
+    # TODO: Frank then want to see all expenses
+    expense_url = reverse('expenses')
+    url = f"{self.live_server_url}{expense_url}/2019-12-01/2020-01-31"
 
 
 # TODO: write me

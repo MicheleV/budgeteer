@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %}</title>
     <link href="{% static 'bootstrap/css/bootstrap.css' %}" rel="stylesheet" media="all">
+    {% block preload_js %}{% endblock %}
   </head>
 
   <body>

@@ -160,9 +160,9 @@ def create_a_monthly_budget(self, category_name, amount, date,
 def create_entry(self, amount, category_name, note, expense_date,
                  is_income=False, verify_creation=True):
     # Frank visits the expenses page
-    url = reverse('expenses')
+    url = reverse('expenses_create')
     if is_income:
-        url = reverse('incomes')
+        url = reverse('incomes_create')
 
     self.browser.get(f"{self.live_server_url}{url}")
     # Frank sees an input box

@@ -400,7 +400,4 @@ class ModelsTest(BaseTest):
         sec_url = m_bal.get_absolute_url()
         self.assertEqual(sec_url, f"/edit_monthly_balance/{m_bal.id}")
 
-
-
-
     # TODO: write me Goal related tests

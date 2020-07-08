@@ -14,8 +14,11 @@
     {% endif %}
 
     <li class="page-item active">
-      <!-- TODO: showing hard coded '1' for the moment being -->
-      <a class="page-link" href="#">{{ page_obj.number }} 1</a>
+      {% if page_obj.number %}
+        <a class="page-link" href="#">{{ page_obj.number }}</a>
+      {% else %}
+        <a class="page-link" href="#">-</a>
+      {% endif %}
     </li>
 
     {% if page_obj.has_next %}

@@ -55,6 +55,7 @@ class CategoryCreateView(CreateView):
 
 class CategoryListView(ListView):
     model = m.Category
+    paginate_by = 15
 
 
 class ExpenseCreateView(CreateView):
@@ -67,6 +68,7 @@ class ExpenseCreateView(CreateView):
 
 class ExpenseListView(ListView):
     model = m.Expense
+    paginate_by = 30
 
     @cached_property
     def profile(self):
@@ -157,6 +159,7 @@ class MonthlyBudgetsCreateView(CreateView):
 
 class MonthlyBudgetListView(ListView):
     model = m.MonthlyBudget
+    paginate_by = 15
 
     def get_queryset(self):
         yymm_date = self.kwargs.get('date', None)
@@ -181,6 +184,7 @@ class GoalCreateView(CreateView):
 
 class GoalListView(ListView):
     model = m.Goal
+    paginate_by = 15
 
 
 class GoalDetailView(DetailView):
@@ -213,6 +217,7 @@ class IncomCreateView(CreateView):
 
 class IncomeView(ListView):
     model = m.Income
+    paginate_by = 15
 
     def get_queryset(self):
         start = yymm_date = self.kwargs.get('start', None)
@@ -239,6 +244,7 @@ class MonthlyBalanceCategoryCreateView(CreateView):
 
 class MonthlyBalanceCategoryView(ListView):
     model = m.MonthlyBalanceCategory
+    paginate_by = 15
 
 
 class MonthlyBalanceCategoryDetailView(DetailView):

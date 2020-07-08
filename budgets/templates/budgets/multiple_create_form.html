@@ -3,11 +3,11 @@
 <div class="row form-row spacer">
     <div class="col-12">
         {{ form }}
-        <!-- TODO: Align buttons -->
         <span >
           <!-- TODO: Injecing values into js through jinja templates... Refactor me ASAP -->
             {% if form.category.value in previous_budgets and previous_budgets|lookup:form.category.value > 0 %}
               Previous month amount: {{ previous_budgets|lookup:form.category.value }}&nbsp;
+              <!-- TODO: Align buttons -->
               <button type="button" id="copy-button-{{forloop.counter0}}" class="btn btn-info" onclick="setInput(this, {{ previous_budgets|lookup:form.category.value }})">Use this amount</button>
             {% else %}
               Previous month amount: N/A

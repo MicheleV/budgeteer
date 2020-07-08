@@ -118,8 +118,8 @@ class ExpenseListView(ListView):
                                                    'budgeted': _.amount}
             else:
                 total = _.amount
-                exp_aggregates[_.category.text] = {'total': total,
-                                                   'budgeted': None}
+                exp_aggregates[_.category.text] = {'total': 0,
+                                                   'budgeted': _.amount}
         context['exp_aggregates'] = exp_aggregates
 
         # TODO: add a new route that autofills budgets based on get param

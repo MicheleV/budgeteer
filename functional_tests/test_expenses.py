@@ -93,8 +93,8 @@ def test_only_expenses_in_range_are_shown(self):
     category_name = Helpers.generateString()
     Helpers.create_a_category(self, category_name)
 
-    # Frank is not going to check if the expenses are created. Frank
-    # believes into this sowftware!
+    # Frank is not going to check if the expenses are created as he always does
+    # Frank now believes into this sowftware!
     is_income = False
     verify_creation = False
 
@@ -110,12 +110,14 @@ def test_only_expenses_in_range_are_shown(self):
     Helpers.create_entry(self, second_amount, category_name, second_note,
                          date, is_income, verify_creation)
 
-    # Frank then enters a special URL...but he enters the wrong end date
+    # Frank has changed his mind: "Testing is important" he says.
+    # Frank then enters a special URL to check the expenses creation...but he
+    # enters the wrong end date
     expense_url = reverse('expenses')
     url = f"{self.live_server_url}{expense_url}/2020-01-01/2020-01-02"
     self.browser.get(url)
 
-    # Frank notices the firt expenses is shown. Frank is so happy
+    # Frank notices the first expenses is shown. Frank is so happy
     formatted_amount = f'{amount:n}'
     Helpers.verify_expense_was_created(self, formatted_amount, category_name,
                                        note)

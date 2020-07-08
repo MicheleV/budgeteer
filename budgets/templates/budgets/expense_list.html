@@ -79,17 +79,17 @@
               <th>Budgeted</th>
               <th>Actual</th>
             </tr>
-          {% for key, value in exp_aggregates.items %}
-              <tr class="{% if value.budgeted < value.total %}text-danger{% else %}text-success{% endif %}">
-                <td> {{key}} </td>
-                {% if value.budgeted is not None %}
-                    <td> {{value.budgeted | intcomma }} </td>
-                {% else %}
-                    <td> <a href="{% url 'monthly_budgets_create' %}">Create Budget</a> </td>
-                {% endif %}
-                <td> <b>{{value.total | intcomma }}</b> </td>
-              </tr>
-          {% endfor %}
+            {% for key, value in exp_aggregates.items %}
+                <tr class="{% if value.budgeted < value.total %}text-danger{% else %}text-success{% endif %}">
+                  <td> {{key}} </td>
+                  {% if value.budgeted is not None %}
+                      <td> {{value.budgeted | intcomma }} </td>
+                  {% else %}
+                      <td> <a href="{% url 'monthly_budgets_create' %}">Create Budget</a> </td>
+                  {% endif %}
+                  <td> <b>{{value.total | intcomma }}</b> </td>
+                </tr>
+            {% endfor %}
           </table>
         </div>
       </div>

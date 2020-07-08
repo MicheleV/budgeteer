@@ -17,6 +17,7 @@
     {% csrf_token %}
     {{ formset.management_form }}
     {% for form in formset %}
+        <!-- TODO: add whether this balance is a foreign currency or not -->
         {% include "budgets/multiple_create_form.html" with form=form%}
     {% endfor %}
     <input type="submit" value="Create all monthly budgets">

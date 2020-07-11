@@ -56,6 +56,7 @@ class CategoryCreateView(CreateView):
 class CategoryListView(ListView):
     model = m.Category
     paginate_by = 15
+    ordering = ['id']
 
 
 class ExpenseCreateView(CreateView):
@@ -69,9 +70,9 @@ class ExpenseCreateView(CreateView):
 class ExpenseListView(ListView):
     model = m.Expense
     paginate_by = 30
+    ordering = ['id']
 
-    @cached_property
-    def profile(self):
+    def start_end(self):
         start = yymm_date = self.kwargs.get('start', None)
         end = yymm_date = self.kwargs.get('end', None)
         if end is None:
@@ -79,22 +80,18 @@ class ExpenseListView(ListView):
         else:
             format_str = '%Y-%m-%d'
             start = datetime.datetime.strptime(start, format_str).date()
+        return (start, end)
 
+    @cached_property
+    def profile(self):
+        start, end = self.start_end()
         expenses = m.Expense.objects.select_related('category').filter(
                    date__range=(start, end)).order_by('-date', '-id')
         return expenses
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        start = yymm_date = self.kwargs.get('start', None)
-        end = yymm_date = self.kwargs.get('end', None)
-
-        # TODO: this block is repeated inside profile(), merge it
-        if end is None:
-            (start, end) = utils.get_month_boundaries(start)
-        else:
-            format_str = '%Y-%m-%d'
-            start = datetime.datetime.strptime(start, format_str).date()
+        start, end = self.start_end()
 
         # Toggle delete buttons
         show_delete = self.request.GET.get('delete', False) == '1'
@@ -160,6 +157,7 @@ class MonthlyBudgetsCreateView(CreateView):
 class MonthlyBudgetListView(ListView):
     model = m.MonthlyBudget
     paginate_by = 15
+    ordering = ['id']
 
     def get_queryset(self):
         yymm_date = self.kwargs.get('date', None)
@@ -185,6 +183,7 @@ class GoalCreateView(CreateView):
 class GoalListView(ListView):
     model = m.Goal
     paginate_by = 15
+    ordering = ['id']
 
 
 class GoalDetailView(DetailView):
@@ -201,6 +200,8 @@ class IncomeCategoryCreateView(CreateView):
 
 class IncomeCategoryView(ListView):
     model = m.IncomeCategory
+    paginate_by = 15
+    ordering = ['id']
 
 
 class IncomeCategoryDetailView(DetailView):
@@ -218,19 +219,20 @@ class IncomCreateView(CreateView):
 class IncomeView(ListView):
     model = m.Income
     paginate_by = 15
+    ordering = ['id']
 
     def get_queryset(self):
         start = yymm_date = self.kwargs.get('start', None)
         end = yymm_date = self.kwargs.get('end', None)
 
-        # TODO: use the date parameter if present to filter
-        #       (add url to grab start and end)
+        # TODO: add a route to filter by start and end
         if end is None:
             (start, end) = utils.get_month_boundaries(start)
         else:
             format_str = '%Y-%m-%d'
             start = datetime.datetime.strptime(start, format_str).date()
-        incomes = m.Income.objects.filter(date__range=(start, end))
+        incomes = m.Income.objects.filter(date__range=(start, end)).order_by(
+                  'id')
         return incomes
 
 
@@ -245,6 +247,7 @@ class MonthlyBalanceCategoryCreateView(CreateView):
 class MonthlyBalanceCategoryView(ListView):
     model = m.MonthlyBalanceCategory
     paginate_by = 15
+    ordering = ['id']
 
 
 class MonthlyBalanceCategoryDetailView(DetailView):
@@ -294,8 +297,10 @@ class MonthlyBalancesView(ListView):
         return context
 
 
-# Show monhtly balances for a given month
 class MonthlyBalancesSingleMonthView(ListView):
+    """
+    Show monhtly balances for a given month
+    """
     model = m.MonthlyBalance
 
     template_name = 'budgets/monthlybalance_singlemonth_list.html'
@@ -437,6 +442,8 @@ def home_page(request):
     Display the home page
     """
     currency = os.getenv("CURRENCY")
+    # TODO: refactor this to enable multiple currencies (and enable currency
+    # rates to be edited inside the app: drop the value from .env file)
     rate = int(os.getenv("EXCHANGE_RATE"))
     (start, end) = utils.current_month_boundaries()
 

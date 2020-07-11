@@ -7,13 +7,14 @@
 
 # root user, password "root" user "cloud-user", password "123456" as per centos8.cfg
 vm_name=centos8-vm
+#CentOS-Stream-8-x86_64-20200629-dvd1.iso
 iso_path=/var/lib/libvirt/images/CentOS-Stream-x86_64-dvd1.iso
 ks_path=./centos8.cfg
 disk_path=/var/lib/libvirt/images/centos8.qcow2
 network_name=default
 
 
-qemu-img create -f qcow2 centos8.qcow2 10G
+qemu-img create -f qcow2 centos8.qcow2 6G
 mv centos8.qcow2 /var/lib/libvirt/images/centos8.qcow2
 chown qemu:qemu /var/lib/libvirt/images/centos8.qcow2
 # restorecon -rvvf /var/lib/libvirt/images/

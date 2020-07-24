@@ -179,6 +179,9 @@ class GoalCreateView(CreateView):
     model = m.Goal
     form_class = f.GoalForm
 
+    def get_success_url(self):
+        return reverse('goals')
+
 
 class GoalListView(ListView):
     model = m.Goal

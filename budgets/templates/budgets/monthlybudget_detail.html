@@ -9,9 +9,9 @@
 
       <div class="row">
           <div class="col-12">
-            <h4 class="mb-1">Goal title: {{ object.text }}</h4>
-            <h4 class="mb-1">Is this a foreign currency? {{ object.category.text }}</h4>
-            <h4 class="mb-1">ID: {{ object.date }}</h4>
+            <h4 class="mb-1">Budget category : {{ object.category.text }}</h4>
+            <h4 class="mb-1">Budget for {{ object.date }}</h4>
+            <h4 class="mb-1">Budget amount: {{ object.amount | intcomma }}</h4>
           </div>
       </div>
 

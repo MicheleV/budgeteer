@@ -28,8 +28,6 @@ Built with:
 ---------------------
 - Python
 - Django
-- Selenium
-- Ansible
 
 Getting started
 ===============
@@ -48,9 +46,12 @@ Clone the repo::
 
 Install the requirements::
 
+    cd app
     pip install -r requirements.txt
 
 Gather the static files::
+
+    cd app
     python manage.py collectstatic
 
 Provisioning and deploying
@@ -58,6 +59,7 @@ Provisioning and deploying
 
 Install ansible::
 
+    cd app
     python36 -m venv virtualenv
     pip install ansible
 
@@ -74,23 +76,33 @@ Create your ansible inventory file inside ``tools/inventory.ansible`` ::
 
 Provision (on RHEL like distros)::
 
-    cd tools
+    cd app/tools
     ansible-playbook -i inventory.ansible provision.yaml [--limit=<env-name>] [--ask-become-pass]
 
 Deploy::
 
-    cd tools
+    cd app/tools
     ansible-playbook -i inventory.ansible deploy.yaml [--limit=<env-name>] [--ask-become-pass]
 
 Usage
 =======
 Run the development server::
 
+    cd app
+    source virtualenv/bin/activate
     (virtualenv) $ python manage.py runserver [0.0.0.0:80]
 
 Run gunicorn::
 
+    cd app
+    source virtualenv/bin/activate
     (virtualenv) $ gunicorn budgeteer.wsgi:application
+
+Run the dockerized version::
+
+    docker-composer -f docker-compose.yml up -d --build
+    # To stop it. Use -v to delete the volumes as well
+    # docker-composer down [-v]
 
 
 Testing
@@ -102,6 +114,7 @@ Confirm geckodriver is your $PATH::
 
 Install the requirements::
 
+    cd app
     pip install -r test-requirements.txt
 
 `keep option docs <https://docs.djangoproject.com/en/2.2/topics/testing/overview/#the-test-database>`_
@@ -128,10 +141,12 @@ Coverage
 
 Generate coverage::
 
+    cd app
     ./tools/generate_coverage.sh
 
 View it in html::
 
+    cd app
     coverage html
 
 References and useful links

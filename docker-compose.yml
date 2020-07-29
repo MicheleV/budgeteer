@@ -16,13 +16,6 @@ services:
       - POSTGRES_USER=hello_django
       - POSTGRES_PASSWORD=hello_django
       - POSTGRES_DB=hello_django_dev
-  # db:
-  #   image: mariadb:10.1
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data/
-  #   environment:
-  #     MYSQL_USER: "hello_django"
-  #     MYSQL_PASSWORD: "hello_django"
-  #     MYSQL_ROOT_PASSWORD: "docker-root"
+
 volumes:
   postgres_data:

@@ -1,0 +1,33 @@
+version: '3.7'
+
+services:
+  web:
+    build: ./app
+    command: gunicorn budgeteer.wsgi:application --bind "0.0.0.0:8000"
+    volumes:
+      - static_volume:/home/app/web/static
+    expose:
+      - 8000
+    env_file:
+      - ./app/.env
+    depends_on:
+      - db
+  # FIXME: we're running the container as root :O
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./app/.env
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/home/app/web/static
+    ports:
+      - 1337:80
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  static_volume:

@@ -1,14 +1,30 @@
-FROM centos:8
+###########
+# BUILDER #
+###########
 
-MAINTAINER Michele Valsecchi
-LABEL Vendor="CentOS8-python36"
-LABEL Version=0.0.1
+FROM centos:8 as builder
 
 WORKDIR /usr/src/app
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+RUN dnf -y install python36 nc
+RUN alternatives --set python /usr/bin/python3
+RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
+
+COPY ./requirements.txt .
+RUN pip install wheel
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
+
+#########
+# FINAL #
+#########
+FROM centos:8
+
+MAINTAINER Michele Valsecchi
+LABEL Vendor="CentOS8-python36"
+LABEL Version=0.0.1
 
 RUN dnf -y install python36 nc
 RUN alternatives --set python /usr/bin/python3
@@ -20,16 +36,21 @@ RUN groupadd -r app && adduser -r app -g app
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
 RUN mkdir $APP_HOME
+RUN mkdir $APP_HOME/static
 WORKDIR $APP_HOME
 
-COPY ./requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+COPY --from=builder /usr/src/app/wheels /wheels
+COPY --from=builder /usr/src/app/requirements.txt .
+RUN pip install wheel & pip install --no-cache /wheels/*
 
 COPY ./entrypoint.sh $APP_HOME
 COPY . $APP_HOME
 
-# chown all the files to the app user
+
 RUN chown -R app:app $APP_HOME
+# FIXME: avoid permission issues on /static from nginx container
+# We should have a share uid:guid between containers instead
+RUN chmod -R 755 $APP_HOME/static
 
 # change to the app user
 USER app

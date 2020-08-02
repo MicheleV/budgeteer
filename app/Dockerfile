@@ -23,12 +23,16 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 FROM centos:8
 
 MAINTAINER Michele Valsecchi
-LABEL Vendor="CentOS8-python36"
+LABEL Vendor="budgeteer"
 LABEL Version=0.0.1
 
 RUN dnf -y install python36 nc
 RUN alternatives --set python /usr/bin/python3
 RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
+
+# This enable us to install the correct pg_dump version (i.e. need to debug)
+RUN dnf -y module disable postgresql:10
+RUN dnf -y module enable postgresql:12
 
 RUN mkdir -p /home/app
 RUN groupadd -r app && adduser -r app -g app
@@ -48,11 +52,11 @@ COPY . $APP_HOME
 
 
 RUN chown -R app:app $APP_HOME
-# FIXME: avoid permission issues on /static from nginx container
-# We should have a share uid:guid between containers instead
+# Avoid permission issues on /static from nginx container
 RUN chmod -R 755 $APP_HOME/static
+# FIXME: We should have a share uid:guid between containers instead of using 755
+# example: https://github.com/rowdybeaver/sample-django-docker/blob/master/Dockerfile
 
-# change to the app user
 USER app
 
 ENTRYPOINT ["/home/app/web/entrypoint.sh"]

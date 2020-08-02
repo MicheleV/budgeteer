@@ -35,7 +35,7 @@ Getting started
 Prerequisites
 --------------------------
 - Python 3.6 installed
-- geckodriver in your system $PATH
+- geckodriver in your system $PATH (needed for functional tests)
 
 Installation
 --------------------------
@@ -63,7 +63,7 @@ Install ansible::
     python36 -m venv virtualenv
     pip install ansible
 
-Create your ansible inventory file inside ``tools/inventory.ansible`` ::
+Create your ansible inventory file inside ``app/tools/inventory.ansible`` ::
 
     [development]
     <your-server-address> ansible_become=yes ansible_ssh_user=<your-user>
@@ -101,8 +101,6 @@ Run gunicorn::
 Run the dockerized version::
 
     docker-composer -f docker-compose.yml up -d --build
-    # To stop it. Use -v to delete the volumes as well
-    # docker-composer down [-v]
 
 
 Testing
@@ -156,9 +154,6 @@ References and useful links
 2. `About custom selinux policies <https://serverfault.com/a/763507/332670>`_
 3. `CentOS and nginx <https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-virtual-hosts-server-blocks-on-centos-6>`_
 4. `Tmp folder permissions in RHEL like distro <https://stackoverflow.com/a/33223403>`_
-    
-    ...  your system probably using namespaced temporary directories, which means every 
-    service can only see its own files in   /tmp.
 5. `More about it <https://serverfault.com/a/464025>`_
 6. `Fedora wiki on this feature <https://fedoraproject.org/wiki/Features/ServicesPrivateTmp>`_
 7. `Django documentation <https://docs.djangoproject.com/en/2.2/>`_
@@ -167,6 +162,7 @@ References and useful links
 10. `geckodriver <https://github.com/mozilla/geckodriver>`_
 11. `Executing queries on init (e.g. Models.py populating dropdown) <https://stackoverflow.com/a/39084645/2535658>`_
 12. `Imports order convention <https://docs.openstack.org/hacking/latest/user/hacking.html#imports>`_
+13. `Migrate django from sqlite3 to postgreSQL <https://web.archive.org/web/20200802014537/https://www.vphventures.com/how-to-migrate-your-django-project-from-sqlite-to-postgresql/>`_
 
 Author
 =======

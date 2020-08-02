@@ -12,14 +12,13 @@ services:
       - ./app/.env
     depends_on:
       - db
+  # FIXME: we're running the container as root :O
   db:
     image: postgres:12.0-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=hello_django
-      - POSTGRES_PASSWORD=hello_django
-      - POSTGRES_DB=hello_django_dev
+    env_file:
+      - ./app/.env
   nginx:
     build: ./nginx
     volumes:

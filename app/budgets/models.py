@@ -11,7 +11,7 @@ from django.urls import reverse
 
 
 class Category(models.Model):
-    text = models.CharField(max_length=25, default=None, unique=True)
+    text = models.CharField(max_length=40, default=None, unique=True)
     is_archived = models.BooleanField(default=False)
 
     def __str__(self):
@@ -47,7 +47,7 @@ class MonthlyBudget(models.Model):
 
 
 class IncomeCategory(models.Model):
-    text = models.CharField(max_length=20, default=None, unique=True)
+    text = models.CharField(max_length=40, default=None, unique=True)
 
     def __str__(self):
         return f"{self.text}"
@@ -72,7 +72,7 @@ class Income(models.Model):
 
 
 class MonthlyBalanceCategory(models.Model):
-    text = models.CharField(max_length=70, default=None, unique=True)
+    text = models.CharField(max_length=40, default=None, unique=True)
     is_foreign_currency = models.BooleanField(default=False)
 
     def __str__(self):

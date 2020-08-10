@@ -40,7 +40,7 @@ class CategoriesTest(BaseTest):
             filled_form = form(data={'text': text})
             self.assertFalse(filled_form.is_valid())
             self.assertIn(
-              'Ensure this value has at most 20 characters',
+              'Ensure this value has at most 40 characters',
               filled_form.errors['text'].as_text(),
             )
 

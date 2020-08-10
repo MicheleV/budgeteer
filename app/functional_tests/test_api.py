@@ -13,7 +13,7 @@ def test_create_and_delete_expenses(self):
     # Frank can create a category to log his food expenses
     Helpers.create_a_category(self, 'Food')
 
-    url = reverse('api')
+    url = reverse('budgets:api')
     # Frank has knowledge of how to force the site to display json
     secret_url = f"{self.live_server_url}{url}?format=json&json=true'"
     self.browser.get(secret_url)

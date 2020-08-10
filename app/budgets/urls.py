@@ -6,6 +6,8 @@ from django.urls import re_path
 import debug_toolbar
 from budgets import views
 from django.urls import include, path
+
+app_name = 'budgets'
 urlpatterns = [
     # Class based routes ######################################################
     path('categories', views.CategoryListView.as_view(), name='categories'),

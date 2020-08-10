@@ -7,19 +7,19 @@ import functional_tests.helpers as Helpers
 
 
 def test_home_page_has_links_in_nav(self):
-    url = reverse('home')
+    url = reverse('budgets:home')
     self.browser.get(f"{self.live_server_url}{url}")
 
     urls = [
-     reverse('home'),
-     reverse('categories'),
-     reverse('expenses'),
-     reverse('monthly_budgets'),
-     reverse('income_categories'),
-     reverse('incomes'),
-     reverse('monthly_balance_categories'),
-     reverse('monthly_balances'),
-     reverse('goals'),
+     reverse('budgets:home'),
+     reverse('budgets:categories'),
+     reverse('budgets:expenses'),
+     reverse('budgets:monthly_budgets'),
+     reverse('budgets:income_categories'),
+     reverse('budgets:incomes'),
+     reverse('budgets:monthly_balance_categories'),
+     reverse('budgets:monthly_balances'),
+     reverse('budgets:goals'),
     ]
 
     for url in urls:
@@ -29,9 +29,9 @@ def test_home_page_has_links_in_nav(self):
 # Credits http://www.obeythetestinggoat.com/book/
 #         chapter_prettification.html#_static_files_in_django
 # Verify css is properly loaded
-def test_layout_and_styling(self): 
+def test_layout_and_styling(self):
     # Frank loads the page
-    url = reverse('home')
+    url = reverse('budgets:home')
     self.browser.get(f"{self.live_server_url}{url}")
     self.browser.set_window_size(1024, 768)
 
@@ -47,9 +47,9 @@ def test_layout_and_styling(self):
 def check_autofocus(self):
 
     urls = [
-     reverse('categories_create'),
-     reverse('income_categories_create'),
-     reverse('new_monthly_balance_category'),
+     reverse('budgets:categories_create'),
+     reverse('budgets:income_categories_create'),
+     reverse('budgets:new_monthly_balance_category'),
     ]
 
     for url in urls:

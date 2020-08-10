@@ -50,7 +50,7 @@ class CategoryCreateView(CreateView):
     form_class = f.CategoryForm
 
     def get_success_url(self):
-        return reverse('categories')
+        return reverse('budgets:categories')
 
 
 class CategoryListView(ListView):
@@ -64,7 +64,7 @@ class ExpenseCreateView(CreateView):
     form_class = f.ExpenseForm
 
     def get_success_url(self):
-        return reverse('expenses_create')
+        return reverse('budgets:expenses_create')
 
 
 class ExpenseListView(ListView):
@@ -137,7 +137,7 @@ class ExpenseDeleteView(DeleteView):
     model = m.Expense
 
     def get_success_url(self):
-        return reverse('expenses')
+        return reverse('budgets:expenses')
 
 
 class MonthlyBudgetsCreateView(CreateView):
@@ -151,7 +151,7 @@ class MonthlyBudgetsCreateView(CreateView):
         return initial
 
     def get_success_url(self):
-        return reverse('monthly_budgets')
+        return reverse('budgets:monthly_budgets')
 
 
 class MonthlyBudgetListView(ListView):
@@ -180,7 +180,7 @@ class GoalCreateView(CreateView):
     form_class = f.GoalForm
 
     def get_success_url(self):
-        return reverse('goals')
+        return reverse('budgets:goals')
 
 
 class GoalListView(ListView):
@@ -198,7 +198,7 @@ class IncomeCategoryCreateView(CreateView):
     form_class = f.IncomeCategoryForm
 
     def get_success_url(self):
-        return reverse('income_categories')
+        return reverse('budgets:income_categories')
 
 
 class IncomeCategoryView(ListView):
@@ -216,7 +216,7 @@ class IncomCreateView(CreateView):
     form_class = f.IncomeForm
 
     def get_success_url(self):
-        return reverse('incomes')
+        return reverse('budgets:incomes')
 
 
 class IncomeView(ListView):
@@ -244,7 +244,7 @@ class MonthlyBalanceCategoryCreateView(CreateView):
     form_class = f.MonthlyBalanceCategoryForm
 
     def get_success_url(self):
-        return reverse('monthly_balance_categories')
+        return reverse('budgets:monthly_balance_categories')
 
 
 class MonthlyBalanceCategoryView(ListView):
@@ -262,7 +262,7 @@ class MonthlyBalancesCreateView(CreateView):
     form_class = f.MonthlyBalanceForm
 
     def get_success_url(self):
-        return reverse('monthly_balances')
+        return reverse('budgets:monthly_balances')
 
 
 class MonthlyBalancesView(ListView):
@@ -341,14 +341,14 @@ class MonthlyBalanceUpdateView(UpdateView):
     form_class = f.MonthlyBalanceForm
 
     def get_success_url(self):
-        return reverse('monthly_balances')
+        return reverse('budgets:monthly_balances')
 
 
 class MonthlyBalanceDeleteView(DeleteView):
     model = m.MonthlyBalance
 
     def get_success_url(self):
-        return reverse('monthly_balances')
+        return reverse('budgets:monthly_balances')
 
 ###############################################################################
 # API

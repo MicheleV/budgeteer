@@ -10,7 +10,7 @@ import functional_tests.helpers as Helpers
 def test_image_is_not_displayed_without_data(self):
     # Frank has heard of this new graph feature
     # He opens the monthly balances page
-    url = reverse('monthly_balances')
+    url = reverse('budgets:monthly_balances')
     self.browser.get(f"{self.live_server_url}{url}")
     images = self.browser.find_elements_by_tag_name('img')
     # ...but he does not see any shiny graph!

@@ -17,23 +17,24 @@ import budgets.views_utils as utils
 class HomePageTest(BaseTest):
 
     def test_title_is_displayed(self):
-        self.check_if_title_is_displayed('home', 'Budgeteer')
+        self.check_if_title_is_displayed('budgets:home', 'Budgeteer')
 
     def test_uses_correct_view(self):
-        self.check_if_correct_view('home', v.home_page)
-        response = self.get_response_from_named_url('expenses')
+        self.check_if_correct_view('budgets:home', v.home_page)
+        response = self.get_response_from_named_url('budgets:expenses')
 
     def test_uses_correct_template(self):
-        response = self.get_response_from_named_url('home')
+        response = self.get_response_from_named_url('budgets:home')
         self.assertTemplateUsed(response, 'home.html')
 
 
 class CategoriesPageTest(BaseTest):
 
     def test_save_on_POST(self):
-        url = reverse('categories_create')
-        redirect_url = reverse('categories')
+        url = reverse('budgets:categories_create')
+        redirect_url = reverse('budgets:categories')
         text = self.generateString(10)
+
         response = self.client.post(url,  data={'text': text})
 
         self.assertEqual(m.Category.objects.count(), 1)
@@ -41,26 +42,27 @@ class CategoriesPageTest(BaseTest):
         self.assertEqual(new_category.text, text)
 
     def test_redirect_on_POST(self):
-        url = reverse('categories_create')
-        redirect_url = reverse('categories')
+        url = reverse('budgets:categories_create')
+        redirect_url = reverse('budgets:categories')
         text = self.generateString(10)
+
         response = self.client.post(url,  data={'text': text})
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
 
     def test_title_is_displayed(self):
-        self.check_if_title_is_displayed('categories', 'Categories')
+        self.check_if_title_is_displayed('budgets:categories', 'Categories')
 
     # def test_uses_correct_view(self):
     #     self.check_if_correct_view('categories', v.categories_page)
 
     def test_uses_correct_template(self):
-        response = self.get_response_from_named_url('categories')
+        response = self.get_response_from_named_url('budgets:categories')
         self.assertTemplateUsed(response, 'budgets/category_list.html')
 
     # def test_uses_category_form(self):
-    #     response = self.get_response_from_named_url('categories')
+    #     response = self.get_response_from_named_url('budgets:categories')
     #     self.assertIsInstance(response.context['form'], f.CategoryForm)
 
     def test_save_and_retrieve_categories(self):
@@ -69,7 +71,7 @@ class CategoriesPageTest(BaseTest):
         text2 = self.generateString(10)
         second_category = self.create_category(text2)
 
-        response = self.get_response_from_named_url('categories')
+        response = self.get_response_from_named_url('budgets:categories')
         self.assertContains(response, text1)
         self.assertContains(response, text2)
 
@@ -79,7 +81,7 @@ class CategoriesPageTest(BaseTest):
         text2 = self.generateString(10)
         m.Category.objects.create(text=text2)
 
-        response = self.get_response_from_named_url('categories')
+        response = self.get_response_from_named_url('budgets:categories')
         self.assertContains(response, text1)
         self.assertContains(response, text2)
 
@@ -90,8 +92,8 @@ class MonthlyBudgetPageTest(BaseTest):
         text = self.generateString(10)
         cat = self.create_category(text)
 
-        url = reverse('monthly_budgets_create')
-        redirect_url = reverse('monthly_budgets')
+        url = reverse('budgets:monthly_budgets_create')
+        redirect_url = reverse('budgets:monthly_budgets')
         amount = random.randint(1, 90000)
         date = datetime.date.today().replace(day=16).strftime("%Y-%m-%d")
         response = self.client.post(url,  data={'amount': amount,
@@ -107,7 +109,8 @@ class MonthlyBudgetPageTest(BaseTest):
         self.assertEqual(response['location'], redirect_url)
 
     def test_title_is_displayed(self):
-        self.check_if_title_is_displayed('monthly_budgets', 'Monthly budgets')
+        self.check_if_title_is_displayed('budgets:monthly_budgets',
+                                         'Monthly budgets')
 
     # TODO: comment out as we can't compare functions with assertEquals().
     # Need some looking up
@@ -115,11 +118,11 @@ class MonthlyBudgetPageTest(BaseTest):
     #     self.check_if_correct_view('monthly_budgets', v.monthly_budgets_page)
 
     def test_uses_correct_template(self):
-        response = self.get_response_from_named_url('monthly_budgets')
+        response = self.get_response_from_named_url('budgets:monthly_budgets')
         self.assertTemplateUsed(response, 'budgets/monthlybudget_list.html')
 
     # def test_uses_category_form(self):
-    #     response = self.get_response_from_named_url('monthly_budgets')
+    #     response = self.get_response_from_named_url('budgets:monthly_budgets')
     #     self.assertIsInstance(response.context['form'], f.MonthlyBudgetForm)
 
     def test_save_and_retrieve_monthly_budget(self):
@@ -150,16 +153,16 @@ class ExpensesPageTest(BaseTest):
         text = self.generateString(10)
         cat = self.create_category(text)
 
-        url = reverse('expenses_create')
-        redirect_url = reverse('expenses')
+        url = reverse('budgets:expenses_create')
+        redirect_url = reverse('budgets:expenses')
         amount = random.randint(1, 90000)
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
         response = self.client.post(url,  data={'amount': amount,
                                     'date': date, 'category': cat.id})
         exp = m.Expense.objects.first()
 
-        url = reverse('expenses_create')
-        redirect_url = reverse('expenses_create')
+        url = reverse('budgets:expenses_create')
+        redirect_url = reverse('budgets:expenses_create')
 
         self.assertEqual(exp.amount, amount)
         self.assertEqual(exp.date.strftime("%Y-%m-%d"), date)
@@ -167,7 +170,7 @@ class ExpensesPageTest(BaseTest):
 
         # TODO: fix me
         # # Merged test_save_and_retrieve_expenses
-        # view_page = reverse('expenses_create')
+        # view_page = reverse('budgets:expenses_create')
         # second_response = self.client.get(view_page)
         # # Note: we're hardcoding comma as thousand separator in the views
         # self.assertContains(second_response, '{:,}'.format(amount))
@@ -188,14 +191,14 @@ class ExpensesPageTest(BaseTest):
         self.assertEqual(expenses.count(), 1)
 
         # Delete an unexisting object
-        url = reverse('expenses')
+        url = reverse('budgets:expenses')
         arg = {'pk': 7}
-        response = self.get_response_from_named_url('expenses_delete', arg)
+        response = self.get_response_from_named_url('budgets:expenses_delete', arg)
         self.assertEqual(response.status_code, 404)
 
         # Deletion is successful
         arg = {'pk': expense.id}
-        response = self.get_response_from_named_url('expenses_delete', arg)
+        response = self.get_response_from_named_url('budgets:expenses_delete', arg)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], url)
 
@@ -203,7 +206,7 @@ class ExpensesPageTest(BaseTest):
         self.assertEqual(expenses.count(), 0)
 
     def test_title_is_displayed(self):
-        self.check_if_title_is_displayed('expenses', 'Expenses')
+        self.check_if_title_is_displayed('budgets:expenses', 'Expenses')
 
     # TODO: comment out as we can't compare functions with assertEquals().
     # Need some looking up
@@ -211,7 +214,7 @@ class ExpensesPageTest(BaseTest):
     #     self.check_if_correct_view('expenses', v.expenses_page)
 
     def test_uses_correct_template(self):
-        response = self.get_response_from_named_url('expenses')
+        response = self.get_response_from_named_url('budgets:expenses')
         self.assertTemplateUsed(response, 'budgets/expense_list.html')
 
     def test_delete_button_showed_with_param(self):
@@ -223,7 +226,7 @@ class ExpensesPageTest(BaseTest):
         exp = self.create_expense(category, 100, text_2, date)
         exp2 = self.create_expense(category, 100, text_3, date)
 
-        url = f"{reverse('expenses')}?delete=1"
+        url = f"{reverse('budgets:expenses')}?delete=1"
         response = second_response = self.client.get(url)
 
         form = f"form method=\"POST\" action=\"/expenses/delete/{exp.id}\""
@@ -240,7 +243,7 @@ class ExpensesPageTest(BaseTest):
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
         exp = self.create_expense(category, 100, text_2, date)
 
-        url = f"{reverse('expenses')}?delete=0"
+        url = f"{reverse('budgets:expenses')}?delete=0"
         response = second_response = self.client.get(url)
 
         form = 'form method="POST" action="/expenses_delete/'
@@ -265,8 +268,8 @@ class ExpensesPageTest(BaseTest):
 class IncomeCategoriesPageTest(BaseTest):
 
     def test_save_on_POST(self):
-        url = reverse('income_categories_create')
-        redirect_url = reverse('income_categories')
+        url = reverse('budgets:income_categories_create')
+        redirect_url = reverse('budgets:income_categories')
         text = self.generateString(10)
         response = self.client.post(url,  data={'text': text})
         ic = m.IncomeCategory.objects.first()
@@ -274,8 +277,8 @@ class IncomeCategoriesPageTest(BaseTest):
         self.assertEqual(ic.text, text)
 
     def test_redirect_on_POST(self):
-        url = reverse('income_categories_create')
-        redirect_url = reverse('income_categories')
+        url = reverse('budgets:income_categories_create')
+        redirect_url = reverse('budgets:income_categories')
         text = self.generateString(10)
         response = self.client.post(url,  data={'text': text})
 
@@ -283,7 +286,7 @@ class IncomeCategoriesPageTest(BaseTest):
         self.assertEqual(response['location'], redirect_url)
 
     def test_title_is_displayed(self):
-        self.check_if_title_is_displayed('income_categories',
+        self.check_if_title_is_displayed('budgets:income_categories',
                                          'Income Categories')
 
     # TODO: comment out as we can't compare functions with assertEquals().
@@ -291,10 +294,10 @@ class IncomeCategoriesPageTest(BaseTest):
     # def test_uses_correct_view(self):
     #     self.check_if_correct_view('income_categories',
     #                                v.income_categories_page)
-    #     response = self.get_response_from_named_url('income_categories')
+    #     response = self.get_response_from_named_url('budgets:income_categories')
 
     def test_uses_correct_template(self):
-        response = self.get_response_from_named_url('income_categories')
+        response = self.get_response_from_named_url('budgets:income_categories')
         self.assertTemplateUsed(response, 'budgets/incomecategory_list.html')
 
 
@@ -304,8 +307,8 @@ class IncomePageTest(BaseTest):
         text = self.generateString(10)
         cat = self.create_income_category(text)
 
-        url = reverse('incomes_create')
-        redirect_url = reverse('incomes')
+        url = reverse('budgets:incomes_create')
+        redirect_url = reverse('budgets:incomes')
         amount = random.randint(1, 90000)
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
         response = self.client.post(url,  data={'amount': amount,
@@ -322,23 +325,23 @@ class IncomePageTest(BaseTest):
         self.assertEqual(response['location'], redirect_url)
 
     def test_title_is_displayed(self):
-        self.check_if_title_is_displayed('incomes', 'Incomes')
+        self.check_if_title_is_displayed('budgets:incomes', 'Incomes')
 
     # TODO: comment out as we can't compare functions with assertEquals().
     # Need some looking up
     # def test_uses_correct_view(self):
     #     self.check_if_correct_view('incomes', v.incomes_page)
-    #     response = self.get_response_from_named_url('incomes')
+    #     response = self.get_response_from_named_url('budgets:incomes')
 
     def test_uses_correct_template(self):
-        response = self.get_response_from_named_url('incomes')
+        response = self.get_response_from_named_url('budgets:incomes')
         self.assertTemplateUsed(response, 'budgets/income_list.html')
 
 
 class MonthlyBalanceCategoriesTest(BaseTest):
 
     def test_save_on_POST(self):
-        url = reverse('new_monthly_balance_category')
+        url = reverse('budgets:new_monthly_balance_category')
         text = self.generateString(10)
         response = self.client.post(url,  data={'text': text})
         mb = m.MonthlyBalanceCategory.objects.all()
@@ -347,10 +350,10 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         self.assertEqual(mb.text, text)
 
     def test_redirect_on_POST(self):
-        url = reverse('new_monthly_balance_category')
+        url = reverse('budgets:new_monthly_balance_category')
         text = self.generateString(10)
         response = self.client.post(url,  data={'text': text})
-        redirect_url = reverse('monthly_balance_categories')
+        redirect_url = reverse('budgets:monthly_balance_categories')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
 
@@ -362,9 +365,9 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         mb = self.create_monthly_balance(new_category, 42000, date)
 
         show_delete = True
-        redirect_url = reverse('monthly_balances')
+        redirect_url = reverse('budgets:monthly_balances')
         arg = {'pk': mb.id}
-        response = self.get_response_from_named_url('monthly_balances_delete',
+        response = self.get_response_from_named_url('budgets:monthly_balances_delete',
                                                     arg)
 
         self.assertEqual(response.status_code, 302)
@@ -374,7 +377,7 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         self.assertEqual(mb.count(), 0)
 
     def test_title_is_displayed(self):
-        self.check_if_title_is_displayed('monthly_balance_categories',
+        self.check_if_title_is_displayed('budgets:monthly_balance_categories',
                                          'Monthly Balance Categories')
 
     # TODO: comment out as we can't compare functions with assertEquals().
@@ -383,10 +386,10 @@ class MonthlyBalanceCategoriesTest(BaseTest):
     #     self.check_if_correct_view('monthly_balance_categories',
     #                                v.MonthlyBalanceCategoryView.as_view())
     #     named_url = 'monthly_balance_categories'
-    #     response = self.get_response_from_named_url(named_url)
+    #     response = self.get_response_from_named_url(nbudgets:amed_url)
 
     def test_uses_correct_template(self):
-        named_url = 'monthly_balance_categories'
+        named_url = 'budgets:monthly_balance_categories'
         response = self.get_response_from_named_url(named_url)
         template_name = 'budgets/monthlybalancecategory_list.html'
         self.assertTemplateUsed(response, template_name)
@@ -398,8 +401,8 @@ class MonthlyBalanceTest(BaseTest):
         text = self.generateString(10)
         cat = self.create_monthly_balance_category(text)
 
-        url = reverse('monthly_balances_create')
-        redirect_url = reverse('monthly_balances')
+        url = reverse('budgets:monthly_balances_create')
+        redirect_url = reverse('budgets:monthly_balances')
         amount = random.randint(1, 90000)
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
         response = self.client.post(url,  data={'amount': amount,
@@ -425,7 +428,7 @@ class MonthlyBalanceTest(BaseTest):
         date_ym = datetime.date.today().replace(day=1).strftime("%Y-%m")
         mb = self.create_monthly_balance(cat, amount, date_ymd)
 
-        url = f"{reverse('monthly_balances')}/{date_ym}?delete=1"
+        url = f"{reverse('budgets:monthly_balances')}/{date_ym}?delete=1"
         response = second_response = self.client.get(url)
 
         form = 'form method="POST" action="/monthly_balances/delete/'
@@ -438,21 +441,21 @@ class MonthlyBalanceTest(BaseTest):
         pass
 
     def test_title_is_displayed(self):
-        self.check_if_title_is_displayed('monthly_balances',
+        self.check_if_title_is_displayed('budgets:monthly_balances',
                                          'Monthly Balances')
 
     # TODO: comment out as we can't compare functions with assertEquals().
     # Need some looking up
     # def test_uses_correct_view(self):
     #   self.check_if_correct_view('monthly_balances', v.monthly_balances_page)
-    #   response = self.get_response_from_named_url('monthly_balances')
+    #   response = self.get_response_from_named_url('budgets:monthly_balances')
 
     def test_uses_correct_template(self):
-        response = self.get_response_from_named_url('monthly_balances')
+        response = self.get_response_from_named_url('budgets:monthly_balances')
         self.assertTemplateUsed(response, 'budgets/monthlybalance_list.html')
 
 
 class GoalPageTest(BaseTest):
     def test_title_is_displayed(self):
-        self.check_if_title_is_displayed('goals',
+        self.check_if_title_is_displayed('budgets:goals',
                                          'Goals')

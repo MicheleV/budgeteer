@@ -19,6 +19,6 @@
         {% include "budgets/multiple_create_form.html" with form=form%}
     {% endfor %}
     <input type="submit" value="Create all monthly balances">
-    <a href="{% url 'monthly_balances' %}">cancel</a>
+    <a href="{% url 'budgets:monthly_balances' %}">cancel</a>
   </form>
 {% endblock %}

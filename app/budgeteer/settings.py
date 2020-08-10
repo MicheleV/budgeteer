@@ -25,6 +25,11 @@ DEFAULT_RENDERER_CLASSES = (
 
 # Application definition
 INSTALLED_APPS = [
+    # Address https://code.djangoproject.com/ticket/20372
+    # Declaration order: own app -> 3rd party -> django builtins
+    'budgets',
+    'rest_framework',
+    # Not using the admin panel atm
     # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,8 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'budgets',
-    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -137,8 +140,6 @@ else:
     }
 
 
-
-
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -175,3 +176,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# NOTE: avoding the leading slash will lookup the url in the app *where the user during login/logout*
+# Converesly, using a leading slash, will tell django wich namespace to use
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = '/'

@@ -8,8 +8,8 @@
     <div class="col-md-12">
       <!-- FIX ME: THIS LINK IS WRONG, CREATE CreateView and its route! -->
       <h3>Monhtly Budgets</h3>
-      <a href="{% url 'monthly_budgets_create' %}">Create Monhtly Budget</a>
-      <a href="{% url 'monthly_budgets_multiple_create' %}">Create Multiple Monhtly Budget</a>
+      <a href="{% url 'budgets:monthly_budgets_create' %}">Create Monhtly Budget</a>
+      <a href="{% url 'budgets:monthly_budgets_multiple_create' %}">Create Multiple Monhtly Budget</a>
       </div>
     </div>
 
@@ -26,7 +26,7 @@
             </tr>
             {% for category in object_list %}
                 <!-- FIX ME: THIS LINK IS WRONG, CREATE CreateView and its route! -->
-                <td><a href="{% url "monthly_budgets_detail" category.pk %}">{{ category.id }}</a></td>
+                <td><a href="{% url "budgets:monthly_budgets_detail" category.pk %}">{{ category.id }}</a></td>
                 <td>{{ category.category.text }}</td>
                 <td>{{ category.amount | intcomma }}</td>
                 <td>{{ category.date }}</td>

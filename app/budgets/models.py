@@ -79,7 +79,7 @@ class MonthlyBalanceCategory(models.Model):
         return f"{self.text}"
 
     def get_absolute_url(self):
-        named_url = 'monthly_balance_categories_details'
+        named_url = 'budgets:monthly_balance_categories_details'
         return reverse(named_url, args=[str(self.pk)])
 
 
@@ -99,7 +99,7 @@ class MonthlyBalance(models.Model):
         unique_together = ('category', 'date')
 
     def get_absolute_url(self):
-        return reverse('edit_monthly_balance', args=[str(self.pk)])
+        return reverse('budgets:edit_monthly_balance', args=[str(self.pk)])
 
 
 class Goal(models.Model):

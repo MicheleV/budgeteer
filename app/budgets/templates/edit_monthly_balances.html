@@ -9,7 +9,7 @@
   <div  class="col">
     <h5 id="id_current_month_date">Monthly balance editing...</h5>
     <hr>
-    <form method="POST" action="{% url 'edit_monthly_balance' id  %}">
+    <form method="POST" action="{% url 'budgets:edit_monthly_balance' id  %}">
         <!-- FIXME: As this form contains the previously entered data
              We need to hide the errors, in order to be able
             to show them all at once, after the submit button -->

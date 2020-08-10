@@ -71,7 +71,7 @@ def assert_text_is_not_inside_table(self, text, table):
 
 
 def find_url_in_home_page(self, url_to_find):
-    url = reverse('home')
+    url = reverse('budgets:home')
     self.browser.get(f"{self.live_server_url}{url}")
 
     links = self.browser.find_elements_by_tag_name('a')
@@ -98,10 +98,10 @@ def find_error(self, errorText, printErrors=False):
 
 def create_a_category(self, category_name,
                       is_income=False, create_check=True, midway_check=False):
-    url = reverse('categories_create')
+    url = reverse('budgets:categories_create')
 
     if is_income:
-        url = reverse('income_categories_create')
+        url = reverse('budgets:income_categories_create')
 
     # Frank creates a category
     self.browser.get(f"{self.live_server_url}{url}")
@@ -128,7 +128,7 @@ def create_a_category(self, category_name,
 def create_a_monthly_budget(self, category_name, amount, date,
                             create_check=True):
     # Frank visits the monthly expenses page
-    url = reverse('monthly_budgets')
+    url = reverse('budgets:monthly_budgets')
     self.browser.get(f"{self.live_server_url}{url}")
 
     # Frank sees an input box
@@ -160,9 +160,9 @@ def create_a_monthly_budget(self, category_name, amount, date,
 def create_entry(self, amount, category_name, note, expense_date,
                  is_income=False, verify_creation=True):
     # Frank visits the expenses page
-    url = reverse('expenses_create')
+    url = reverse('budgets:expenses_create')
     if is_income:
-        url = reverse('incomes_create')
+        url = reverse('budgets:incomes_create')
 
     self.browser.get(f"{self.live_server_url}{url}")
     # Frank sees an input box
@@ -235,7 +235,7 @@ def create_category_and_two_expenses(self, first_item, second_item,
 
 
 def visit_and_verify_categories(self, category_name, should_exist=True):
-    url = reverse('categories')
+    url = reverse('budgets:categories')
     self.browser.get(f"{self.live_server_url}{url}")
     table = self.browser.find_element_by_id('id_categories')
     if should_exist:

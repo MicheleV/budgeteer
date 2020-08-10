@@ -9,8 +9,8 @@
   <div class="row">
     <div class="col">
       <h3>Monthly Balances</h3>
-      <a href="{% url 'monthly_balances_create' %}">Create Monhtly Balance</a>
-      <a href="{% url 'monthly_balances_multiple_create' %}">Create Multiple Monhtly Balances</a>
+      <a href="{% url 'budgets:monthly_balances_create' %}">Create Monhtly Balance</a>
+      <a href="{% url 'budgets:monthly_balances_multiple_create' %}">Create Multiple Monhtly Balances</a>
     </div>
   </div>
 
@@ -39,7 +39,7 @@
               <td>{{ monthly_balance.date | date:'Y-m' }}</td>
               <td>{{ monthly_balance.amount | intcomma }}</td>
               {% with ym_date=monthly_balance.date|date:'Y-m' %}
-                <td><a href={% url 'monthly_balances' ym_date %}>See details</a></td>
+                <td><a href={% url 'budgets:monthly_balances' ym_date %}>See details</a></td>
               {% endwith %}
               </tr>
             {% endfor %}

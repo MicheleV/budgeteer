@@ -41,7 +41,7 @@ def test_expenses_sum_appear_on_home_page(self):
                                              second_expense, category_name)
 
     # Frank sees the sum of this month expenses on the home page
-    url = reverse('home')
+    url = reverse('budgets:home')
     self.browser.get(f"{self.live_server_url}{url}")
     Helpers.check_amount_and_cat_name(self, curr_mont_amount, category_name)
 
@@ -78,7 +78,7 @@ def test_expenses_page_can_show_old_expenses(self):
 
     # Frank visit the expenses page using a parameter
     # (Frank manually changes the URL as he can not find any dropdown yet)
-    expense_url = reverse('expenses')
+    expense_url = reverse('budgets:expenses')
     url = f"{self.live_server_url}{expense_url}/{first_rent_date_ym}"
     self.browser.get(url)
 
@@ -113,7 +113,7 @@ def test_only_expenses_in_range_are_shown(self):
     # Frank has changed his mind: "Testing is important" he says.
     # Frank then enters a special URL to check the expenses creation...but he
     # enters the wrong end date
-    expense_url = reverse('expenses')
+    expense_url = reverse('budgets:expenses')
     url = f"{self.live_server_url}{expense_url}/2020-01-01/2020-01-02"
     self.browser.get(url)
 
@@ -128,7 +128,7 @@ def test_only_expenses_in_range_are_shown(self):
 
     # Frank then gets very anxious... but then Frank breathes, and re-types the
     # URL. He notices he had typed the wrong one: "Silly me!" he mumbles.
-    expense_url = reverse('expenses')
+    expense_url = reverse('budgets:expenses')
     url = f"{self.live_server_url}{expense_url}/2020-01-01/2020-01-07"
     self.browser.get(url)
     formatted_second_amount = f'{second_amount:n}'
@@ -149,7 +149,7 @@ def test_only_expenses_in_range_are_shown(self):
 
     # Frank then enters a special URL that allows him to only show expenses
     # broken down by months
-    expense_url = reverse('expenses')
+    expense_url = reverse('budgets:expenses')
     url = f"{self.live_server_url}{expense_url}/2019-12-01/2019-12-31"
     self.browser.get(url)
 
@@ -158,7 +158,7 @@ def test_only_expenses_in_range_are_shown(self):
                                        category_name, third_note)
 
     # TODO: Frank then want to see all expenses
-    expense_url = reverse('expenses')
+    expense_url = reverse('budgets:expenses')
     url = f"{self.live_server_url}{expense_url}/2019-12-01/2020-01-31"
 
 

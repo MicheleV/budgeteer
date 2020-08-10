@@ -7,7 +7,7 @@
   <div class="row">
     <div class="col-md-12">
       <h3>Goals</h3>
-      <a href="{% url 'goals_create' %}">Create goal</a>
+      <a href="{% url 'budgets:goals_create' %}">Create goal</a>
     </div>
   </div>
 
@@ -25,7 +25,7 @@
             </tr>
             {% for goal in goal_list %}
               <tr>
-                <td><a href="{% url "goals_detail" goal.pk %}">{{ goal.id }}</a></td>
+                <td><a href="{% url "budgets:goals_detail" goal.pk %}">{{ goal.id }}</a></td>
                 <td>{{ goal.amount | intcomma }}</td>
                 <td>{{ goal.text }}</td>
                 <td>{{ goal.note }}</td>

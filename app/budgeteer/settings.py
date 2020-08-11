@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     # Address https://code.djangoproject.com/ticket/20372
     # Declaration order: own app -> 3rd party -> django builtins
     'budgets',
+    'api',
     'rest_framework',
     # Not using the admin panel atm
     # 'django.contrib.admin',

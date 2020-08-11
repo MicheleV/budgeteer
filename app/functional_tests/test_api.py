@@ -13,7 +13,7 @@ def test_create_and_delete_expenses(self):
     # Frank can create a category to log his food expenses
     Helpers.create_a_category(self, 'Food')
 
-    url = reverse('budgets:api')
+    url = reverse('api:categories')
     # Frank has knowledge of how to force the site to display json
     secret_url = f"{self.live_server_url}{url}?format=json&json=true'"
     self.browser.get(secret_url)
@@ -35,7 +35,7 @@ def test_create_and_delete_expenses(self):
     html = self.browser.find_element_by_tag_name('html')
     json_res = json.loads(html.text)
 
-    # Franks is happy with the resutls
+    # Franks is happy with the results
     self.assertEqual(len(json_res), 2)
     self.assertEqual(json_res[1]['id'], 2)
     self.assertEqual(json_res[1]['text'], 'Rent')

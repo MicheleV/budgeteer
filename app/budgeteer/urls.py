@@ -22,6 +22,7 @@ from django.conf.urls import url
 # Warning: month is always two digits (i.e. Jan -> '01', not '1')
 urlpatterns = [
     path('', include('budgets.urls')),
+    path('api/', include('api.urls')),
 ]
 
 if 'y' in os.getenv("DJANGO_DEBUG_MODE"):

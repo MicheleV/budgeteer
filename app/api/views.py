@@ -9,7 +9,7 @@ from budgets.serializers import CategorySerializer
 # API
 ###############################################################################
 
-# TODO: move me inside a namespace
+
 @api_view(['GET'])
 # @renderer_classes([JSONRenderer])
 def api_categories(request):

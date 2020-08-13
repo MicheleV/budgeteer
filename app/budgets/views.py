@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 import math
 import os
 
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db.models import Sum
 from django.db.models import F
@@ -18,6 +19,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView
@@ -39,12 +41,8 @@ import budgets.views_utils as utils
 # Class based views
 ###############################################################################
 
-# TODO: find out how to decorate Classes as_view() function
-# https://jsatt.com/blog/decorators-vs-mixins-for-django-class-based-views
-# @require_http_methods(["GET"])
-# def dispatch(self, request, *args, **kwargs):
-#     return super(CategoryListView, self).dispatch(request, *args, **kwargs)
 
+@method_decorator(login_required, name='dispatch')
 class CategoryCreateView(CreateView):
     model = m.Category
     form_class = f.CategoryForm
@@ -53,12 +51,14 @@ class CategoryCreateView(CreateView):
         return reverse('budgets:categories')
 
 
+@method_decorator(login_required, name='dispatch')
 class CategoryListView(ListView):
     model = m.Category
     paginate_by = 15
     ordering = ['id']
 
 
+@method_decorator(login_required, name='dispatch')
 class ExpenseCreateView(CreateView):
     model = m.Expense
     form_class = f.ExpenseForm
@@ -67,6 +67,7 @@ class ExpenseCreateView(CreateView):
         return reverse('budgets:expenses_create')
 
 
+@method_decorator(login_required, name='dispatch')
 class ExpenseListView(ListView):
     model = m.Expense
     paginate_by = 30
@@ -133,6 +134,7 @@ class ExpenseListView(ListView):
         return expenses
 
 
+@method_decorator(login_required, name='dispatch')
 class ExpenseDeleteView(DeleteView):
     model = m.Expense
 
@@ -140,6 +142,7 @@ class ExpenseDeleteView(DeleteView):
         return reverse('budgets:expenses')
 
 
+@method_decorator(login_required, name='dispatch')
 class MonthlyBudgetsCreateView(CreateView):
     model = m.MonthlyBudget
     form_class = f.MonthlyBudgetForm
@@ -154,6 +157,7 @@ class MonthlyBudgetsCreateView(CreateView):
         return reverse('budgets:monthly_budgets')
 
 
+@method_decorator(login_required, name='dispatch')
 class MonthlyBudgetListView(ListView):
     model = m.MonthlyBudget
     paginate_by = 15
@@ -171,10 +175,12 @@ class MonthlyBudgetListView(ListView):
         return mb
 
 
+@method_decorator(login_required, name='dispatch')
 class MonthlyBudgetDetailView(DetailView):
     model = m.MonthlyBudget
 
 
+@method_decorator(login_required, name='dispatch')
 class GoalCreateView(CreateView):
     model = m.Goal
     form_class = f.GoalForm
@@ -183,16 +189,19 @@ class GoalCreateView(CreateView):
         return reverse('budgets:goals')
 
 
+@method_decorator(login_required, name='dispatch')
 class GoalListView(ListView):
     model = m.Goal
     paginate_by = 15
     ordering = ['id']
 
 
+@method_decorator(login_required, name='dispatch')
 class GoalDetailView(DetailView):
     model = m.Goal
 
 
+@method_decorator(login_required, name='dispatch')
 class IncomeCategoryCreateView(CreateView):
     model = m.IncomeCategory
     form_class = f.IncomeCategoryForm
@@ -201,16 +210,19 @@ class IncomeCategoryCreateView(CreateView):
         return reverse('budgets:income_categories')
 
 
+@method_decorator(login_required, name='dispatch')
 class IncomeCategoryView(ListView):
     model = m.IncomeCategory
     paginate_by = 15
     ordering = ['id']
 
 
+@method_decorator(login_required, name='dispatch')
 class IncomeCategoryDetailView(DetailView):
     model = m.IncomeCategory
 
 
+@method_decorator(login_required, name='dispatch')
 class IncomCreateView(CreateView):
     model = m.Income
     form_class = f.IncomeForm
@@ -219,6 +231,7 @@ class IncomCreateView(CreateView):
         return reverse('budgets:incomes')
 
 
+@method_decorator(login_required, name='dispatch')
 class IncomeView(ListView):
     model = m.Income
     paginate_by = 15
@@ -239,6 +252,7 @@ class IncomeView(ListView):
         return incomes
 
 
+@method_decorator(login_required, name='dispatch')
 class MonthlyBalanceCategoryCreateView(CreateView):
     model = m.MonthlyBalanceCategory
     form_class = f.MonthlyBalanceCategoryForm
@@ -247,16 +261,19 @@ class MonthlyBalanceCategoryCreateView(CreateView):
         return reverse('budgets:monthly_balance_categories')
 
 
+@method_decorator(login_required, name='dispatch')
 class MonthlyBalanceCategoryView(ListView):
     model = m.MonthlyBalanceCategory
     paginate_by = 15
     ordering = ['id']
 
 
+@method_decorator(login_required, name='dispatch')
 class MonthlyBalanceCategoryDetailView(DetailView):
     model = m.MonthlyBalanceCategory
 
 
+@method_decorator(login_required, name='dispatch')
 class MonthlyBalancesCreateView(CreateView):
     model = m.MonthlyBalance
     form_class = f.MonthlyBalanceForm
@@ -265,6 +282,7 @@ class MonthlyBalancesCreateView(CreateView):
         return reverse('budgets:monthly_balances')
 
 
+@method_decorator(login_required, name='dispatch')
 class MonthlyBalancesView(ListView):
     model = m.MonthlyBalance
 
@@ -300,6 +318,7 @@ class MonthlyBalancesView(ListView):
         return context
 
 
+@method_decorator(login_required, name='dispatch')
 class MonthlyBalancesSingleMonthView(ListView):
     """
     Show monhtly balances for a given month
@@ -336,6 +355,7 @@ class MonthlyBalancesSingleMonthView(ListView):
 
 
 # This class is reusing the same template as MonthlyBalancesCreateView
+@method_decorator(login_required, name='dispatch')
 class MonthlyBalanceUpdateView(UpdateView):
     model = m.MonthlyBalance
     form_class = f.MonthlyBalanceForm
@@ -344,6 +364,7 @@ class MonthlyBalanceUpdateView(UpdateView):
         return reverse('budgets:monthly_balances')
 
 
+@method_decorator(login_required, name='dispatch')
 class MonthlyBalanceDeleteView(DeleteView):
     model = m.MonthlyBalance
 
@@ -354,7 +375,7 @@ class MonthlyBalanceDeleteView(DeleteView):
 ###############################################################################
 # Function based classes
 ###############################################################################
-
+@login_required
 @require_http_methods(["GET", "POST"])
 def multiple_new_monthly_budget(request):
     categories = m.Category.objects.filter(is_archived=False)
@@ -387,6 +408,7 @@ def multiple_new_monthly_budget(request):
                    'previous_budgets': prev_month_dic})
 
 
+@login_required
 @require_http_methods(["GET", "POST"])
 def multiple_new_monthly_balance(request):
     categories = m.MonthlyBalanceCategory.objects.filter()
@@ -419,11 +441,18 @@ def multiple_new_monthly_balance(request):
 
 
 # TODO: write me
+@login_required
 @require_http_methods(["GET", "POST"])
 def edit_new_monthly_balance(request):
     pass
 
 
+@require_http_methods(["GET"])
+def landing_page(request):
+    return render(request, 'landing_page.html')
+
+
+@login_required
 @require_http_methods(["GET"])
 def home_page(request):
     """

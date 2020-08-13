@@ -23,6 +23,7 @@ from django.conf.urls import url
 urlpatterns = [
     path('', include('budgets.urls')),
     path('api/', include('api.urls')),
+    path('accounts/', include('accounts.urls'))
 ]
 
 if 'y' in os.getenv("DJANGO_DEBUG_MODE"):

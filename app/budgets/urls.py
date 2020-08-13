@@ -103,4 +103,5 @@ urlpatterns = [
 
     # ############### Function based routes #################
     path('', views.home_page, name='home'),
+    path('landing_page', views.landing_page, name='landing_page'),
 ]

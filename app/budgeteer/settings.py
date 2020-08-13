@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     # Declaration order: own app -> 3rd party -> django builtins
     'budgets',
     'api',
+    'accounts',
     'rest_framework',
     # Not using the admin panel atm
     # 'django.contrib.admin',
@@ -180,5 +181,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # NOTE: avoding the leading slash will lookup the url in the app *where the user during login/logout*
 # Converesly, using a leading slash, will tell django wich namespace to use
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/landing_page'

@@ -96,6 +96,38 @@ def find_error(self, errorText, printErrors=False):
     )
 
 
+# TODO, turn this into a decorator <====================================
+def create_user(self, username=None, password=None):
+    """
+    Sign up and create an user
+    """
+    if not username:
+        username = generateString()
+    if not password:
+        password = generateString()
+
+    url = reverse('accounts:signup')
+    self.browser.get(f"{self.live_server_url}{url}")
+
+    # Frank sign up: first he enters a gibberish username, he likes privacy
+    user_input_box = self.browser.find_element_by_id('id_username')
+    user_input_box.send_keys(username)
+
+    # Frank then insert a random password... Frank likes security
+    pwd_input_1 = self.browser.find_element_by_id('id_password1')
+    pwd_input_1.send_keys(password)
+
+    # Frank re-inputs the same password, Frank really knows how web form works!
+    pwd_input_2 = self.browser.find_element_by_id('id_password2')
+    pwd_input_2.send_keys(password)
+
+    # Frank see a submit button
+    submit_button = self.browser.find_elements_by_tag_name('button')
+    submit_button[0].click()
+
+    return (username, password)
+
+
 def create_a_category(self, category_name,
                       is_income=False, create_check=True, midway_check=False):
     url = reverse('budgets:categories_create')

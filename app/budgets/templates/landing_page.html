@@ -1,4 +1,44 @@
-<h2>Stylish landing page</h2>
+{% load staticfiles %}
 
-<a href="{% url 'accounts:signup' %}">Signup</a>
-<a href="{% url 'accounts:login' %}">Login</a>
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Budgeteer</title>
+    <link href="{% static 'bootstrap/css/bootstrap.css' %}" rel="stylesheet" media="all">
+    {% block preload_js %}{% endblock %}
+  </head>
+
+  <body>
+
+     <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="text-center">
+            <a href="{% url 'accounts:signup' %}">Signup</a>
+            <a href="{% url 'accounts:login' %}">Login</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div class="col-md-12">
+    <div class="text-center">
+      <footer class="page-footer font-small">
+        <span id="footer_text">
+          If this is horizontally centered, CSS was loaded correctly ;)
+        </span>
+      </footer>
+    </div>
+  </div>
+
+  </body>
+
+
+</html>
+
+
+

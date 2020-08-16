@@ -8,6 +8,8 @@ import functional_tests.helpers as Helpers
 
 
 def test_image_is_not_displayed_without_data(self):
+    Helpers.create_user(self)
+
     # Frank has heard of this new graph feature
     # He opens the monthly balances page
     url = reverse('budgets:monthly_balances')

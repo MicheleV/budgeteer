@@ -7,6 +7,8 @@ import functional_tests.helpers as Helpers
 
 
 def test_home_page_has_links_in_nav(self):
+    Helpers.create_user(self)
+
     url = reverse('budgets:home')
     self.browser.get(f"{self.live_server_url}{url}")
 
@@ -30,8 +32,10 @@ def test_home_page_has_links_in_nav(self):
 #         chapter_prettification.html#_static_files_in_django
 # Verify css is properly loaded
 def test_layout_and_styling(self):
+    Helpers.create_user(self)
+
     # Frank loads the page
-    url = reverse('budgets:home')
+    url = reverse('budgets:landing_page')
     self.browser.get(f"{self.live_server_url}{url}")
     self.browser.set_window_size(1024, 768)
 
@@ -45,6 +49,7 @@ def test_layout_and_styling(self):
 
 
 def check_autofocus(self):
+    Helpers.create_user(self)
 
     urls = [
      reverse('budgets:categories_create'),

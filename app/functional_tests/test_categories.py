@@ -8,6 +8,8 @@ def test_cant_create_an_empty_expense_category(self):
     category_text = None
     is_income_category = False
     run_verification = False
+
+    Helpers.create_user(self)
     Helpers.create_a_category(self, category_text,
                               is_income_category, run_verification)
 

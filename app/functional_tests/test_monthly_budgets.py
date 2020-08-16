@@ -19,6 +19,8 @@ def test_cant_create_an_empty_monthly_budget(self):
 
 @skip
 def test_can_create_multiple_monthly_budgets(self):
+    Helpers.create_user(self)
+
     # Frank creates a category to log expenses related his rent
     category_name = 'Rent'
     Helpers.create_a_category(self, category_name)
@@ -84,8 +86,11 @@ def test_can_create_multiple_monthly_budgets(self):
     # should be cloned from the previous one
     # self.fail("Write me!")
 
+
 @skip
 def test_cant_create_multiple_monthly_budgets_for_same_month(self):
+    Helpers.create_user(self)
+
     # Frank creates a category to log expenses related his rent
     category_name = 'Rent'
     Helpers.create_a_category(self, category_name)

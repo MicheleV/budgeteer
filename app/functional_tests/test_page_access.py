@@ -3,6 +3,8 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.urls import reverse
 
+import functional_tests.helpers as Helpers
+
 
 def test_can_access_page(self, named_url, title):
     url = reverse(named_url)
@@ -17,6 +19,12 @@ def test_cant_access_admin_page(self):
 
 
 def test_access_to_all_pages(self):
+    test_can_access_page(self, 'budgets:landing_page', 'Budgeteer')
+
+    # Frank register himself and then accesses some pages
+    Helpers.create_user(self)
+
+    # Frank notices they are all browseable: Frank is happy
     test_can_access_page(self, 'budgets:home', 'Budgeteer')
     test_can_access_page(self, 'budgets:categories', 'Categories')
     test_can_access_page(self, 'budgets:expenses', 'Expense')

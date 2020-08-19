@@ -22,8 +22,10 @@ def test_cant_create_expenses_without_selecting_a_category(self):
     pass
 
 
+@Helpers.register_and_login
 @skip
 def test_expenses_sum_appear_on_home_page(self):
+
     category_name = 'Rent'
     curr_mont_amount = 500
     next_month_amount = 420
@@ -53,6 +55,7 @@ def test_expenses_sum_appear_on_home_page(self):
     Helpers.check_current_month(self, curr_mont_amount, category_name)
 
 
+@Helpers.register_and_login
 @skip
 def test_expenses_page_can_show_old_expenses(self):
     category_name = 'Rent'
@@ -88,7 +91,9 @@ def test_expenses_page_can_show_old_expenses(self):
                                        amount, category_name, note)
 
 
+@Helpers.register_and_login
 def test_only_expenses_in_range_are_shown(self):
+
     # Frank creates 2 expenses for January 2020
     category_name = Helpers.generateString()
     Helpers.create_a_category(self, category_name)
@@ -96,6 +101,9 @@ def test_only_expenses_in_range_are_shown(self):
     # Frank is not going to check if the expenses are created as he always does
     # Frank now believes into this sowftware!
     is_income = False
+    # We skip verication because...the function is old and broke down due to
+    # the new redirect to /expense/create on success ?
+    # TODO: check if this is the case, and fix it if needed
     verify_creation = False
 
     amount = 4000
@@ -118,7 +126,7 @@ def test_only_expenses_in_range_are_shown(self):
     self.browser.get(url)
 
     # Frank notices the first expenses is shown. Frank is so happy
-    formatted_amount = f'{amount:n}'
+    formatted_amount = f'{amount:,}'
     Helpers.verify_expense_was_created(self, formatted_amount, category_name,
                                        note)
 
@@ -131,7 +139,7 @@ def test_only_expenses_in_range_are_shown(self):
     expense_url = reverse('budgets:expenses')
     url = f"{self.live_server_url}{expense_url}/2020-01-01/2020-01-07"
     self.browser.get(url)
-    formatted_second_amount = f'{second_amount:n}'
+    formatted_second_amount = f'{second_amount:,}'
 
     # Frank now sees both expenses, he smiles. Frank is so relieved now
     Helpers.verify_expense_was_created(self, formatted_amount, category_name,
@@ -153,7 +161,7 @@ def test_only_expenses_in_range_are_shown(self):
     url = f"{self.live_server_url}{expense_url}/2019-12-01/2019-12-31"
     self.browser.get(url)
 
-    formatted_third_amount = f'{third_amount:n}'
+    formatted_third_amount = f'{third_amount:,}'
     Helpers.verify_expense_was_created(self, formatted_third_amount,
                                        category_name, third_note)
 

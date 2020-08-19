@@ -7,10 +7,10 @@ from django.urls import resolve
 from django.urls import reverse
 import functional_tests.helpers as Helpers
 
-
-# 'http://development-server.net/api/?format=json&json=true'
+# Use this syntax to get plain json
+# http://example.com/<route-name>?format=json&json=true'
+@Helpers.register_and_login
 def test_create_and_delete_expenses(self):
-    Helpers.create_user(self)
 
     # Frank can create a category to log his food expenses
     Helpers.create_a_category(self, 'Food')

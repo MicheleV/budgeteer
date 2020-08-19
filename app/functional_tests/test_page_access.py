@@ -18,11 +18,9 @@ def test_cant_access_admin_page(self):
     self.assertIn('not found', header_text.lower())
 
 
+@Helpers.register_and_login
 def test_access_to_all_pages(self):
     test_can_access_page(self, 'budgets:landing_page', 'Budgeteer')
-
-    # Frank register himself and then accesses some pages
-    Helpers.create_user(self)
 
     # Frank notices they are all browseable: Frank is happy
     test_can_access_page(self, 'budgets:home', 'Budgeteer')

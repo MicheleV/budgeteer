@@ -6,8 +6,9 @@ from django.urls import reverse
 import functional_tests.helpers as Helpers
 
 
+@Helpers.register_and_login
 def test_home_page_has_links_in_nav(self):
-    Helpers.create_user(self)
+    # Helpers.create_user(self)
 
     url = reverse('budgets:home')
     self.browser.get(f"{self.live_server_url}{url}")
@@ -32,7 +33,7 @@ def test_home_page_has_links_in_nav(self):
 #         chapter_prettification.html#_static_files_in_django
 # Verify css is properly loaded
 def test_layout_and_styling(self):
-    Helpers.create_user(self)
+    # Helpers.create_user(self)
 
     # Frank loads the page
     url = reverse('budgets:landing_page')
@@ -48,9 +49,8 @@ def test_layout_and_styling(self):
     )
 
 
+@Helpers.register_and_login
 def check_autofocus(self):
-    Helpers.create_user(self)
-
     urls = [
      reverse('budgets:categories_create'),
      reverse('budgets:income_categories_create'),

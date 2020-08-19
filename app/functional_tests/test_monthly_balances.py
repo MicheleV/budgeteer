@@ -6,9 +6,9 @@ from django.urls import resolve
 
 import functional_tests.helpers as Helpers
 
-
+# FIX ME: this test will succeed for ANY failure, not only for missing images
+@Helpers.register_and_login
 def test_image_is_not_displayed_without_data(self):
-    Helpers.create_user(self)
 
     # Frank has heard of this new graph feature
     # He opens the monthly balances page

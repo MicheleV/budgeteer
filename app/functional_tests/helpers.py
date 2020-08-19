@@ -43,7 +43,7 @@ def wait_for_page_to_reload(self):
         old_page = self.browser.find_element_by_tag_name('html')
         element = wait.until(EC.staleness_of(old_page))
     else:
-        # TODO investigate why chromium does work without this
+        # TODO: investigate why chromium does work without this
         pass
 
 
@@ -75,7 +75,6 @@ def find_url_in_home_page(self, url_to_find):
     self.browser.get(f"{self.live_server_url}{url}")
 
     links = self.browser.find_elements_by_tag_name('a')
-
     self.assertTrue(
         any(url_to_find in link.get_attribute('href') for link in links),
         f"No url: {url_to_find} was found in the Page. links were\n{links}",
@@ -96,10 +95,20 @@ def find_error(self, errorText, printErrors=False):
     )
 
 
-# TODO, turn this into a decorator <====================================
+def register_and_login(func):
+    """
+    Decorator that create a random user, log in as it, and log out at the end
+    """
+    def wrapper(*args, **kwargs):
+        create_user(*args, **kwargs)
+        func(*args, **kwargs)
+        logout_user(*args, **kwargs)
+    return wrapper
+
+
 def create_user(self, username=None, password=None):
     """
-    Sign up and create an user
+    Sign up, and automatically log in as said user
     """
     if not username:
         username = generateString()
@@ -128,10 +137,18 @@ def create_user(self, username=None, password=None):
     return (username, password)
 
 
+def logout_user(self):
+    """
+    Simply log out
+    """
+    url = reverse('accounts:logout')
+    self.browser.get(f"{self.live_server_url}{url}")
+
+
+# TODO: is_income is making the logic complex, refactor
 def create_a_category(self, category_name,
                       is_income=False, create_check=True, midway_check=False):
     url = reverse('budgets:categories_create')
-
     if is_income:
         url = reverse('budgets:income_categories_create')
 
@@ -160,7 +177,7 @@ def create_a_category(self, category_name,
 def create_a_monthly_budget(self, category_name, amount, date,
                             create_check=True):
     # Frank visits the monthly expenses page
-    url = reverse('budgets:monthly_budgets')
+    url = reverse('budgets:monthly_budgets_create')
     self.browser.get(f"{self.live_server_url}{url}")
 
     # Frank sees an input box
@@ -189,6 +206,7 @@ def create_a_monthly_budget(self, category_name, amount, date,
                                            formatted_amount, date)
 
 
+# TODO: is_income is making the logic complex, refactor
 def create_entry(self, amount, category_name, note, expense_date,
                  is_income=False, verify_creation=True):
     # Frank visits the expenses page

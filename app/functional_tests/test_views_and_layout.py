@@ -7,11 +7,9 @@ import functional_tests.helpers as Helpers
 
 
 @Helpers.register_and_login
-def test_home_page_has_links_in_nav(self):
-    # Helpers.create_user(self)
-
+def test_home_page_has_links_in_nav(tester):
     url = reverse('budgets:home')
-    self.browser.get(f"{self.live_server_url}{url}")
+    tester.browser.get(f"{tester.live_server_url}{url}")
 
     urls = [
      reverse('budgets:home'),
@@ -26,23 +24,21 @@ def test_home_page_has_links_in_nav(self):
     ]
 
     for url in urls:
-        Helpers.find_url_in_home_page(self, url)
+        Helpers.find_url_in_home_page(tester, url)
 
 
 # Credits http://www.obeythetestinggoat.com/book/
 #         chapter_prettification.html#_static_files_in_django
 # Verify css is properly loaded
-def test_layout_and_styling(self):
-    # Helpers.create_user(self)
-
+def test_layout_and_styling(tester):
     # Frank loads the page
     url = reverse('budgets:landing_page')
-    self.browser.get(f"{self.live_server_url}{url}")
-    self.browser.set_window_size(1024, 768)
+    tester.browser.get(f"{tester.live_server_url}{url}")
+    tester.browser.set_window_size(1024, 768)
 
     # Frank notices the logo at the bottom is nicely centered
-    inputbox = self.browser.find_element_by_css_selector('#footer_text')
-    self.assertAlmostEqual(
+    inputbox = tester.browser.find_element_by_css_selector('#footer_text')
+    tester.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
             512,
             delta=10
@@ -50,7 +46,7 @@ def test_layout_and_styling(self):
 
 
 @Helpers.register_and_login
-def check_autofocus(self):
+def check_autofocus(tester):
     urls = [
      reverse('budgets:categories_create'),
      reverse('budgets:income_categories_create'),
@@ -58,6 +54,6 @@ def check_autofocus(self):
     ]
 
     for url in urls:
-        self.browser.get(f"{self.live_server_url}{url}")
-        inputbox = self.browser.find_element_by_id('id_text')
-        self.assertTrue(inputbox.get_attribute("autofocus"))
+        tester.browser.get(f"{tester.live_server_url}{url}")
+        inputbox = tester.browser.find_element_by_id('id_text')
+        tester.assertTrue(inputbox.get_attribute("autofocus"))

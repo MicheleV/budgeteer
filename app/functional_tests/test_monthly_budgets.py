@@ -10,13 +10,14 @@ from django.urls import reverse
 import functional_tests.helpers as Helpers
 
 
-def test_cant_create_an_empty_monthly_budget(self):
+def test_cant_create_an_empty_monthly_budget(tester):
     # TODO Franks wants to create a budget but being confused,
     # he enters an empty sum and tries to press 'Submit'...
     # ...Nothing happens!
     pass
 
 
+# TODO: replace self with tester for readability, once we remove @skip
 @skip
 @Helpers.register_and_login
 def test_can_create_multiple_monthly_budgets(self):
@@ -86,6 +87,7 @@ def test_can_create_multiple_monthly_budgets(self):
     # self.fail("Write me!")
 
 
+# TODO: replace self with tester for readability, once we remove @skip
 @skip
 @Helpers.register_and_login
 def test_cant_create_multiple_monthly_budgets_for_same_month(self):

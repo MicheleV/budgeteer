@@ -7,6 +7,7 @@ import functional_tests.helpers as Helpers
 
 
 # FIX ME: this test will succeed for ANY failure, not only for creation failure
+# TODO: replace self with tester for readability, once we remove @skip
 @Helpers.register_and_login
 @skip
 def test_cant_create_an_empty_expense_category(self):
@@ -29,6 +30,7 @@ def test_cant_create_an_empty_expense_category(self):
     # Helpers.assert_text_is_not_inside_table(self, '1', table)
 
 
+# TODO: replace self with tester for readability, once we remove @skip
 @Helpers.register_and_login
 @skip
 def test_can_create_multiple_expense_categories(self):
@@ -41,6 +43,7 @@ def test_can_create_multiple_expense_categories(self):
 
 
 # FIX ME: this test will succeed for ANY failure, not only for creation failure
+# TODO: replace self with tester for readability, once we remove @skip
 @Helpers.register_and_login
 @skip
 def test_cant_create_duplicate_expense_categories(self):
@@ -52,7 +55,7 @@ def test_cant_create_duplicate_expense_categories(self):
     Helpers.create_a_category(self, 'Rent', is_income=True,
                               create_check=False, midway_check=True)
 
-
+# TODO: replace self with tester for readability, once we remove @skip
 @Helpers.register_and_login
 @skip
 def test_cant_create_an_empty_income_category(self):
@@ -70,7 +73,7 @@ def test_cant_create_an_empty_income_category(self):
     table = self.browser.find_element_by_id('id_categories')
     Helpers.assert_text_is_not_inside_table(self, '1', table)
 
-
+# TODO: replace self with tester for readability, once we remove @skip
 @Helpers.register_and_login
 @skip
 def test_can_create_multiple_income_categories(self):
@@ -83,7 +86,7 @@ def test_can_create_multiple_income_categories(self):
     Helpers.create_a_category(self, 'MoneyTree',
                               is_income_category, run_verification)
 
-
+# TODO: replace self with tester for readability, once we remove @skip
 @Helpers.register_and_login
 @skip
 def test_cant_create_duplicate_income_categories(self):

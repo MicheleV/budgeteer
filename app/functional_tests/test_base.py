@@ -47,7 +47,7 @@ class FunctionalTest(LiveServerTestCase):
             if headless:
                 options.add_argument('-headless')
             self.browser = webdriver.Firefox(options=options)
-        # Uses chromium if not Firefox
+        # fallback to chromium otherwise
         else:
             options = webdriver.ChromeOptions()
             options.add_argument('--ignore-certificate-errors')
@@ -55,7 +55,7 @@ class FunctionalTest(LiveServerTestCase):
             options.add_argument('--no-proxy-server')
             if headless:
                 options.add_argument('--headless')
-                # You need this if running the tests as root (run as root!?)
+                # Note: if running the tests as root (why would we!?) add:
                 # options.add_argument('--no-sandbox')
             options.binary_location = "/usr/bin/chromium-browser"
             self.browser = webdriver.Chrome(chrome_options=options)
@@ -69,39 +69,38 @@ class FunctionalTest(LiveServerTestCase):
         super(FunctionalTest, self).setUpClass()
         self.browser.quit()
 
-    # Actual tests
-    def test_categories(self):
-        Categories.test_cant_create_an_empty_expense_category(self)
-        Categories.test_can_create_multiple_expense_categories(self)
-        Categories.test_cant_create_duplicate_expense_categories(self)
-        Categories.test_cant_create_an_empty_income_category(self)
-        Categories.test_cant_create_duplicate_income_categories(self)
+    def test_categories(tester):
+        Categories.test_cant_create_an_empty_expense_category(tester)
+        Categories.test_can_create_multiple_expense_categories(tester)
+        Categories.test_cant_create_duplicate_expense_categories(tester)
+        Categories.test_cant_create_an_empty_income_category(tester)
+        Categories.test_cant_create_duplicate_income_categories(tester)
 
-    def test_expenses(self):
-        Expenses.test_cant_create_malformed_expenses(self)
-        Expenses.test_expenses_sum_appear_on_home_page(self)
-        Expenses.test_expenses_page_can_show_old_expenses(self)
-        Expenses.test_expenses_wont_show_expenses_in_the_future(self)
-        Expenses.test_creating_expenses_before_categories_will_fail(self)
-        Expenses.test_cant_create_expenses_without_selecting_a_category(self)
-        Expenses.test_only_expenses_in_range_are_shown(self)
+    def test_expenses(tester):
+        Expenses.test_cant_create_malformed_expenses(tester)
+        Expenses.test_expenses_sum_appear_on_home_page(tester)
+        Expenses.test_expenses_page_can_show_old_expenses(tester)
+        Expenses.test_expenses_wont_show_expenses_in_the_future(tester)
+        Expenses.test_creating_expenses_before_categories_will_fail(tester)
+        Expenses.test_cant_create_expenses_without_selecting_a_category(tester)
+        Expenses.test_only_expenses_in_range_are_shown(tester)
 
-    def test_monthly_budgets(self):
-        MBudgets.test_cant_create_an_empty_monthly_budget(self)
-        MBudgets.test_can_create_multiple_monthly_budgets(self)
-        MBudgets.test_cant_create_multiple_monthly_budgets_for_same_month(self)
+    def test_monthly_budgets(tester):
+        MBudgets.test_cant_create_an_empty_monthly_budget(tester)
+        MBudgets.test_can_create_multiple_monthly_budgets(tester)
+        MBudgets.test_cant_create_multiple_monthly_budgets_for_same_month(tester)
 
-    def test_monthly_balances(self):
-        MonthlyBalances.test_image_is_not_displayed_without_data(self)
-        MonthlyBalances.test_image_is_displayed_with_data(self)
+    def test_monthly_balances(tester):
+        MonthlyBalances.test_image_is_not_displayed_without_data(tester)
+        MonthlyBalances.test_image_is_displayed_with_data(tester)
 
-    def test_access(self):
-        PageAccess.test_access_to_all_pages(self)
+    def test_access(tester):
+        PageAccess.test_access_to_all_pages(tester)
 
-    def test_views_and_layout(self):
-        ViewAndLayout.test_home_page_has_links_in_nav(self)
-        ViewAndLayout.test_layout_and_styling(self)
-        ViewAndLayout.check_autofocus(self)
+    def test_views_and_layout(tester):
+        ViewAndLayout.test_home_page_has_links_in_nav(tester)
+        ViewAndLayout.test_layout_and_styling(tester)
+        ViewAndLayout.check_autofocus(tester)
 
-    def test_api(self):
-        API.test_create_and_delete_expenses(self)
+    def test_api(tester):
+        API.test_create_and_delete_expenses(tester)

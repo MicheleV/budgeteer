@@ -10,34 +10,34 @@ import functional_tests.helpers as Helpers
 # Use this syntax to get plain json
 # http://example.com/<route-name>?format=json&json=true'
 @Helpers.register_and_login
-def test_create_and_delete_expenses(self):
+def test_create_and_delete_expenses(tester):
 
     # Frank can create a category to log his food expenses
-    Helpers.create_a_category(self, 'Food')
+    Helpers.create_a_category(tester, 'Food')
 
     url = reverse('api:categories')
     # Frank has knowledge of how to force the site to display json
-    secret_url = f"{self.live_server_url}{url}?format=json&json=true'"
-    self.browser.get(secret_url)
+    secret_url = f"{tester.live_server_url}{url}?format=json&json=true'"
+    tester.browser.get(secret_url)
 
-    html = self.browser.find_element_by_tag_name('html')
+    html = tester.browser.find_element_by_tag_name('html')
     json_res = json.loads(html.text)
 
     # Franks is happy with the resutls
-    self.assertEqual(len(json_res), 1)
-    self.assertEqual(json_res[0]['id'], 1)
-    self.assertEqual(json_res[0]['text'], 'Food')
+    tester.assertEqual(len(json_res), 1)
+    tester.assertEqual(json_res[0]['id'], 1)
+    tester.assertEqual(json_res[0]['text'], 'Food')
 
     # Frank does not trust the API, and he wants to check if new Categories
     # will appear in his next call or not
-    Helpers.create_a_category(self, 'Rent')
+    Helpers.create_a_category(tester, 'Rent')
 
-    self.browser.get(secret_url)
+    tester.browser.get(secret_url)
 
-    html = self.browser.find_element_by_tag_name('html')
+    html = tester.browser.find_element_by_tag_name('html')
     json_res = json.loads(html.text)
 
     # Franks is happy with the results
-    self.assertEqual(len(json_res), 2)
-    self.assertEqual(json_res[1]['id'], 2)
-    self.assertEqual(json_res[1]['text'], 'Rent')
+    tester.assertEqual(len(json_res), 2)
+    tester.assertEqual(json_res[1]['id'], 2)
+    tester.assertEqual(json_res[1]['text'], 'Rent')

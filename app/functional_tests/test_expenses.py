@@ -9,6 +9,7 @@ from django.urls import reverse, resolve
 import functional_tests.helpers as Helpers
 
 
+# TODO: replace self with tester for readability, once we remove @skip
 # TODO add negative test
 # I.e. try to post with missing fields, etc
 def test_cant_create_malformed_expenses(self):
@@ -16,12 +17,14 @@ def test_cant_create_malformed_expenses(self):
     pass
 
 
+# TODO: replace self with tester for readability, once we remove @skip
 # TODO add test in which Franks does not select any Categoy from the dropdown
 def test_cant_create_expenses_without_selecting_a_category(self):
     # TODO use Helpers.wait_for_required_input(self, "id_text")
     pass
 
 
+# TODO: replace self with tester for readability, once we remove @skip
 @Helpers.register_and_login
 @skip
 def test_expenses_sum_appear_on_home_page(self):
@@ -55,6 +58,7 @@ def test_expenses_sum_appear_on_home_page(self):
     Helpers.check_current_month(self, curr_mont_amount, category_name)
 
 
+# TODO: replace self with tester for readability, once we remove @skip
 @Helpers.register_and_login
 @skip
 def test_expenses_page_can_show_old_expenses(self):
@@ -92,11 +96,11 @@ def test_expenses_page_can_show_old_expenses(self):
 
 
 @Helpers.register_and_login
-def test_only_expenses_in_range_are_shown(self):
+def test_only_expenses_in_range_are_shown(tester):
 
     # Frank creates 2 expenses for January 2020
     category_name = Helpers.generateString()
-    Helpers.create_a_category(self, category_name)
+    Helpers.create_a_category(tester, category_name)
 
     # Frank is not going to check if the expenses are created as he always does
     # Frank now believes into this sowftware!
@@ -109,25 +113,25 @@ def test_only_expenses_in_range_are_shown(self):
     amount = 4000
     note = Helpers.generateString()
     date = "2020-01-01"
-    Helpers.create_entry(self, amount, category_name, note,
+    Helpers.create_entry(tester, amount, category_name, note,
                          date, is_income, verify_creation)
 
     second_amount = 4200
     second_date = "2020-01-07"
     second_note = Helpers.generateString()
-    Helpers.create_entry(self, second_amount, category_name, second_note,
+    Helpers.create_entry(tester, second_amount, category_name, second_note,
                          date, is_income, verify_creation)
 
     # Frank has changed his mind: "Testing is important" he says.
     # Frank then enters a special URL to check the expenses creation...but he
     # enters the wrong end date
     expense_url = reverse('budgets:expenses')
-    url = f"{self.live_server_url}{expense_url}/2020-01-01/2020-01-02"
-    self.browser.get(url)
+    url = f"{tester.live_server_url}{expense_url}/2020-01-01/2020-01-02"
+    tester.browser.get(url)
 
     # Frank notices the first expenses is shown. Frank is so happy
     formatted_amount = f'{amount:,}'
-    Helpers.verify_expense_was_created(self, formatted_amount, category_name,
+    Helpers.verify_expense_was_created(tester, formatted_amount, category_name,
                                        note)
 
     # TODO: verify the second expenses is NOT shown
@@ -137,14 +141,14 @@ def test_only_expenses_in_range_are_shown(self):
     # Frank then gets very anxious... but then Frank breathes, and re-types the
     # URL. He notices he had typed the wrong one: "Silly me!" he mumbles.
     expense_url = reverse('budgets:expenses')
-    url = f"{self.live_server_url}{expense_url}/2020-01-01/2020-01-07"
-    self.browser.get(url)
+    url = f"{tester.live_server_url}{expense_url}/2020-01-01/2020-01-07"
+    tester.browser.get(url)
     formatted_second_amount = f'{second_amount:,}'
 
     # Frank now sees both expenses, he smiles. Frank is so relieved now
-    Helpers.verify_expense_was_created(self, formatted_amount, category_name,
+    Helpers.verify_expense_was_created(tester, formatted_amount, category_name,
                                        note)
-    Helpers.verify_expense_was_created(self, formatted_second_amount,
+    Helpers.verify_expense_was_created(tester, formatted_second_amount,
                                        category_name, second_note)
 
     # Then, Frank remembers he also bought something during December 2019
@@ -152,34 +156,34 @@ def test_only_expenses_in_range_are_shown(self):
     third_amount = 4200
     third_note = Helpers.generateString()
     older_date = "2019-12-31"
-    Helpers.create_entry(self, third_amount, category_name, third_note,
+    Helpers.create_entry(tester, third_amount, category_name, third_note,
                          older_date, is_income, verify_creation)
 
     # Frank then enters a special URL that allows him to only show expenses
     # broken down by months
     expense_url = reverse('budgets:expenses')
-    url = f"{self.live_server_url}{expense_url}/2019-12-01/2019-12-31"
-    self.browser.get(url)
+    url = f"{tester.live_server_url}{expense_url}/2019-12-01/2019-12-31"
+    tester.browser.get(url)
 
     formatted_third_amount = f'{third_amount:,}'
-    Helpers.verify_expense_was_created(self, formatted_third_amount,
+    Helpers.verify_expense_was_created(tester, formatted_third_amount,
                                        category_name, third_note)
 
     # TODO: Frank then want to see all expenses
     expense_url = reverse('budgets:expenses')
-    url = f"{self.live_server_url}{expense_url}/2019-12-01/2020-01-31"
+    url = f"{tester.live_server_url}{expense_url}/2019-12-01/2020-01-31"
 
 
 # TODO: write me
-def test_expenses_wont_show_expenses_in_the_future(self):
+def test_expenses_wont_show_expenses_in_the_future(tester):
     pass
 
 
 # TODO: write me
-def test_creating_expenses_before_categories_will_fail(self):
+def test_creating_expenses_before_categories_will_fail(tester):
     pass
 
 
 # TODO: write me
-def test_graph_is_displayed_in_expenses_page_with_only_one_expense(self):
+def test_graph_is_displayed_in_expenses_page_with_only_one_expense(tester):
     pass

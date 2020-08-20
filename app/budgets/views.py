@@ -47,6 +47,10 @@ class CategoryCreateView(CreateView):
     model = m.Category
     form_class = f.CategoryForm
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super(CategoryCreateView, self).form_valid(form)
+
     def get_success_url(self):
         return reverse('budgets:categories')
 
@@ -62,6 +66,10 @@ class CategoryListView(ListView):
 class ExpenseCreateView(CreateView):
     model = m.Expense
     form_class = f.ExpenseForm
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super(ExpenseCreateView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse('budgets:expenses_create')
@@ -153,6 +161,10 @@ class MonthlyBudgetsCreateView(CreateView):
         initial['date'] = self.request.GET.get('date', None)
         return initial
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super(MonthlyBudgetsCreateView, self).form_valid(form)
+
     def get_success_url(self):
         return reverse('budgets:monthly_budgets')
 
@@ -185,6 +197,10 @@ class GoalCreateView(CreateView):
     model = m.Goal
     form_class = f.GoalForm
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super(GoalCreateView, self).form_valid(form)
+
     def get_success_url(self):
         return reverse('budgets:goals')
 
@@ -206,6 +222,10 @@ class IncomeCategoryCreateView(CreateView):
     model = m.IncomeCategory
     form_class = f.IncomeCategoryForm
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super(IncomeCategoryCreateView, self).form_valid(form)
+
     def get_success_url(self):
         return reverse('budgets:income_categories')
 
@@ -226,6 +246,10 @@ class IncomeCategoryDetailView(DetailView):
 class IncomCreateView(CreateView):
     model = m.Income
     form_class = f.IncomeForm
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super(IncomCreateView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse('budgets:incomes')
@@ -257,6 +281,10 @@ class MonthlyBalanceCategoryCreateView(CreateView):
     model = m.MonthlyBalanceCategory
     form_class = f.MonthlyBalanceCategoryForm
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super(MonthlyBalanceCategoryCreateView, self).form_valid(form)
+
     def get_success_url(self):
         return reverse('budgets:monthly_balance_categories')
 
@@ -277,6 +305,10 @@ class MonthlyBalanceCategoryDetailView(DetailView):
 class MonthlyBalancesCreateView(CreateView):
     model = m.MonthlyBalance
     form_class = f.MonthlyBalanceForm
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super(MonthlyBalancesCreateView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse('budgets:monthly_balances')
@@ -389,6 +421,8 @@ def multiple_new_monthly_budget(request):
         formset = MBFormSet(data=request.POST)
         if formset.is_valid():
             for form in formset:
+                # FIX ME: this should register the current user
+                # form.created_by = self.request.user
                 form.save()
             return redirect('monthly_budgets')
     else:
@@ -422,6 +456,8 @@ def multiple_new_monthly_balance(request):
         formset = MBFormSet(data=request.POST)
         if formset.is_valid():
             for form in formset:
+                # FIX ME: this should register the current user
+                # form.created_by = self.request.user
                 form.save()
             return redirect('monthly_balances')
     else:

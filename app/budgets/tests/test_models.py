@@ -1,11 +1,13 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+from datetime import datetime
+
 from django.db import transaction
 from django.db.utils import IntegrityError
-from django.urls import reverse
-
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
+from django.urls import reverse
 
 import budgets.models as m
 from budgets.tests.base import BaseTest
@@ -352,7 +354,7 @@ class ModelsTest(BaseTest):
         monthly_budget = self.create_monthly_budgets(
           category=category,
           amount=4200,
-          date='2019-09-01'
+          date='2019-09-01',
         )
 
         # Duplicate

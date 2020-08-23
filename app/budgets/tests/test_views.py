@@ -4,6 +4,7 @@
 import datetime
 import random
 
+from django.contrib.auth.models import User
 from django.urls import resolve
 from django.urls import reverse
 
@@ -16,13 +17,16 @@ import budgets.views_utils as utils
 
 class HomePageTest(BaseTest):
 
+    @BaseTest.login
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('budgets:home', 'Budgeteer')
 
+    @BaseTest.login
     def test_uses_correct_view(self):
         self.check_if_correct_view('budgets:home', v.home_page)
         response = self.get_response_from_named_url('budgets:expenses')
 
+    @BaseTest.login
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('budgets:home')
         self.assertTemplateUsed(response, 'home.html')
@@ -30,6 +34,7 @@ class HomePageTest(BaseTest):
 
 class CategoriesPageTest(BaseTest):
 
+    @BaseTest.login
     def test_save_on_POST(self):
         url = reverse('budgets:categories_create')
         redirect_url = reverse('budgets:categories')
@@ -41,6 +46,7 @@ class CategoriesPageTest(BaseTest):
         new_category = m.Category.objects.first()
         self.assertEqual(new_category.text, text)
 
+    @BaseTest.login
     def test_redirect_on_POST(self):
         url = reverse('budgets:categories_create')
         redirect_url = reverse('budgets:categories')
@@ -51,12 +57,13 @@ class CategoriesPageTest(BaseTest):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
 
+    @BaseTest.login
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('budgets:categories', 'Categories')
 
     # def test_uses_correct_view(self):
     #     self.check_if_correct_view('categories', v.categories_page)
-
+    @BaseTest.login
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('budgets:categories')
         self.assertTemplateUsed(response, 'budgets/category_list.html')
@@ -64,7 +71,7 @@ class CategoriesPageTest(BaseTest):
     # def test_uses_category_form(self):
     #     response = self.get_response_from_named_url('budgets:categories')
     #     self.assertIsInstance(response.context['form'], f.CategoryForm)
-
+    @BaseTest.login
     def test_save_and_retrieve_categories(self):
         text1 = self.generateString(10)
         first_category = self.create_category(text1)
@@ -75,11 +82,12 @@ class CategoriesPageTest(BaseTest):
         self.assertContains(response, text1)
         self.assertContains(response, text2)
 
+    @BaseTest.login
     def test_displays_all_categories(self):
         text1 = self.generateString(10)
-        m.Category.objects.create(text=text1)
+        m.Category.objects.create(text=text1, created_by=self.user)
         text2 = self.generateString(10)
-        m.Category.objects.create(text=text2)
+        m.Category.objects.create(text=text2, created_by=self.user)
 
         response = self.get_response_from_named_url('budgets:categories')
         self.assertContains(response, text1)
@@ -88,6 +96,7 @@ class CategoriesPageTest(BaseTest):
 
 class MonthlyBudgetPageTest(BaseTest):
 
+    @BaseTest.login
     def test_save_and_redirect_on_POST(self):
         text = self.generateString(10)
         cat = self.create_category(text)
@@ -108,6 +117,7 @@ class MonthlyBudgetPageTest(BaseTest):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
 
+    @BaseTest.login
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('budgets:monthly_budgets',
                                          'Monthly budgets')
@@ -117,6 +127,7 @@ class MonthlyBudgetPageTest(BaseTest):
     # def test_uses_correct_view(self):
     #     self.check_if_correct_view('monthly_budgets', v.monthly_budgets_page)
 
+    @BaseTest.login
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('budgets:monthly_budgets')
         self.assertTemplateUsed(response, 'budgets/monthlybudget_list.html')
@@ -124,7 +135,7 @@ class MonthlyBudgetPageTest(BaseTest):
     # def test_uses_category_form(self):
     #     response = self.get_response_from_named_url('budgets:monthly_budgets')
     #     self.assertIsInstance(response.context['form'], f.MonthlyBudgetForm)
-
+    @BaseTest.login
     def test_save_and_retrieve_monthly_budget(self):
         text1 = self.generateString(10)
         cat1 = self.create_category(text1)
@@ -149,6 +160,7 @@ class MonthlyBudgetPageTest(BaseTest):
 
 class ExpensesPageTest(BaseTest):
 
+    @BaseTest.login
     def test_save_and_redirect_on_POST(self):
         text = self.generateString(10)
         cat = self.create_category(text)
@@ -179,6 +191,7 @@ class ExpensesPageTest(BaseTest):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
 
+    @BaseTest.login
     def test_delete_expenses(self):
         text = self.generateString(10)
         text_2 = self.generateString(10)
@@ -205,6 +218,7 @@ class ExpensesPageTest(BaseTest):
         expenses = m.Expense.objects.all()
         self.assertEqual(expenses.count(), 0)
 
+    @BaseTest.login
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('budgets:expenses', 'Expenses')
 
@@ -213,10 +227,12 @@ class ExpensesPageTest(BaseTest):
     # def test_uses_correct_view(self):
     #     self.check_if_correct_view('expenses', v.expenses_page)
 
+    @BaseTest.login
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('budgets:expenses')
         self.assertTemplateUsed(response, 'budgets/expense_list.html')
 
+    @BaseTest.login
     def test_delete_button_showed_with_param(self):
         text = self.generateString(10)
         text_2 = self.generateString(10)
@@ -236,6 +252,7 @@ class ExpensesPageTest(BaseTest):
         self.assertContains(response, form2)
         self.assertContains(response, button)
 
+    @BaseTest.login
     def test_delete_button_missing_without_param(self):
         text = self.generateString(10)
         text_2 = self.generateString(10)
@@ -267,6 +284,7 @@ class ExpensesPageTest(BaseTest):
 
 class IncomeCategoriesPageTest(BaseTest):
 
+    @BaseTest.login
     def test_save_on_POST(self):
         url = reverse('budgets:income_categories_create')
         redirect_url = reverse('budgets:income_categories')
@@ -276,15 +294,18 @@ class IncomeCategoriesPageTest(BaseTest):
 
         self.assertEqual(ic.text, text)
 
+    @BaseTest.login
     def test_redirect_on_POST(self):
         url = reverse('budgets:income_categories_create')
         redirect_url = reverse('budgets:income_categories')
         text = self.generateString(10)
+
         response = self.client.post(url,  data={'text': text})
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
 
+    @BaseTest.login
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('budgets:income_categories',
                                          'Income Categories')
@@ -295,7 +316,7 @@ class IncomeCategoriesPageTest(BaseTest):
     #     self.check_if_correct_view('income_categories',
     #                                v.income_categories_page)
     #     response = self.get_response_from_named_url('budgets:income_categories')
-
+    @BaseTest.login
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('budgets:income_categories')
         self.assertTemplateUsed(response, 'budgets/incomecategory_list.html')
@@ -303,6 +324,7 @@ class IncomeCategoriesPageTest(BaseTest):
 
 class IncomePageTest(BaseTest):
 
+    @BaseTest.login
     def test_save_and_redirect_on_POST(self):
         text = self.generateString(10)
         cat = self.create_income_category(text)
@@ -324,6 +346,7 @@ class IncomePageTest(BaseTest):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
 
+    @BaseTest.login
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('budgets:incomes', 'Incomes')
 
@@ -332,7 +355,7 @@ class IncomePageTest(BaseTest):
     # def test_uses_correct_view(self):
     #     self.check_if_correct_view('incomes', v.incomes_page)
     #     response = self.get_response_from_named_url('budgets:incomes')
-
+    @BaseTest.login
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('budgets:incomes')
         self.assertTemplateUsed(response, 'budgets/income_list.html')
@@ -340,6 +363,7 @@ class IncomePageTest(BaseTest):
 
 class MonthlyBalanceCategoriesTest(BaseTest):
 
+    @BaseTest.login
     def test_save_on_POST(self):
         url = reverse('budgets:new_monthly_balance_category')
         text = self.generateString(10)
@@ -349,6 +373,7 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         mb = mb.first()
         self.assertEqual(mb.text, text)
 
+    @BaseTest.login
     def test_redirect_on_POST(self):
         url = reverse('budgets:new_monthly_balance_category')
         text = self.generateString(10)
@@ -357,6 +382,7 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
 
+    @BaseTest.login
     def test_delete_on_POST(self):
         text = self.generateString(10)
         self.create_monthly_balance_category(text)
@@ -376,6 +402,7 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         mb = m.MonthlyBalance.objects.all()
         self.assertEqual(mb.count(), 0)
 
+    @BaseTest.login
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('budgets:monthly_balance_categories',
                                          'Monthly Balance Categories')
@@ -387,7 +414,7 @@ class MonthlyBalanceCategoriesTest(BaseTest):
     #                                v.MonthlyBalanceCategoryView.as_view())
     #     named_url = 'monthly_balance_categories'
     #     response = self.get_response_from_named_url(nbudgets:amed_url)
-
+    @BaseTest.login
     def test_uses_correct_template(self):
         named_url = 'budgets:monthly_balance_categories'
         response = self.get_response_from_named_url(named_url)
@@ -397,6 +424,7 @@ class MonthlyBalanceCategoriesTest(BaseTest):
 
 class MonthlyBalanceTest(BaseTest):
 
+    @BaseTest.login
     def test_save_and_redirect_on_POST(self):
         text = self.generateString(10)
         cat = self.create_monthly_balance_category(text)
@@ -419,6 +447,7 @@ class MonthlyBalanceTest(BaseTest):
     def data_is_ordered_by_date_ascending(self):
         pass
 
+    @BaseTest.login
     def test_delete_button_showed_with_param(self):
         text = self.generateString(10)
         cat = self.create_monthly_balance_category(text)
@@ -440,6 +469,7 @@ class MonthlyBalanceTest(BaseTest):
     def test_delete_button_missing_without_param(self):
         pass
 
+    @BaseTest.login
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('budgets:monthly_balances',
                                          'Monthly Balances')
@@ -450,12 +480,15 @@ class MonthlyBalanceTest(BaseTest):
     #   self.check_if_correct_view('monthly_balances', v.monthly_balances_page)
     #   response = self.get_response_from_named_url('budgets:monthly_balances')
 
+    @BaseTest.login
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('budgets:monthly_balances')
         self.assertTemplateUsed(response, 'budgets/monthlybalance_list.html')
 
 
 class GoalPageTest(BaseTest):
+
+    @BaseTest.login
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('budgets:goals',
                                          'Goals')

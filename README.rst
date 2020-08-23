@@ -128,6 +128,7 @@ Run the functional test suite::
 Run a single functional test::
 
     [TEST_TARGET=localhost ] python manage.py test functional_tests.<file_name_without_py>.<class_name>.<method_name> --keep
+    # Example: python app/manage.py test functional_tests.test_base.FunctionalTest.test_expenses --keep
 
 Run the unit test suite::
 
@@ -152,17 +153,33 @@ References and useful links
 
 1. `TDD with Python and Django <http://obeythetestinggoat.com/>`_
 2. `About custom selinux policies <https://serverfault.com/a/763507/332670>`_
+# replace nginx link with nginx official docs
+# change link order
 3. `CentOS and nginx <https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-virtual-hosts-server-blocks-on-centos-6>`_
 4. `Tmp folder permissions in RHEL like distro <https://stackoverflow.com/a/33223403>`_
 5. `More about it <https://serverfault.com/a/464025>`_
 6. `Fedora wiki on this feature <https://fedoraproject.org/wiki/Features/ServicesPrivateTmp>`_
 7. `Django documentation <https://docs.djangoproject.com/en/2.2/>`_
-8. `Selenium <https://seleniumhq.github.io/selenium/docs/api/py/api.html>`_
-9. `Ansible <https://docs.ansible.com/>`_
-10. `geckodriver <https://github.com/mozilla/geckodriver>`_
+8. `Selenium documentation <https://seleniumhq.github.io/selenium/docs/api/py/api.html>`_
+9. `Ansible documentation <https://docs.ansible.com/>`_
+10. `Get geckodriver <https://github.com/mozilla/geckodriver>`_
 11. `Executing queries on init (e.g. Models.py populating dropdown) <https://stackoverflow.com/a/39084645/2535658>`_
 12. `Imports order convention <https://docs.openstack.org/hacking/latest/user/hacking.html#imports>`_
 13. `Migrate django from sqlite3 to postgreSQL <https://web.archive.org/web/20200802014537/https://www.vphventures.com/how-to-migrate-your-django-project-from-sqlite-to-postgresql/>`_
+
+Self-memo
+=======
+
+Dump the postgres content to a file (from the web container)::
+    TODO
+
+Move data to web container::
+    docker cp data_only.sql budgeteer_web_1:/home/app/web/data.sql
+
+Inject the data(execute from inside the web container)::
+    psql -h db -U budgeteer_user -d budgeteer_db < data.sql 
+
+
 
 Author
 =======

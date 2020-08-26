@@ -74,7 +74,8 @@ class BaseTest(TestCase):
 
     def _sign_up(self):
         """
-        Create an user per each method
+        Create an user, and add a reference to self.user
+        self.credentials is a dictionaru containing both username and password
         """
         text = self.generateString(50)
         pwd = self.generateString(10)

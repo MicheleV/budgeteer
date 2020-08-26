@@ -170,16 +170,26 @@ References and useful links
 Self-memo
 =======
 
-Dump the postgres content to a file (from the web container)::
-    TODO
+Backup data:
+---------------------
+Dump the postgres content to a file::
+     docker exec -it --user root  budgeteer_web_1 pg_dump -h db -d budgeteer_db -U <db-user>  --data-only -W > data_only.sql
+     docker cp budgeteer_web_1:/home/app/web/data_only.sql .
 
-Move data to web container::
+Restore data:
+---------------------
+Move the backup file to web container::
     docker cp data_only.sql budgeteer_web_1:/home/app/web/data.sql
 
 Inject the data(execute from inside the web container)::
-    psql -h db -U budgeteer_user -d budgeteer_db < data.sql 
+    psql -h db -U budgeteer_user -d budgeteer_db < data.sql
 
 
+Inspect data with GUI:
+---------------------
+GUI postgre editor::
+    docker pull dpage/pgadmin4
+    sudo docker run --rm -d --network budgeteer_default  --name pgadmin4 -p 5050:80 --env PGADMIN_DEFAULT_EMAIL=admin@example.com --env PGADMIN_DEFAULT_PASSWORD=<super-safe-password>  dpage/pgadmin4
 
 Author
 =======

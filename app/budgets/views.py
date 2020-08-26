@@ -61,12 +61,22 @@ class CategoryListView(ListView):
     paginate_by = 15
     ordering = ['id']
 
+    def get_queryset(self):
+        return m.Category.objects.filter(
+                 created_by=self.request.user).order_by('id')
+
 
 @method_decorator(login_required, name='dispatch')
 class ExpenseCreateView(CreateView):
     model = m.Expense
     form_class = f.ExpenseForm
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    # FIX ME: check permissions here
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super(ExpenseCreateView, self).form_valid(form)
@@ -95,7 +105,8 @@ class ExpenseListView(ListView):
     def profile(self):
         start, end = self.start_end()
         expenses = m.Expense.objects.select_related('category').filter(
-                   date__range=(start, end)).order_by('-date', '-id')
+                   date__range=(start, end),
+                   created_by=self.request.user).order_by('-date', '-id')
         return expenses
 
     def get_context_data(self, **kwargs):
@@ -116,7 +127,7 @@ class ExpenseListView(ListView):
         exp_aggregates = utils.aggregate_expenses_by_category(expenses)
 
         monthly_budgets = m.MonthlyBudget.objects.select_related(
-                          'category').filter(date=start)
+                          'category').filter(date=start, created_by=self.request.user)
 
         # Add budgeted amount to expenses aggregates
         for _ in monthly_budgets:
@@ -146,6 +157,7 @@ class ExpenseListView(ListView):
 class ExpenseDeleteView(DeleteView):
     model = m.Expense
 
+    # FIX ME: check for permissions here
     def get_success_url(self):
         return reverse('budgets:expenses')
 
@@ -161,7 +173,13 @@ class MonthlyBudgetsCreateView(CreateView):
         initial['date'] = self.request.GET.get('date', None)
         return initial
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
+        # FIX ME: check for permissions
         form.instance.created_by = self.request.user
         return super(MonthlyBudgetsCreateView, self).form_valid(form)
 
@@ -178,12 +196,14 @@ class MonthlyBudgetListView(ListView):
     def get_queryset(self):
         yymm_date = self.kwargs.get('date', None)
         if yymm_date is None:
-            mb = m.MonthlyBudget.objects.select_related(
+            mb = m.MonthlyBudget.objects.filter(
+                 created_by=self.request.user).select_related(
                  'category').all().order_by('-date')
         else:
             full_date = f"{yymm_date}-01"
-            mb = m.MonthlyBudget.objects.select_related('category').filter(
-                 date=full_date).order_by('-date')
+            mb = m.MonthlyBudget.objects.filter(
+                 created_by=self.request.user).select_related(
+                 'category').filter(date=full_date).order_by('-date')
         return mb
 
 
@@ -211,10 +231,15 @@ class GoalListView(ListView):
     paginate_by = 15
     ordering = ['id']
 
+    def get_queryset(self):
+        return m.Goal.objects.filter(
+                 created_by=self.request.user).order_by('id')
+
 
 @method_decorator(login_required, name='dispatch')
 class GoalDetailView(DetailView):
     model = m.Goal
+    # FIX ME: check permissions here
 
 
 @method_decorator(login_required, name='dispatch')
@@ -236,10 +261,15 @@ class IncomeCategoryView(ListView):
     paginate_by = 15
     ordering = ['id']
 
+    def get_queryset(self):
+        return m.IncomeCategory.objects.filter(
+                 created_by=self.request.user).order_by('id')
+
 
 @method_decorator(login_required, name='dispatch')
 class IncomeCategoryDetailView(DetailView):
     model = m.IncomeCategory
+    # FIX ME: check permissions here
 
 
 @method_decorator(login_required, name='dispatch')
@@ -247,6 +277,12 @@ class IncomCreateView(CreateView):
     model = m.Income
     form_class = f.IncomeForm
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    # FIX ME: check permissions here
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super(IncomCreateView, self).form_valid(form)
@@ -260,6 +296,7 @@ class IncomeView(ListView):
     model = m.Income
     paginate_by = 15
     ordering = ['id']
+    template_name = 'budgets/income_list.html'
 
     def get_queryset(self):
         start = yymm_date = self.kwargs.get('start', None)
@@ -271,8 +308,14 @@ class IncomeView(ListView):
         else:
             format_str = '%Y-%m-%d'
             start = datetime.datetime.strptime(start, format_str).date()
-        incomes = m.Income.objects.filter(date__range=(start, end)).order_by(
-                  'id')
+
+    def get_queryset(self):
+        return m.IncomeCategory.objects.filter(
+                 created_by=self.request.user).order_by('id')
+
+        incomes = m.Income.objects.filter(
+                  date__range=(start, end),
+                  created_by=self.request.user).order_by('id')
         return incomes
 
 
@@ -295,10 +338,15 @@ class MonthlyBalanceCategoryView(ListView):
     paginate_by = 15
     ordering = ['id']
 
+    def get_queryset(self):
+        return m.MonthlyBalanceCategory.objects.filter(
+                 created_by=self.request.user).order_by('id')
+
 
 @method_decorator(login_required, name='dispatch')
 class MonthlyBalanceCategoryDetailView(DetailView):
     model = m.MonthlyBalanceCategory
+    # FIX ME: check permissions here
 
 
 @method_decorator(login_required, name='dispatch')
@@ -333,13 +381,14 @@ class MonthlyBalancesView(ListView):
             annotate(amount=Sum(Case(
               When(category__is_foreign_currency=False, then='amount'),
               When(category__is_foreign_currency=True, then=F('amount') * rate)
-            )))
+            ))).filter(created_by=self.request.user)
         total = 0
         for _ in mb:
             total += _['amount']
 
         # Display only not archived goals
-        goals = m.Goal.objects.filter(is_archived=False)
+        goals = m.Goal.objects.filter(
+                is_archived=False, created_by=self.request.user)
         if len(mb) > 0:
             bar_graph = utils.generate_monthly_balance_bar_graph(mb, goals)
 
@@ -369,7 +418,7 @@ class MonthlyBalancesSingleMonthView(ListView):
         currency = os.getenv("CURRENCY")
 
         mb = m.MonthlyBalance.objects.select_related('category').filter(
-             date=complete_date).order_by('date')
+             date=complete_date, created_by=self.request.user).order_by('date')
 
         total = 0
         for _ in mb:
@@ -392,6 +441,7 @@ class MonthlyBalanceUpdateView(UpdateView):
     model = m.MonthlyBalance
     form_class = f.MonthlyBalanceForm
 
+    # FIX ME: check permissions here
     def get_success_url(self):
         return reverse('budgets:monthly_balances')
 
@@ -400,6 +450,7 @@ class MonthlyBalanceUpdateView(UpdateView):
 class MonthlyBalanceDeleteView(DeleteView):
     model = m.MonthlyBalance
 
+    # FIX ME: check permissions here
     def get_success_url(self):
         return reverse('budgets:monthly_balances')
 
@@ -416,23 +467,29 @@ def multiple_new_monthly_budget(request):
                                 max_num=cats)
 
     curr_month_start = utils.get_month_boundaries()[0]
-    prev_month_start = utils.get_previous_month_first_day_date(curr_month_start)
+    prev_month_start = utils.get_previous_month_first_day_date(
+                       curr_month_start)
     if request.method == 'POST':
         formset = MBFormSet(data=request.POST)
+        # FIXME: we are not handling when the user submit forms with the same
+        # category, and we're also not handling creation of monthly_budgets
+        # that already exists for that (category - date combination)
         if formset.is_valid():
             for form in formset:
-                # FIX ME: this should register the current user
-                # form.created_by = self.request.user
+                form.instance.created_by = request.user
                 form.save()
-            return redirect('monthly_budgets')
+            return redirect('budgets:monthly_budgets')
     else:
+        # Prepopulate the form date field, and select a different category
+        # for each form
         intial_data = []
         curr_month_start = utils.get_month_boundaries()[0]
         for c in categories:
             intial_data.append({'date': curr_month_start, 'category': c.id})
         formset = MBFormSet(initial=intial_data)
 
-    prev_month_monthly_budgets = m.MonthlyBudget.objects.filter(date=prev_month_start)
+    prev_month_monthly_budgets = m.MonthlyBudget.objects.filter(
+                                 date=prev_month_start)
     prev_month_dic = {}
     for _ in prev_month_monthly_budgets:
         prev_month_dic[int(_.category.id)] = _.amount
@@ -445,7 +502,7 @@ def multiple_new_monthly_budget(request):
 @login_required
 @require_http_methods(["GET", "POST"])
 def multiple_new_monthly_balance(request):
-    categories = m.MonthlyBalanceCategory.objects.filter()
+    categories = m.MonthlyBalanceCategory.objects.filter(created_by=request.user)
     cats = categories.count()
     MBFormSet = formset_factory(form=f.MonthlyBalanceForm, extra=cats,
                                 max_num=cats)
@@ -454,19 +511,22 @@ def multiple_new_monthly_balance(request):
     prev_month_start = utils.get_previous_month_first_day_date(curr_month_start)
     if request.method == 'POST':
         formset = MBFormSet(data=request.POST)
+        # FIXME: we are not handling when the user submit forms with the same
+        # category, and we're also not handling creation of monthly_balance
+        # that already exists for that (category - date combination)
         if formset.is_valid():
             for form in formset:
-                # FIX ME: this should register the current user
-                # form.created_by = self.request.user
+                form.instance.created_by = request.user
                 form.save()
-            return redirect('monthly_balances')
+            return redirect('budgets:monthly_balances')
     else:
         intial_data = []
         for c in categories:
             intial_data.append({'date': curr_month_start, 'category': c.id})
         formset = MBFormSet(initial=intial_data)
 
-    prev_month_monthly_balances = m.MonthlyBalance.objects.filter(date=prev_month_start)
+    prev_month_monthly_balances = m.MonthlyBalance.objects.filter(
+                                  date=prev_month_start, created_by=request.user)
     prev_month_dic = {}
     for _ in prev_month_monthly_balances:
         prev_month_dic[int(_.category.id)] = _.amount
@@ -505,6 +565,7 @@ def home_page(request):
     prev_month = utils.get_previous_month_first_day_date(start)
     starting_balance = utils.get_total_of_monthly_balances(prev_month)
 
+    # FIX ME: check permissions here
     # Fetch previous month data to compare it with the current month's
     prev_mb, prev_tot = utils.get_month_balance_stats(prev_month, rate)
     current_mb, curr_tot = utils.get_month_balance_stats(start, rate)

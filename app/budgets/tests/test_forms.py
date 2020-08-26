@@ -39,13 +39,8 @@ class CategoriesTest(BaseTest):
           f.MonthlyBalanceCategoryForm
         ]
         text = self.generateString(50)
-        username = self.generateString(10) + str(datetime.now())
-        user = User.objects.create_user(
-          username=username, email='jacob@…', password='top_secret')
-
-        import pdb
         for form in forms:
-            filled_form = form(data={'text': text, 'created_by': user})
+            filled_form = form(data={'text': text, 'created_by': self.user})
 
             self.assertFalse(filled_form.is_valid())
             self.assertIn(
@@ -198,7 +193,7 @@ class IncomeFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': self.generateString(50)
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -241,7 +236,7 @@ class MonthlyBalanceFormTest(BaseTest):
 class ExpenseFormTest(BaseTest):
 
     def test_form_renders_correctly(self):
-        form = f.ExpenseForm()
+        form = f.ExpenseForm(self.user)
         self.assertIn('placeholder="Enter the spended amount"', form.as_p())
         self.assertIn('placeholder="What did you buy?"', form.as_p())
         self.assertIn('placeholder="%Y-%m-%d format"', form.as_p())
@@ -251,7 +246,7 @@ class ExpenseFormTest(BaseTest):
             'category': None,
             'amount': 5000,
             'date': '2019-09-23'
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'category',
@@ -269,7 +264,7 @@ class ExpenseFormTest(BaseTest):
             'category': category.id,
             'amount': None,
             'date': '2019-09-23',
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'amount',
@@ -289,7 +284,7 @@ class ExpenseFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': None,
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -304,7 +299,7 @@ class ExpenseFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': ''
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -319,7 +314,7 @@ class ExpenseFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': self.generateString(50)
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -334,7 +329,7 @@ class ExpenseFormTest(BaseTest):
 class MonthlyBudgetFormTest(BaseTest):
 
     def test_form_renders_correctly(self):
-        form = f.MonthlyBudgetForm()
+        form = f.MonthlyBudgetForm(self.user)
         self.assertIn('placeholder="Enter the budget amount"', form.as_p())
         self.assertIn('placeholder="%Y-%m-%d format"', form.as_p())
 
@@ -343,7 +338,7 @@ class MonthlyBudgetFormTest(BaseTest):
             'category': None,
             'amount': 5000,
             'date': '2019-09-23'
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'category',
@@ -360,7 +355,7 @@ class MonthlyBudgetFormTest(BaseTest):
             'category': category.id,
             'amount': None,
             'date': '2019-09-23',
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'amount',
@@ -379,7 +374,7 @@ class MonthlyBudgetFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': None
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -394,7 +389,7 @@ class MonthlyBudgetFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': ''
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -409,7 +404,7 @@ class MonthlyBudgetFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': self.generateString(50),
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',

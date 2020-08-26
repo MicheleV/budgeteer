@@ -34,6 +34,10 @@ class CategoryForm(forms.models.ModelForm):
 
 class ExpenseForm(forms.models.ModelForm):
 
+    def __init__(self, user, *args, **kwargs):
+        super(ExpenseForm, self).__init__(*args, **kwargs)
+        self.fields['category'].queryset = m.Category.objects.filter(created_by=user)
+
     class Meta:
         model = m.Expense
         fields = ('date', 'amount', 'note', 'category')
@@ -58,6 +62,10 @@ class DeleteExpenseForm(forms.models.ModelForm):
 
 
 class MonthlyBudgetForm(forms.models.ModelForm):
+
+    def __init__(self, user, *args, **kwargs):
+        super(MonthlyBudgetForm, self).__init__(*args, **kwargs)
+        self.fields['category'].queryset = m.Category.objects.filter(created_by=user)
 
     class Meta:
         model = m.MonthlyBudget

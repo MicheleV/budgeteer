@@ -9,25 +9,22 @@ from django.urls import reverse, resolve
 import functional_tests.helpers as Helpers
 
 
-# TODO: replace self with tester for readability, once we remove @skip
 # TODO add negative test
 # I.e. try to post with missing fields, etc
-def test_cant_create_malformed_expenses(self):
-    # TODO use Helpers.wait_for_required_input(self, "id_text")
+def test_cant_create_malformed_expenses(tester):
+    # TODO use Helpers.wait_for_required_input(tester, "id_text")
     pass
 
 
-# TODO: replace self with tester for readability, once we remove @skip
 # TODO add test in which Franks does not select any Categoy from the dropdown
-def test_cant_create_expenses_without_selecting_a_category(self):
+def test_cant_create_expenses_without_selecting_a_category(tester):
     # TODO use Helpers.wait_for_required_input(self, "id_text")
     pass
 
 
-# TODO: replace self with tester for readability, once we remove @skip
 @Helpers.register_and_login
 @skip
-def test_expenses_sum_appear_on_home_page(self):
+def test_expenses_sum_appear_on_home_page(tester):
 
     category_name = 'Rent'
     curr_mont_amount = 500
@@ -42,35 +39,34 @@ def test_expenses_sum_appear_on_home_page(self):
     ]
     total_amount = curr_mont_amount + next_month_amount
 
-    Helpers.create_category_and_two_expenses(self, first_expense,
+    Helpers.create_category_and_two_expenses(tester, first_expense,
                                              second_expense, category_name)
 
     # Frank sees the sum of this month expenses on the home page
     url = reverse('budgets:home')
-    self.browser.get(f"{self.live_server_url}{url}")
-    Helpers.check_amount_and_cat_name(self, curr_mont_amount, category_name)
+    tester.browser.get(f"{tester.live_server_url}{url}")
+    Helpers.check_amount_and_cat_name(tester, curr_mont_amount, category_name)
 
     # Frank notices that the current month id displayed in the expense page
-    Helpers.check_whether_current_month_date_is_displayed(self)
+    Helpers.check_whether_current_month_date_is_displayed(tester)
 
     # Frank also notices that only expenses related to the current month are
     # displayed
-    Helpers.check_current_month(self, curr_mont_amount, category_name)
+    Helpers.check_current_month(tester, curr_mont_amount, category_name)
 
 
-# TODO: replace self with tester for readability, once we remove @skip
 @Helpers.register_and_login
 @skip
-def test_expenses_page_can_show_old_expenses(self):
+def test_expenses_page_can_show_old_expenses(tester):
     category_name = 'Rent'
-    Helpers.create_a_category(self, category_name)
+    Helpers.create_a_category(tester, category_name)
 
     amount = 4000
     note = 'Second month of rent'
     second_date = date.today().replace(day=1)
     second_date_ymd = second_date.strftime("%Y-%m-%d")
     is_income = False
-    Helpers.create_entry(self, amount, category_name, note,
+    Helpers.create_entry(tester, amount, category_name, note,
                          second_date_ymd, is_income)
 
     # Frank visits the expenses page
@@ -80,18 +76,18 @@ def test_expenses_page_can_show_old_expenses(self):
     first_rent_date_ym = first_rent_date.strftime("%Y-%m")
     first_rent_date_ymd = first_rent_date.strftime("%Y-%m-%d")
     verify_creation = False
-    Helpers.create_entry(self, amount, category_name, note,
+    Helpers.create_entry(tester, amount, category_name, note,
                          first_rent_date_ymd, is_income, verify_creation)
 
     # Frank visit the expenses page using a parameter
     # (Frank manually changes the URL as he can not find any dropdown yet)
     expense_url = reverse('budgets:expenses')
-    url = f"{self.live_server_url}{expense_url}/{first_rent_date_ym}"
-    self.browser.get(url)
+    url = f"{tester.live_server_url}{expense_url}/{first_rent_date_ym}"
+    tester.browser.get(url)
 
     formatted_amount = f'{amount:n}'
     # Frank notices that this URL does not show entries from other months
-    Helpers.verify_expense_was_created(self,
+    Helpers.verify_expense_was_created(tester,
                                        amount, category_name, note)
 
 

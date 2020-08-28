@@ -4,6 +4,7 @@
 # Docs at https://selenium-python.readthedocs.io/waits.html
 from datetime import date
 from datetime import timedelta
+from functools import wraps
 import locale
 import string
 import random
@@ -99,6 +100,7 @@ def register_and_login(func):
     """
     Decorator that create a random user, log in as it, and log out at the end
     """
+    @wraps(func)
     def wrapper(*args, **kwargs):
         create_user(*args, **kwargs)
         func(*args, **kwargs)
@@ -139,7 +141,7 @@ def create_user(tester, username=None, password=None):
 
 def logout_user(tester):
     """
-    Simply log out
+    Log out
     """
     url = reverse('accounts:logout')
     tester.browser.get(f"{tester.live_server_url}{url}")
@@ -147,7 +149,8 @@ def logout_user(tester):
 
 # TODO: is_income is making the logic complex, refactor
 def create_a_category(tester, category_name,
-                      is_income=False, create_check=True, midway_check=False):
+                      is_income=False, create_check=True, midway_check=False,
+                      wait_for_reload=True):
     url = reverse('budgets:categories_create')
     if is_income:
         url = reverse('budgets:income_categories_create')
@@ -160,18 +163,22 @@ def create_a_category(tester, category_name,
         'Enter a new category'
     )
 
-    if category_name:
-        inputbox.send_keys(category_name)
-        inputbox.send_keys(Keys.ENTER)
+    inputbox.send_keys(category_name)
+    inputbox.send_keys(Keys.ENTER)
+
+    if wait_for_reload:
         wait_for_page_to_reload(tester)
 
     # Check for error right after submitting the form
     if midway_check:
-        find_error(tester, 'Category with this Text already exists')
+        error_text = 'Category with this Text already exists'
+        if is_income:
+            error_text = 'Income category with this Text already exists'
+        find_error(tester, error_text)
 
     # Check if the categoy page is showing created category
     if create_check:
-        visit_and_verify_categories(tester, category_name)
+        visit_and_verify_categories(tester, category_name, is_income=is_income)
 
 
 def create_a_monthly_budget(tester, category_name, amount, date,
@@ -195,14 +202,16 @@ def create_a_monthly_budget(tester, category_name, amount, date,
     # Frank enters the date for the budget
     date_inputbox.send_keys(date.strftime("%Y-%m-%d"))
 
+    inputbox.send_keys(Keys.ENTER)
     # Frank finds the submit button
-    submit_button = tester.browser.find_element_by_id('id_submit')
+    # submit_button = tester.browser.find_element_by_id('id_submit')
     # Frank clicks the button to save the entry
-    submit_button.click()
+    # submit_button.click()
 
-    if verify_creation:
-        formatted_amount = f'{amount:n}'
-        verify_monthly_expense_was_created(tester, category_name,
+    if create_check:
+        formatted_amount = f'{amount:,}'
+        wait_for_page_to_reload(tester)
+        verify_monthly_budget_was_created(tester, category_name,
                                            formatted_amount, date)
 
 
@@ -242,7 +251,10 @@ def create_entry(tester, amount, category_name, note, expense_date,
     submit_button.click()
 
     if verify_creation:
-        formatted_amount = f'{amount:n}'
+        formatted_amount = f'{amount:,}'
+
+        check_url = url = reverse('budgets:expenses')
+        tester.browser.get(f"{tester.live_server_url}{url}")
         # Frank can see the information the correct information on the page
         verify_expense_was_created(tester, formatted_amount, category_name, note)
 
@@ -284,8 +296,11 @@ def create_category_and_two_expenses(tester, first_item, second_item,
     )
 
 
-def visit_and_verify_categories(tester, category_name, should_exist=True):
-    url = reverse('budgets:categories')
+def visit_and_verify_categories(tester, category_name, is_income, should_exist=True):
+    if is_income:
+        url = reverse('budgets:income_categories')
+    else:
+        url = reverse('budgets:categories')
     tester.browser.get(f"{tester.live_server_url}{url}")
     table = tester.browser.find_element_by_id('id_categories')
     if should_exist:
@@ -314,13 +329,13 @@ def verify_expense_was_created(tester, amount, category_name, note):
 
 
 # NOTE: to be deprecated
-def verify_monthly_expense_was_created(tester, category_name, amount, date):
+def verify_monthly_budget_was_created(tester, category_name, amount, date):
     # Frank sees all the details about the monghtly budget displayed on the
     # page
     table = tester.browser.find_element_by_id('id_monthly_budgets')
     find_text_inside_table(tester, str(amount), table)
     find_text_inside_table(tester, category_name, table)
-    year_month = date.strftime("%Y-%m")
+    year_month = date.strftime("%b. %-d, %Y")
     find_text_inside_table(tester, year_month, table)
 
     # Franks visits the home page and sees the budget

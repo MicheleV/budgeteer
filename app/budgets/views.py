@@ -202,8 +202,8 @@ class MonthlyBudgetListView(ListView):
         else:
             full_date = f"{yymm_date}-01"
             mb = m.MonthlyBudget.objects.filter(
-                 created_by=self.request.user).select_related(
-                 'category').filter(date=full_date).order_by('-date')
+                 date=full_date, created_by=self.request.user).select_related(
+                 'category').order_by('-date')
         return mb
 
 
@@ -482,7 +482,7 @@ def multiple_new_monthly_budget(request):
         curr_month_start = utils.get_month_boundaries()[0]
         for c in categories:
             intial_data.append({'date': curr_month_start, 'category': c.id})
-        formset = MBFormSet(initial=intial_data)
+        formset = MBFormSet(initial=intial_data, form_kwargs={'user': request.user})
 
     prev_month_monthly_budgets = m.MonthlyBudget.objects.filter(
                                  date=prev_month_start)
@@ -519,7 +519,7 @@ def multiple_new_monthly_balance(request):
         intial_data = []
         for c in categories:
             intial_data.append({'date': curr_month_start, 'category': c.id})
-        formset = MBFormSet(initial=intial_data)
+        formset = MBFormSet(initial=intial_data, form_kwargs={'user': request.user})
 
     prev_month_monthly_balances = m.MonthlyBalance.objects.filter(
                                   date=prev_month_start, created_by=request.user)

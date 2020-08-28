@@ -115,7 +115,8 @@ Install the requirements::
     cd app
     pip install -r test-requirements.txt
 
-`keep option docs <https://docs.djangoproject.com/en/2.2/topics/testing/overview/#the-test-database>`_
+
+`Use the --keep flag to make tests faster <https://docs.djangoproject.com/en/2.2/topics/testing/overview/#the-test-database>`_
 
 Run both function and unit test suite::
 
@@ -181,13 +182,13 @@ Restore data:
 Move the backup file to web container::
     docker cp data_only.sql budgeteer_web_1:/home/app/web/data.sql
 
-Inject the data(execute from inside the web container)::
+Inject the data(execute from inside the web container, as it requires manual pwd prompt)::
     psql -h db -U budgeteer_user -d budgeteer_db < data.sql
 
 
 Inspect data with GUI:
 ---------------------
-GUI postgre editor::
+GUI postgre editor (n.b. the pdamin container should be on the same network the db container is using!)::
     docker pull dpage/pgadmin4
     sudo docker run --rm -d --network budgeteer_default  --name pgadmin4 -p 5050:80 --env PGADMIN_DEFAULT_EMAIL=admin@example.com --env PGADMIN_DEFAULT_PASSWORD=<super-safe-password>  dpage/pgadmin4
 

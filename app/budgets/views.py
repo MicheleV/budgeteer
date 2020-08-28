@@ -309,10 +309,6 @@ class IncomeView(ListView):
             format_str = '%Y-%m-%d'
             start = datetime.datetime.strptime(start, format_str).date()
 
-    def get_queryset(self):
-        return m.IncomeCategory.objects.filter(
-                 created_by=self.request.user).order_by('id')
-
         incomes = m.Income.objects.filter(
                   date__range=(start, end),
                   created_by=self.request.user).order_by('id')

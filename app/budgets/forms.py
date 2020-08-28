@@ -36,7 +36,8 @@ class ExpenseForm(forms.models.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(ExpenseForm, self).__init__(*args, **kwargs)
-        self.fields['category'].queryset = m.Category.objects.filter(created_by=user)
+        self.fields['category'].queryset = m.Category.objects.filter(
+                                           created_by=user)
 
     class Meta:
         model = m.Expense
@@ -107,6 +108,11 @@ class IncomeCategoryForm(forms.models.ModelForm):
 
 class IncomeForm(forms.models.ModelForm):
 
+    def __init__(self, user, *args, **kwargs):
+        super(IncomeForm, self).__init__(*args, **kwargs)
+        self.fields['category'].queryset = m.IncomeCategory.objects.filter(
+                                           created_by=user)
+
     class Meta:
         model = m.Income
         fields = ('amount', 'note', 'date', 'category')
@@ -142,6 +148,11 @@ class MonthlyBalanceCategoryForm(forms.models.ModelForm):
 
 
 class MonthlyBalanceForm(forms.models.ModelForm):
+
+    def __init__(self, user, *args, **kwargs):
+        super(ExpenseForm, self).__init__(*args, **kwargs)
+        self.fields['category'].queryset = m.Category.objects.filter(
+                                           created_by=user)
 
     class Meta:
         model = m.MonthlyBalance

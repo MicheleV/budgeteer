@@ -25,7 +25,8 @@ def test_can_create_multiple_monthly_budgets(tester):
 
     budget_date = datetime.date.today().replace(day=1)
     amount = 7000
-    Helpers.create_a_monthly_budget(tester, category_name, amount, budget_date)
+    Helpers.create_a_monthly_budget(tester, category_name=category_name,
+                                    amount=amount, date=budget_date)
 
     # Frank logs a fraction of his rent (he got confused with this previous
     # apartment)
@@ -33,8 +34,8 @@ def test_can_create_multiple_monthly_budgets(tester):
     note = 'First month of rent'
     rent_date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
     is_income = False
-    Helpers.create_entry(tester, wrong_amt, category_name, note,
-                         rent_date, is_income)
+    Helpers.create_entry(tester, amount=wrong_amt, category_name=category_name,
+                         note=note, expense_date=rent_date, is_income=is_income)
 
     # FIX ME: we're not displaying the monthly bugets anymore!!!
 
@@ -65,8 +66,9 @@ def test_can_create_multiple_monthly_budgets(tester):
     note = Helpers.generateString()
     rent_date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
     is_income = False
-    Helpers.create_entry(tester, remainder, category_name, note,
-                         rent_date, is_income)
+    Helpers.create_entry(tester, amount=remainder, category_name=category_name,
+                         note=note, expense_date=rent_date,
+                         is_income=is_income)
 
     # Frank now notices he is overspending, he should have not moved!
     # TODO, check for "text-success" class
@@ -90,11 +92,13 @@ def test_cant_create_multiple_monthly_budgets_for_same_month(tester):
     # so he proceed to create one
     budget_date = datetime.date.today().replace(day=1)
     amount = 7000
-    Helpers.create_a_monthly_budget(tester, category_name, amount, budget_date)
+    Helpers.create_a_monthly_budget(tester, category_name=category_name,
+                                    amount=amount, date=budget_date)
 
     # Frank however has been up till very late the day before, and is quite
     # distracted. Accidentally he repeats the same procedure again
-    Helpers.create_a_monthly_budget(tester, category_name, amount, budget_date,
+    Helpers.create_a_monthly_budget(tester, category_name=category_name,
+                                    amount=amount, date=budget_date,
                                     create_check=False)
 
     # However an error promtply notifies him that this is not allowed

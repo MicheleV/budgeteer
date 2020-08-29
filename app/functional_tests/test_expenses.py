@@ -39,35 +39,38 @@ def test_expenses_sum_appear_on_home_page(tester):
     ]
     total_amount = curr_mont_amount + next_month_amount
 
-    Helpers.create_category_and_two_expenses(tester, first_expense,
-                                             second_expense, category_name)
+    Helpers.create_category_and_two_expenses(tester, first_item=first_expense,
+                                             second_item=second_expense,
+                                             category_name=category_name)
 
     # Frank sees the sum of this month expenses on the home page
     url = reverse('budgets:home')
     tester.browser.get(f"{tester.live_server_url}{url}")
-    Helpers.check_amount_and_cat_name(tester, curr_mont_amount, category_name)
+    Helpers.check_amount_and_cat_name(tester, amount=curr_mont_amount,
+                                      category_name=category_name)
 
     # Frank notices that the current month id displayed in the expense page
     Helpers.check_whether_current_month_date_is_displayed(tester)
 
     # Frank also notices that only expenses related to the current month are
     # displayed
-    Helpers.check_current_month(tester, curr_mont_amount, category_name)
+    Helpers.check_current_month(tester, curr_mont_amount=curr_mont_amount,
+                                category_name=category_name)
 
 
 @Helpers.register_and_login
 @skip
 def test_expenses_page_can_show_old_expenses(tester):
-    category_name = 'Rent'
-    Helpers.create_a_category(tester, category_name)
+    text = 'Rent'
+    Helpers.create_a_category(tester, category_name=text)
 
     amount = 4000
     note = 'Second month of rent'
     second_date = date.today().replace(day=1)
     second_date_ymd = second_date.strftime("%Y-%m-%d")
     is_income = False
-    Helpers.create_entry(tester, amount, category_name, note,
-                         second_date_ymd, is_income)
+    Helpers.create_entry(tester, amount=amount, category_name=text, note=note,
+                         expense_date=second_date_ymd, is_income=is_income)
 
     # Frank visits the expenses page
     note = 'First month of rent'
@@ -76,8 +79,9 @@ def test_expenses_page_can_show_old_expenses(tester):
     first_rent_date_ym = first_rent_date.strftime("%Y-%m")
     first_rent_date_ymd = first_rent_date.strftime("%Y-%m-%d")
     verify_creation = False
-    Helpers.create_entry(tester, amount, category_name, note,
-                         first_rent_date_ymd, is_income, verify_creation)
+    Helpers.create_entry(tester, amount, category_name=text, note=note,
+                         expense_date=first_rent_date_ymd, is_income=is_income,
+                         verify_creation=verify_creation)
 
     # Frank visit the expenses page using a parameter
     # (Frank manually changes the URL as he can not find any dropdown yet)
@@ -87,16 +91,16 @@ def test_expenses_page_can_show_old_expenses(tester):
 
     formatted_amount = f'{amount:n}'
     # Frank notices that this URL does not show entries from other months
-    Helpers.verify_expense_was_created(tester,
-                                       amount, category_name, note)
+    Helpers.verify_expense_was_created(tester, amount=amount,
+                                       category_name=text, note=note)
 
 
 @Helpers.register_and_login
 def test_only_expenses_in_range_are_shown(tester):
 
     # Frank creates 2 expenses for January 2020
-    category_name = Helpers.generateString()
-    Helpers.create_a_category(tester, category_name)
+    text = Helpers.generateString()
+    Helpers.create_a_category(tester, category_name=text)
 
     # Frank is not going to check if the expenses are created as he always does
     # Frank now believes into this sowftware!
@@ -109,14 +113,16 @@ def test_only_expenses_in_range_are_shown(tester):
     amount = 4000
     note = Helpers.generateString()
     date = "2020-01-01"
-    Helpers.create_entry(tester, amount, category_name, note,
-                         date, is_income, verify_creation)
+    Helpers.create_entry(tester, amount, category_name=text, note=note,
+                         expense_date=date, is_income=is_income,
+                         verify_creation=verify_creation)
 
     second_amount = 4200
     second_date = "2020-01-07"
     second_note = Helpers.generateString()
-    Helpers.create_entry(tester, second_amount, category_name, second_note,
-                         date, is_income, verify_creation)
+    Helpers.create_entry(tester, second_amount, category_name=text,
+                         note=second_note, expense_date=date,
+                         is_income=is_income, verify_creation=verify_creation)
 
     # Frank has changed his mind: "Testing is important" he says.
     # Frank then enters a special URL to check the expenses creation...but he
@@ -127,8 +133,8 @@ def test_only_expenses_in_range_are_shown(tester):
 
     # Frank notices the first expenses is shown. Frank is so happy
     formatted_amount = f'{amount:,}'
-    Helpers.verify_expense_was_created(tester, formatted_amount, category_name,
-                                       note)
+    Helpers.verify_expense_was_created(tester, amount=formatted_amount,
+                                       category_name=text, note=note)
 
     # TODO: verify the second expenses is NOT shown
     # Frank can not see the second expenses! Frank wonders whether the
@@ -142,18 +148,19 @@ def test_only_expenses_in_range_are_shown(tester):
     formatted_second_amount = f'{second_amount:,}'
 
     # Frank now sees both expenses, he smiles. Frank is so relieved now
-    Helpers.verify_expense_was_created(tester, formatted_amount, category_name,
-                                       note)
-    Helpers.verify_expense_was_created(tester, formatted_second_amount,
-                                       category_name, second_note)
+    Helpers.verify_expense_was_created(tester, formatted_amount,
+                                       category_name=text, note=note)
+    Helpers.verify_expense_was_created(tester, amount=formatted_second_amount,
+                                       category_name=text, note=second_note)
 
     # Then, Frank remembers he also bought something during December 2019
     # He really wants to keep track of all his expenses!
     third_amount = 4200
     third_note = Helpers.generateString()
     older_date = "2019-12-31"
-    Helpers.create_entry(tester, third_amount, category_name, third_note,
-                         older_date, is_income, verify_creation)
+    Helpers.create_entry(tester, amount=third_amount, category_name=text,
+                         note=third_note, expense_date=older_date,
+                         is_income=is_income, verify_creation=verify_creation)
 
     # Frank then enters a special URL that allows him to only show expenses
     # broken down by months
@@ -162,8 +169,8 @@ def test_only_expenses_in_range_are_shown(tester):
     tester.browser.get(url)
 
     formatted_third_amount = f'{third_amount:,}'
-    Helpers.verify_expense_was_created(tester, formatted_third_amount,
-                                       category_name, third_note)
+    Helpers.verify_expense_was_created(tester, amount=formatted_third_amount,
+                                       category_name=text, note=third_note)
 
     # TODO: Frank then want to see all expenses
     expense_url = reverse('budgets:expenses')

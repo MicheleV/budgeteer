@@ -5,19 +5,24 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
-# TODO: when we''ll have multiple users, we should expose UUID instead of ID
+# TODO: when we''ll have multiple users, we want to expose UUID instead of ID
 # in the urls/API
 # How to do migrations that include unique fields
 # https://docs.djangoproject.com/en/2.2/howto/writing-migrations/#migrations-that-add-unique-fields
 
 
 class Category(models.Model):
-    # TODO: unique should be (name + created_by), as we now have
-    # multiple users now
-    text = models.CharField(max_length=40, default=None, unique=True)
+    text = models.CharField(max_length=40, default=None)
     is_archived = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, default=None,
                                    null=True, on_delete=models.SET_NULL)
+
+    class Meta:
+        # Different users can have categories with the same text
+        constraints = [
+          models.UniqueConstraint(fields=['text', 'created_by'],
+                                  name="cat-per-user")
+        ]
 
     def __str__(self):
         return f"{self.text}"

@@ -11,6 +11,7 @@ import random
 # Docs at https://seleniumhq.github.io/selenium/docs/api/py/webdriver_support/
 #  selenium.webdriver.support.expected_conditions.html
 from django.urls import resolve, reverse
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
@@ -82,7 +83,12 @@ def find_url_in_home_page(tester, url_to_find):
     )
 
 
-def find_error(tester, errorText, printErrors=False):
+def find_error(tester, errorText, printErrors=False, check_lack_of_error=False):
+    if check_lack_of_error:
+        with tester.assertRaises(NoSuchElementException) as e:
+            error_container = tester.browser.find_element_by_class_name('errorlist')
+        return
+
     error_container = tester.browser.find_element_by_class_name('errorlist')
     errors = error_container.find_elements_by_tag_name('li')
 
@@ -150,7 +156,7 @@ def logout_user(tester):
 # TODO: is_income is making the logic complex, refactor
 def create_a_category(tester, category_name,
                       is_income=False, create_check=True, midway_check=False,
-                      wait_for_reload=True):
+                      wait_for_reload=True, lack_of_error=False):
     url = reverse('budgets:categories_create')
     if is_income:
         url = reverse('budgets:income_categories_create')
@@ -174,7 +180,7 @@ def create_a_category(tester, category_name,
         error_text = 'Category with this Text already exists'
         if is_income:
             error_text = 'Income category with this Text already exists'
-        find_error(tester, error_text)
+        find_error(tester, error_text, check_lack_of_error=lack_of_error)
 
     # Check if the categoy page is showing created category
     if create_check:

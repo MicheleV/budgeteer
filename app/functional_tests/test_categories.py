@@ -36,6 +36,22 @@ def test_can_create_multiple_expense_categories(tester):
     Helpers.create_a_category(tester, cat_name2)
 
 
+# @Helpers.register_and_login
+def test_different_users_can_create_categories_with_the_same_name(tester):
+    # Frank can create a category to log his expenses
+    cat_name = Helpers.generateString()
+
+    Helpers.create_user(tester)
+    Helpers.create_a_category(tester, category_name=cat_name)
+    Helpers.logout_user(tester)
+
+    # Guido can create a category with the same name
+    Helpers.create_user(tester)
+    Helpers.create_a_category(tester, category_name=cat_name,
+                              midway_check=True, create_check=False,
+                              lack_of_error=True)
+    Helpers.logout_user(tester)
+
 # FIX ME: this test will succeed for ANY failure, not only for creation failure
 @Helpers.register_and_login
 def test_cant_create_duplicate_expense_categories(tester):

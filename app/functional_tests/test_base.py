@@ -75,6 +75,7 @@ class FunctionalTest(LiveServerTestCase):
         Categories.test_cant_create_duplicate_expense_categories(tester)
         Categories.test_cant_create_an_empty_income_category(tester)
         Categories.test_cant_create_duplicate_income_categories(tester)
+        Categories.test_different_users_can_create_categories_with_the_same_name(tester)
 
     def test_expenses(tester):
         Expenses.test_cant_create_malformed_expenses(tester)

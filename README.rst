@@ -28,6 +28,7 @@ Built with:
 ---------------------
 - Python
 - Django
+- Bootstrap 4
 
 Getting started
 ===============
@@ -60,7 +61,7 @@ Provisioning and deploying
 Install ansible::
 
     cd app
-    python36 -m venv virtualenv
+    python3 -m venv virtualenv
     pip install ansible
 
 Create your ansible inventory file inside ``app/tools/inventory.ansible`` ::
@@ -129,12 +130,13 @@ Run the functional test suite::
 Run a single functional test::
 
     [TEST_TARGET=localhost ] python manage.py test functional_tests.<file_name_without_py>.<class_name>.<method_name> --keep
-    # Example: python app/manage.py test functional_tests.test_base.FunctionalTest.test_expenses --keep
+    # e.g. python app/manage.py test functional_tests.test_base.FunctionalTest.test_expenses --keep
 
 Run the unit test suite::
 
     [TEST_TARGET=localhost ] python manage.py test budgets --keep
 
+Github is just a mirror, for the up-to-date code, issues and PR, please instead visit `the gitlab page<https://gitlab.com/micheleva>`_.
 
 Coverage
 ===========================
@@ -195,7 +197,7 @@ GUI postgre editor (n.b. the pdamin container should be on the same network the 
 Author
 =======
 
-Budgeteer was created by `Michele Valsecchi <https://github.com/MicheleV>`_
+Budgeteer was created by `Michele Valsecchi <https://gitlab.com/micheleva>`_
 
 
 License

@@ -12,6 +12,10 @@
   <script src="{% static 'js/main.js' %}" defer></script>
 
   <h1>Multiple new monthly balances</h1>
+  <div class="alert alert-warning" role="alert">
+    This view does not update existing models, and fails if any of them already exist for a given category and date combination. Also, this expects date in YYYY-mm-01 format.
+    <br>Feel free to open a PR <a href="https://gitlab.com/micheleva/budgeteer">upstream</a> if you think you can help out :)
+  </div>
   <form class="form-horizontal" method="post">
     {% csrf_token %}
     {{ formset.management_form }}

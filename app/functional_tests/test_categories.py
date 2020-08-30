@@ -36,7 +36,6 @@ def test_can_create_multiple_expense_categories(tester):
     Helpers.create_a_category(tester, cat_name2)
 
 
-# @Helpers.register_and_login
 def test_different_users_can_create_categories_with_the_same_name(tester):
     # Frank can create a category to log his expenses
     cat_name = Helpers.generateString()
@@ -94,6 +93,22 @@ def test_can_create_multiple_income_categories(tester):
     # Frank can create a category to log the money he gets from his money tree
     Helpers.create_a_category(tester, 'MoneyTree',
                               is_income=True, create_check=True)
+
+
+def test_diff_users_can_create_income_categories_with_the_same_name(tester):
+    # Frank can create a category to log his expenses
+    cat_name = Helpers.generateString()
+
+    Helpers.create_user(tester)
+    Helpers.create_a_category(tester, category_name=cat_name, is_income=True)
+    Helpers.logout_user(tester)
+
+    # Guido can create a category with the same name
+    Helpers.create_user(tester)
+    Helpers.create_a_category(tester, category_name=cat_name,
+                              midway_check=True, create_check=False,
+                              lack_of_error=True, is_income=True)
+    Helpers.logout_user(tester)
 
 
 @Helpers.register_and_login

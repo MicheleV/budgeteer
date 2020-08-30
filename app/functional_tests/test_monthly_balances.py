@@ -19,6 +19,22 @@ def test_image_is_not_displayed_without_data(tester):
     tester.assertEqual(len(images), 0)
 
 
+def test_diff_users_can_create_monthly_balance_cat_with_the_same_name(tester):
+    # Frank can create a category to log his expenses
+    cat_name = Helpers.generateString()
+
+    Helpers.create_user(tester)
+    Helpers.create_a_category(tester, category_name=cat_name, is_balance=True)
+    Helpers.logout_user(tester)
+
+    # Guido can create a category with the same name
+    Helpers.create_user(tester)
+    Helpers.create_a_category(tester, category_name=cat_name,
+                              midway_check=True, create_check=False,
+                              lack_of_error=True, is_balance=True)
+    Helpers.logout_user(tester)
+
+
 def test_image_is_displayed_with_data(tester):
     # Frank enters some data (he wants to get his hands on the new graphs asap)
     # Frank finally opens the monthly balances page and see a shiny graph

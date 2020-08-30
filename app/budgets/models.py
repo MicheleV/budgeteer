@@ -62,11 +62,16 @@ class MonthlyBudget(models.Model):
 
 
 class IncomeCategory(models.Model):
-    # TODO: unique should be (text + created_by) as now we have
-    # multiple users now
-    text = models.CharField(max_length=40, default=None, unique=True)
+    text = models.CharField(max_length=40, default=None)
     created_by = models.ForeignKey(User, default=None,
                                    null=True, on_delete=models.SET_NULL)
+
+    class Meta:
+        # Different users can have monthly balance categories w/ the same text
+        constraints = [
+          models.UniqueConstraint(fields=['text', 'created_by'],
+                                  name="cat-per-user")
+        ]
 
     def __str__(self):
         return f"{self.text}"
@@ -92,12 +97,17 @@ class Income(models.Model):
 
 
 class MonthlyBalanceCategory(models.Model):
-    # TODO: unique should be (text + created_by) not only text, as we have
-    # multiple users now
-    text = models.CharField(max_length=40, default=None, unique=True)
+    text = models.CharField(max_length=40, default=None)
     is_foreign_currency = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, default=None,
                                    null=True, on_delete=models.SET_NULL)
+
+    class Meta:
+        # Different users can have monthly balance categories w/ the same text
+        constraints = [
+          models.UniqueConstraint(fields=['text', 'created_by'],
+                                  name="cat-per-user")
+        ]
 
     def __str__(self):
         return f"{self.text}"

@@ -8,7 +8,6 @@ import math
 import os
 
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ValidationError
 from django.db.models import Sum
 from django.db.models import F
 from django.db.models import Case
@@ -41,15 +40,17 @@ import budgets.views_utils as utils
 # Class based views
 ###############################################################################
 
-
 @method_decorator(login_required, name='dispatch')
 class CategoryCreateView(CreateView):
     model = m.Category
     form_class = f.CategoryForm
+    error_msg = 'Category with this Text already exists'
+    url = 'budgets:categories'
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        return super(CategoryCreateView, self).form_valid(form)
+        return utils.check_constraints_workaround(self, form,
+                                            CategoryCreateView.error_msg,
+                                            CategoryCreateView.url)
 
     def get_success_url(self):
         return reverse('budgets:categories')
@@ -246,13 +247,16 @@ class GoalDetailView(DetailView):
 class IncomeCategoryCreateView(CreateView):
     model = m.IncomeCategory
     form_class = f.IncomeCategoryForm
+    error_msg = 'Income category with this Text already exists'
+    url = 'budgets:income_categories'
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        return super(IncomeCategoryCreateView, self).form_valid(form)
+        return utils.check_constraints_workaround(self, form,
+                                                  IncomeCategoryCreateView.error_msg,
+                                                  IncomeCategoryCreateView.url)
 
     def get_success_url(self):
-        return reverse('budgets:income_categories')
+        return reverse(url)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -319,10 +323,13 @@ class IncomeView(ListView):
 class MonthlyBalanceCategoryCreateView(CreateView):
     model = m.MonthlyBalanceCategory
     form_class = f.MonthlyBalanceCategoryForm
+    error_msg = 'MonthlyBalanceCategory with this Text already exists'
+    url = 'budgets:monthly_balance_categories'
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        return super(MonthlyBalanceCategoryCreateView, self).form_valid(form)
+        return utils.check_constraints_workaround(self, form,
+                                                  MonthlyBalanceCategoryCreateView.error_msg,
+                                                  MonthlyBalanceCategoryCreateView.url)
 
     def get_success_url(self):
         return reverse('budgets:monthly_balance_categories')

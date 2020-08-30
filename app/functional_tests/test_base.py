@@ -92,6 +92,7 @@ class FunctionalTest(LiveServerTestCase):
         MBudgets.test_cant_create_multiple_monthly_budgets_for_same_month(tester)
 
     def test_monthly_balances(tester):
+        MonthlyBalances.test_diff_users_can_create_monthly_balance_cat_with_the_same_name(tester)
         MonthlyBalances.test_image_is_not_displayed_without_data(tester)
         MonthlyBalances.test_image_is_displayed_with_data(tester)
 

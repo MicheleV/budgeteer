@@ -153,20 +153,56 @@ def logout_user(tester):
     tester.browser.get(f"{tester.live_server_url}{url}")
 
 
+# def create_monthly_balance_category(tester, category_name, create_check=True,
+#                                     midway_check=False, wait_for_reload=True,
+#                                     lack_of_error=False):
+#     url = reverse('budgets:new_monthly_balance_category')
+#     # Frank creates a category
+#     tester.browser.get(f"{tester.live_server_url}{url}")
+#     inputbox = tester.browser.find_element_by_id('id_text')
+#     tester.assertEqual(
+#         inputbox.get_attribute('placeholder'),
+#         'Enter a new balance category (i.e. savings, cash)'
+#     )
+
+#     inputbox.send_keys(category_name)
+#     inputbox.send_keys(Keys.ENTER)
+
+#     if wait_for_reload:
+#         wait_for_page_to_reload(tester)
+
+#     # Check for error right after submitting the form
+#     if midway_check:
+#         error_text = 'MonthlyBalanceCategory with this Text already exists'
+#         find_error(tester, error_text, check_lack_of_error=lack_of_error)
+
+#     # Check if the categoy page is showing created category
+#     if create_check:
+#         visit_and_verify_categories(tester, category_name, is_income=is_income)
+
+
 # TODO: is_income is making the logic complex, refactor
 def create_a_category(tester, category_name,
                       is_income=False, create_check=True, midway_check=False,
-                      wait_for_reload=True, lack_of_error=False):
-    url = reverse('budgets:categories_create')
+                      wait_for_reload=True, lack_of_error=False, is_balance=False):
     if is_income:
         url = reverse('budgets:income_categories_create')
+    elif is_balance:
+        url = reverse('budgets:new_monthly_balance_category')
+    else:
+        url = reverse('budgets:categories_create')
 
     # Frank creates a category
     tester.browser.get(f"{tester.live_server_url}{url}")
     inputbox = tester.browser.find_element_by_id('id_text')
+
+    placeholder_text = 'Enter a new category'
+    if is_balance:
+        placeholder_text = 'Enter a new balance category (i.e. savings, cash)'
+
     tester.assertEqual(
         inputbox.get_attribute('placeholder'),
-        'Enter a new category'
+        placeholder_text
     )
 
     inputbox.send_keys(category_name)
@@ -177,14 +213,18 @@ def create_a_category(tester, category_name,
 
     # Check for error right after submitting the form
     if midway_check:
-        error_text = 'Category with this Text already exists'
         if is_income:
             error_text = 'Income category with this Text already exists'
+        elif is_income:
+            errorText = 'MonthlyBalanceCategory with this Text already exists'
+        else:
+            error_text = 'Category with this Text already exists'
         find_error(tester, error_text, check_lack_of_error=lack_of_error)
 
     # Check if the categoy page is showing created category
     if create_check:
-        visit_and_verify_categories(tester, category_name, is_income=is_income)
+        visit_and_verify_categories(tester, category_name, is_income=is_income,
+                                    is_balance=is_balance)
 
 
 def create_a_monthly_budget(tester, category_name, amount, date,
@@ -218,7 +258,7 @@ def create_a_monthly_budget(tester, category_name, amount, date,
         formatted_amount = f'{amount:,}'
         wait_for_page_to_reload(tester)
         verify_monthly_budget_was_created(tester, category_name,
-                                           formatted_amount, date)
+                                          formatted_amount, date)
 
 
 # TODO: is_income is making the logic complex, refactor
@@ -302,10 +342,14 @@ def create_category_and_two_expenses(tester, first_item, second_item,
     )
 
 
+# FIX ME: refactor me, two flags (is_income, is_balance) are a bad code smell
+# use a 'type' instead
 def visit_and_verify_categories(tester, category_name, is_income=False,
-                                should_exist=True):
+                                should_exist=True, is_balance=False):
     if is_income:
         url = reverse('budgets:income_categories')
+    elif is_balance:
+        url = reverse('budgets:monthly_balance_categories')
     else:
         url = reverse('budgets:categories')
     tester.browser.get(f"{tester.live_server_url}{url}")

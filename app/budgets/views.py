@@ -486,7 +486,6 @@ def multiple_new_monthly_budget(request):
         # Prepopulate the form date field, and select a different category
         # for each form
         intial_data = []
-        curr_month_start = utils.get_month_boundaries()[0]
         for c in categories:
             intial_data.append({'date': curr_month_start, 'category': c.id})
         formset = MBFormSet(initial=intial_data, form_kwargs={'user': request.user})

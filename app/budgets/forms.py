@@ -151,7 +151,7 @@ class MonthlyBalanceForm(forms.models.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(MonthlyBalanceForm, self).__init__(*args, **kwargs)
-        self.fields['category'].queryset = m.Category.objects.filter(
+        self.fields['category'].queryset = m.MonthlyBalanceCategory.objects.filter(
                                            created_by=user)
 
     class Meta:

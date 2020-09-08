@@ -49,8 +49,8 @@ class CategoryCreateView(CreateView):
 
     def form_valid(self, form):
         return utils.check_constraints_workaround(self, form,
-                                            CategoryCreateView.error_msg,
-                                            CategoryCreateView.url)
+                                                  CategoryCreateView.error_msg,
+                                                  CategoryCreateView.url)
 
     def get_success_url(self):
         return reverse('budgets:categories')
@@ -129,6 +129,11 @@ class ExpenseListView(ListView):
 
         monthly_budgets = m.MonthlyBudget.objects.select_related(
                           'category').filter(date=start, created_by=self.request.user)
+
+        # FIX ME: do not show budgets if both start and end are not None
+        # Just show the sum!
+
+        # TODO: show the sum even for non-budgeted categories
 
         # Add budgeted amount to expenses aggregates
         for _ in monthly_budgets:
@@ -444,6 +449,11 @@ class MonthlyBalanceUpdateView(UpdateView):
     model = m.MonthlyBalance
     form_class = f.MonthlyBalanceForm
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     # FIX ME: check permissions here
     def get_success_url(self):
         return reverse('budgets:monthly_balances')
@@ -473,7 +483,7 @@ def multiple_new_monthly_budget(request):
     prev_month_start = utils.get_previous_month_first_day_date(
                        curr_month_start)
     if request.method == 'POST':
-        formset = MBFormSet(data=request.POST)
+        formset = MBFormSet(data=request.POST, form_kwargs={'user': request.user})
         # FIXME: we are not handling when the user submit forms with the same
         # category, and we're also not handling creation of monthly_budgets
         # that already exists for that (category - date combination)
@@ -512,7 +522,7 @@ def multiple_new_monthly_balance(request):
     curr_month_start = utils.get_month_boundaries()[0]
     prev_month_start = utils.get_previous_month_first_day_date(curr_month_start)
     if request.method == 'POST':
-        formset = MBFormSet(data=request.POST)
+        formset = MBFormSet(data=request.POST, form_kwargs={'user': request.user})
         # FIXME: we are not handling when the user submit forms with the same
         # category, and we're also not handling creation of monthly_balance
         # that already exists for that (category - date combination)

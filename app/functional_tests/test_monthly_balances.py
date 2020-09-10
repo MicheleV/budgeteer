@@ -66,3 +66,20 @@ def test_check_both_graph_and_right_side_table_are_shown(tester):
     pass
 
 # TODO: add tests for mass creation
+
+
+def users_cant_see_other_users_balance_categories(tester):
+    # Frank can create a category to log his balance
+    cat_name = Helpers.generateString()
+
+    username, password = Helpers.create_user(tester)
+    Helpers.create_a_category(tester, category_name=cat_name, is_balance=True)
+    Helpers.logout_user(tester)
+
+    # Guido can not see Frank's income category
+    username_2, password_2 = Helpers.create_user(tester)
+
+    Helpers.visit_and_verify_categories(tester, cat_name, is_income=False,
+                                        should_exist=True, is_balance=True)
+
+    Helpers.logout_user(tester)

@@ -120,3 +120,37 @@ def test_cant_create_duplicate_income_categories(tester):
     # to create the same category
     Helpers.create_a_category(tester, 'Rent', is_income=True,
                               midway_check=True)
+
+
+def users_cant_see_other_users_expense_categories(tester):
+    # Frank can create a category to log his expenses
+    cat_name = Helpers.generateString()
+
+    username, password = Helpers.create_user(tester)
+    Helpers.create_a_category(tester, category_name=cat_name, is_income=True)
+    Helpers.logout_user(tester)
+
+    # Guido can not see Frank's expense category
+    username_2, password_2 = Helpers.create_user(tester)
+
+    Helpers.visit_and_verify_categories(tester, cat_name, is_income=False,
+                                        should_exist=False, is_balance=False)
+
+    Helpers.logout_user(tester)
+
+
+def users_cant_see_other_users_income_categories(tester):
+    # Frank can create a category to log his incomes
+    cat_name = Helpers.generateString()
+
+    username, password = Helpers.create_user(tester)
+    Helpers.create_a_category(tester, category_name=cat_name, is_income=True)
+    Helpers.logout_user(tester)
+
+    # Guido can not see Frank's income category
+    username_2, password_2 = Helpers.create_user(tester)
+
+    Helpers.visit_and_verify_categories(tester, cat_name, is_income=True,
+                                        should_exist=False, is_balance=False)
+
+    Helpers.logout_user(tester)

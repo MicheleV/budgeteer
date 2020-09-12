@@ -331,6 +331,8 @@ class MonthlyBalanceCategoryCreateView(CreateView):
     error_msg = 'MonthlyBalanceCategory with this Text already exists'
     url = 'budgets:monthly_balance_categories'
 
+    # Issue: Unique together contraints are not checked, and it look like this
+    # is not going to be working in Django **2.2** anytime soon [1]
     def form_valid(self, form):
         return utils.check_constraints_workaround(self, form,
                                                   MonthlyBalanceCategoryCreateView.error_msg,
@@ -361,6 +363,11 @@ class MonthlyBalanceCategoryDetailView(DetailView):
 class MonthlyBalancesCreateView(CreateView):
     model = m.MonthlyBalance
     form_class = f.MonthlyBalanceForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user

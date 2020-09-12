@@ -419,6 +419,7 @@ class MonthlyBudgetFormTest(BaseTest):
         """
         Test whether the models are saved and updated correctly or not
         """
+
         amount = random.randint(1, 90000)
         date = '2019-08-01'
         text = self.generateString(20)
@@ -435,6 +436,7 @@ class MonthlyBudgetFormTest(BaseTest):
 
         saved_income_category = m.IncomeCategory.objects.first()
         self.assertEqual(saved_income_category.text, text)
+        self.assertEqual(saved_income_category.created_by.id, self.user.id)
 
         income_form = f.IncomeForm(data={
             'category': saved_income_category.id,
@@ -450,6 +452,7 @@ class MonthlyBudgetFormTest(BaseTest):
         self.assertEqual(saved_income.amount, amount)
         self.assertEqual(saved_income.note, note)
         self.assertEqual(saved_income.date.strftime("%Y-%m-%d"), date)
+        # NOTE: we bypass the view, hence set user is not set
 
         # Update does not throw errors
         income_form = f.IncomeForm(data={
@@ -471,6 +474,7 @@ class MonthlyBudgetFormTest(BaseTest):
         self.assertEqual(updated_income.note, note2)
         self.assertEqual(updated_income.date.strftime("%Y-%m-%d"),
                          date2)
+        # NOTE: we bypass the view, hence set user is not set
 
 
 class GoalFormTest(BaseTest):

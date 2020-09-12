@@ -51,7 +51,7 @@ class BaseTest(TestCase):
         found = resolve(url)
         self.assertEqual(found.func, view_func)
 
-    def get_response_from_named_url(self, named_url):
+    def get_response_from_named_url(self, named_url, args=None):
         """
         Wrapper for get/post methods for a given named url
         """
@@ -99,6 +99,7 @@ class BaseTest(TestCase):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
             self._login()
+            func(self, *args, **kwargs)
 
         return wrapper
 

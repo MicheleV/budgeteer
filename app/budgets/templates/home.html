@@ -91,7 +91,8 @@
         {% for monthly_balance in current_mb %}
           <tr>
             <td>{{ monthly_balance.category.text }}</td>
-            <td>{{ currency}} 
+            <td>{{ currency}}
+              <!-- TODO: check for foreign currencies. Factor in the exchange rate, display correct currency symbol -->
               {% if monthly_balance.actual_amount %}
                   {{ monthly_balance.actual_amount | intcomma }}</td>
               {% else %}
@@ -120,7 +121,8 @@
       {% for monthly_balance in prev_mb %}
         <tr>
           <td>{{ monthly_balance.category.text }}</td>
-          <td>{{ currency}} 
+          <td>{{ currency}}
+            <!-- TODO: check for foreign currencies. Factor in the exchange rate, display correct currency symbol -->
             {% if monthly_balance.actual_amount %}
                 {{ monthly_balance.actual_amount | intcomma }}</td>
             {% else %}

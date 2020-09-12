@@ -80,6 +80,20 @@ def users_cant_see_other_users_balance_categories(tester):
     username_2, password_2 = Helpers.create_user(tester)
 
     Helpers.visit_and_verify_categories(tester, cat_name, is_income=False,
-                                        should_exist=True, is_balance=True)
+                                        should_exist=False, is_balance=True)
+    Helpers.logout_user(tester)
 
+
+def users_cant_see_other_users_monthly_balance_entry(tester):
+    # Frank can create a category to log his expenses
+    cat_name = Helpers.generateString()
+
+    Helpers.create_user(tester)
+    Helpers.create_a_category(tester, category_name=cat_name, is_balance=True)
+    Helpers.logout_user(tester)
+
+    # Guido can create a category with the same name
+    Helpers.create_user(tester)
+    Helpers.visit_and_verify_categories(tester, cat_name, is_balance=True,
+                                        should_exist=False)
     Helpers.logout_user(tester)

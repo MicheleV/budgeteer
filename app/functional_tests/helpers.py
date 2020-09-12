@@ -400,17 +400,44 @@ def verify_expense_was_created(tester, amount, category_name, note):
     # find_text_inside_table('2019-08-04', table)
 
 
+def visit_and_verify_expense(tester, amount, category_name, note,
+                             should_exist):
+    formatted_amount = f'{amount:,}'
+    check_url = url = reverse('budgets:expenses')
+    tester.browser.get(f"{tester.live_server_url}{url}")
+
+    if should_exist:
+        verify_expense_was_created(tester, amount, category_name, note)
+    else:
+        table = tester.browser.find_element_by_id('id_expenses')
+        assert_text_is_not_inside_table(tester, category_name, table)
+
+
 # NOTE: to be deprecated
-def verify_monthly_budget_was_created(tester, category_name, amount, date):
+def verify_monthly_budget_was_created(tester, category_name, amount, date,
+                                      should_exist=True):
     # Frank sees all the details about the monghtly budget displayed on the
     # page
     table = tester.browser.find_element_by_id('id_monthly_budgets')
-    find_text_inside_table(tester, str(amount), table)
-    find_text_inside_table(tester, category_name, table)
-    year_month = date.strftime("%b. %-d, %Y")
-    find_text_inside_table(tester, year_month, table)
 
-    # Franks visits the home page and sees the budget
+    year_month = date.strftime("%b. %-d, %Y")
+    formatted_amount = str(amount)
+    if should_exist:
+        find_text_inside_table(tester, formatted_amount, table)
+        find_text_inside_table(tester, category_name, table)
+        # find_text_inside_table(tester, year_month, table)
+    else:
+        assert_text_is_not_inside_table(tester, formatted_amount, table)
+        assert_text_is_not_inside_table(tester, category_name, table)
+        # assert_text_is_not_inside_table(tester, year_month, table)
+
+
+def visit_and_verify_month_budget_creation(*args, **kwargs):
+    url = reverse('budgets:monthly_budgets')
+    tester = kwargs.get('tester')
+    tester.browser.get(f"{tester.live_server_url}{url}")
+
+    verify_monthly_budget_was_created(*args, **kwargs)
 
 
 def check_whether_current_month_date_is_displayed(tester):

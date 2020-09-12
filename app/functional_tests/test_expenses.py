@@ -3,6 +3,7 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from datetime import date
 from datetime import timedelta
+import random
 from unittest import skip
 
 from django.urls import reverse, resolve
@@ -190,3 +191,29 @@ def test_creating_expenses_before_categories_will_fail(tester):
 # TODO: write me
 def test_graph_is_displayed_in_expenses_page_with_only_one_expense(tester):
     pass
+
+
+def users_cant_see_other_users_expenses(tester):
+    username, password = Helpers.create_user(tester)
+
+    # Frank can create a category to log his expenses
+    cat_name = Helpers.generateString()
+    Helpers.create_a_category(tester, category_name=cat_name, is_income=False)
+
+    amount = random.randint(1, 90000)
+    expense_date = str(date.today())
+    note = Helpers.generateString()
+
+    # Frank enters some data
+    Helpers.create_entry(tester, amount, category_name=cat_name, note=note,
+                         expense_date=expense_date, is_income=False,
+                         verify_creation=True)
+
+    Helpers.logout_user(tester)
+
+    # Guido can not see Frank's expense
+    username_2, password_2 = Helpers.create_user(tester)
+    Helpers.visit_and_verify_expense(tester, amount=amount,
+                                     category_name=cat_name, note=note,
+                                     should_exist=False)
+    Helpers.logout_user(tester)

@@ -87,17 +87,20 @@ class FunctionalTest(LiveServerTestCase):
         Expenses.test_creating_expenses_before_categories_will_fail(tester)
         Expenses.test_cant_create_expenses_without_selecting_a_category(tester)
         Expenses.test_only_expenses_in_range_are_shown(tester)
+        Expenses.users_cant_see_other_users_expenses(tester)
 
     def test_monthly_budgets(tester):
         MBudgets.test_cant_create_an_empty_monthly_budget(tester)
         MBudgets.test_can_create_multiple_monthly_budgets(tester)
         MBudgets.test_cant_create_multiple_monthly_budgets_for_same_month(tester)
+        MBudgets.users_cant_see_other_users_monthly_budgets(tester)
 
     def test_monthly_balances(tester):
         MonthlyBalances.test_diff_users_can_create_monthly_balance_cat_with_the_same_name(tester)
         MonthlyBalances.test_image_is_not_displayed_without_data(tester)
         MonthlyBalances.test_image_is_displayed_with_data(tester)
         MonthlyBalances.users_cant_see_other_users_balance_categories(tester)
+        MonthlyBalances.users_cant_see_other_users_monthly_balance_entry(tester)
 
     def test_access(tester):
         PageAccess.test_access_to_all_pages(tester)
@@ -108,4 +111,5 @@ class FunctionalTest(LiveServerTestCase):
         ViewAndLayout.check_autofocus(tester)
 
     def test_api(tester):
-        API.test_create_and_delete_expenses(tester)
+        API.test_create_and_retrieve_categories(tester)
+        API.test_users_can_not_see_other_users_categories(tester)

@@ -2,6 +2,7 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 import datetime
+import random
 from unittest import skip
 
 from django.urls import resolve
@@ -89,7 +90,7 @@ def test_cant_create_multiple_monthly_budgets_for_same_month(tester):
     Helpers.create_a_category(tester, category_name)
 
     # Frank knows he also has to create a budget for the current month
-    # so he proceed to create one
+    # so he proceeds to create one
     budget_date = datetime.date.today().replace(day=1)
     amount = 7000
     Helpers.create_a_monthly_budget(tester, category_name=category_name,
@@ -111,3 +112,29 @@ def test_cant_create_multiple_monthly_budgets_for_same_month(tester):
 # in date desc order
 
 # TODO: add tests for mass creation
+
+
+def users_cant_see_other_users_monthly_budgets(tester):
+    username, password = Helpers.create_user(tester)
+
+    # Frank creates a category to log expenses related his rent
+    category_name = Helpers.generateString()
+    Helpers.create_a_category(tester, category_name)
+
+    # Frank knows he also has to create a budget for the current month
+    # ...so he proceeds to create one
+    budget_date = datetime.date.today().replace(day=1)
+    amount = random.randint(1, 90000)
+    Helpers.create_a_monthly_budget(tester, category_name=category_name,
+                                    amount=amount, date=budget_date)
+    Helpers.logout_user(tester)
+
+    # Guido can not see Frank's monthly budget
+    username_2, password_2 = Helpers.create_user(tester)
+
+    Helpers.visit_and_verify_month_budget_creation(tester=tester,
+                                                   category_name=category_name,
+                                                   amount=amount,
+                                                   date=budget_date,
+                                                   should_exist=False)
+    Helpers.logout_user(tester)

@@ -10,7 +10,7 @@ import functional_tests.helpers as Helpers
 # Use this syntax to get plain json
 # http://example.com/<route-name>?format=json&json=true'
 @Helpers.register_and_login
-def test_create_and_delete_expenses(tester):
+def test_create_and_retrieve_categories(tester):
 
     # Frank can create a category to log his food expenses
     Helpers.create_a_category(tester, 'Food')
@@ -41,3 +41,27 @@ def test_create_and_delete_expenses(tester):
     tester.assertEqual(len(json_res), 2)
     tester.assertEqual(json_res[1]['id'], 2)
     tester.assertEqual(json_res[1]['text'], 'Rent')
+
+
+def test_users_can_not_see_other_users_categories(tester):
+    # Frank can create a category to log his expenses
+    cat_name = Helpers.generateString()
+
+    Helpers.create_user(tester)
+    Helpers.create_a_category(tester, category_name=cat_name)
+    Helpers.logout_user(tester)
+
+    # Guido registers to the site
+    Helpers.create_user(tester)
+
+    url = reverse('api:categories')
+    # Guido has knowledge of how to force the site to display json
+    secret_url = f"{tester.live_server_url}{url}?format=json&json=true'"
+    tester.browser.get(secret_url)
+
+    html = tester.browser.find_element_by_tag_name('html')
+    json_res = json.loads(html.text)
+
+    # Guido, however, can not see Frank category
+    tester.assertEqual(len(json_res), 0)
+    Helpers.logout_user(tester)

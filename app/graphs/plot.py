@@ -152,7 +152,7 @@ def generateBarGraph(x, y, goals):
     ax.xaxis_date()
 
     # Set the figure title and the axis labels
-    ax.set(xlabel='time (months)', ylabel=f'Amount ({currency})',
+    ax.set(xlabel='Time (months)', ylabel=f'Amount ({currency})',
            title='Monthly balances')
     ax.grid(True, which='major')
 

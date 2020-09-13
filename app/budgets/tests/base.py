@@ -103,6 +103,18 @@ class BaseTest(TestCase):
 
         return wrapper
 
+    def signup_and_login(self):
+        """Create an user, and log in using said user credentials"""
+        self._sign_up()
+        self._login()
+
+    def _logout(self):
+        """
+        Logout an user
+        """
+        url = reverse('accounts:logout')
+        response = self.client.get(url)
+
     def create_category(self, text):
         """
         Create a category

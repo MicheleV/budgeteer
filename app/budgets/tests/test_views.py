@@ -94,6 +94,22 @@ class CategoriesPageTest(BaseTest):
         self.assertContains(response, text1)
         self.assertContains(response, text2)
 
+    def test_displays_only_current_user_categories(self):
+        # Note: _sign_up() is executed on BaseTest.setUp()
+        self._login()
+        text = self.generateString(10)
+        category = self.create_category(text)
+
+        # Current user can see it
+        response = self.get_response_from_named_url('budgets:categories')
+        self.assertContains(response, text)
+        self._logout()
+
+        # Create and login as a different user: can't see it
+        self.signup_and_login()
+        response = self.get_response_from_named_url('budgets:categories')
+        self.assertNotContains(response, text)
+
 
 class MonthlyBudgetPageTest(BaseTest):
 
@@ -158,6 +174,32 @@ class MonthlyBudgetPageTest(BaseTest):
         self.assertContains(response, text2)
         self.assertContains(response, '{:,}'.format(amount2))
 
+    def test_displays_only_current_user_monhtly_bugets(self):
+        # Note: _sign_up() is executed on BaseTest.setUp()
+        self._login()
+
+        text = self.generateString(10)
+        cat = self.create_category(text)
+
+        amount = random.randint(1, 90000)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        mb = self.create_monthly_budgets(cat, amount, date)
+
+        # Current user can see it
+        url = view_url = reverse('budgets:monthly_budgets')
+        response = self.client.get(url)
+        self.assertContains(response, text)
+        # Note: we're hardcoding comma as thousand separator in the views
+        self.assertContains(response, '{:,}'.format(amount))
+
+        self._logout()
+
+        # Create and login as a different user
+        self.signup_and_login()
+        response = self.get_response_from_named_url('budgets:monthly_budgets')
+        self.assertNotContains(response, text)
+        self.assertNotContains(response, '{:,}'.format(amount))
+
 
 class ExpensesPageTest(BaseTest):
 
@@ -181,14 +223,6 @@ class ExpensesPageTest(BaseTest):
         self.assertEqual(exp.date.strftime("%Y-%m-%d"), date)
         self.assertEqual(exp.category.id, cat.id)
 
-        # TODO: fix me
-        # # Merged test_save_and_retrieve_expenses
-        # view_page = reverse('budgets:expenses_create')
-        # second_response = self.client.get(view_page)
-        # # Note: we're hardcoding comma as thousand separator in the views
-        # self.assertContains(second_response, '{:,}'.format(amount))
-
-        # Merged test_redirect_on_POST(self)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
 
@@ -282,13 +316,38 @@ class ExpensesPageTest(BaseTest):
         # but this test will be necessary in case we do change that
         pass
 
+    def test_displays_only_current_user_expenses(self):
+        # Note: _sign_up() is executed on BaseTest.setUp()
+        self._login()
+
+        category_text = self.generateString(10)
+        category = self.create_category(category_text)
+        note = self.generateString(10)
+        amount = random.randint(1, 90000)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        expense = self.create_expense(category=category, amount=amount,
+                                      note=note, date=date)
+
+        # Current user can see it
+        response = self.get_response_from_named_url('budgets:expenses')
+        self.assertContains(response, category_text)
+        self.assertContains(response, note)
+        self.assertContains(response, '{:,}'.format(amount))
+        self._logout()
+
+        # Create and login as a different user
+        self.signup_and_login()
+        response = self.get_response_from_named_url('budgets:expenses')
+        self.assertNotContains(response, category_text)
+        self.assertNotContains(response, note)
+        self.assertNotContains(response, '{:,}'.format(amount))
+
 
 class IncomeCategoriesPageTest(BaseTest):
 
     @BaseTest.login
     def test_save_on_POST(self):
         url = reverse('budgets:income_categories_create')
-        redirect_url = reverse('budgets:income_categories')
         text = self.generateString(10)
         response = self.client.post(url,  data={'text': text})
         ic = m.IncomeCategory.objects.first()
@@ -321,6 +380,24 @@ class IncomeCategoriesPageTest(BaseTest):
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('budgets:income_categories')
         self.assertTemplateUsed(response, 'budgets/incomecategory_list.html')
+
+    def test_displays_only_current_user_income_categories(self):
+        # Note: _sign_up() is executed on BaseTest.setUp()
+        self._login()
+
+        text = self.generateString(10)
+        self.create_income_category(text)
+
+        # Current user can see it
+        response = self.get_response_from_named_url('budgets:income_categories')
+        self.assertContains(response, text)
+
+        self._logout()
+
+        # Create and login as a different user: can't see it
+        self.signup_and_login()
+        response = self.get_response_from_named_url('budgets:income_categories')
+        self.assertNotContains(response, text)
 
 
 class IncomePageTest(BaseTest):
@@ -361,6 +438,37 @@ class IncomePageTest(BaseTest):
         response = self.get_response_from_named_url('budgets:incomes')
         self.assertTemplateUsed(response, 'budgets/income_list.html')
 
+    def test_displays_only_current_user_income(self):
+        # Note: _sign_up() is executed on BaseTest.setUp()
+        self._login()
+
+        text = self.generateString(10)
+        category = self.create_income_category(text)
+        amount = random.randint(1, 90000)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        note = self.generateString(10)
+        income = self.create_income(
+          category=category,
+          amount=amount,
+          note=note,
+          date=date
+        )
+
+        # Current user can see it
+        response = self.get_response_from_named_url('budgets:incomes')
+        self.assertContains(response, text)
+        self.assertContains(response, note)
+        self.assertContains(response, '{:,}'.format(amount))
+
+        self._logout()
+
+        # Create and login as a different user: can't see it
+        self.signup_and_login()
+        response = self.get_response_from_named_url('budgets:incomes')
+        self.assertNotContains(response, text)
+        self.assertNotContains(response, note)
+        self.assertNotContains(response, '{:,}'.format(amount))
+
 
 class MonthlyBalanceCategoriesTest(BaseTest):
 
@@ -384,26 +492,6 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         self.assertEqual(response['location'], redirect_url)
 
     @BaseTest.login
-    def test_delete_on_POST(self):
-        text = self.generateString(10)
-        self.create_monthly_balance_category(text)
-        new_category = m.MonthlyBalanceCategory.objects.first()
-        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
-        mb = self.create_monthly_balance(new_category, 42000, date)
-
-        show_delete = True
-        redirect_url = reverse('budgets:monthly_balances')
-        arg = {'pk': mb.id}
-        response = self.get_response_from_named_url('budgets:monthly_balances_delete',
-                                                    arg)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], redirect_url)
-
-        mb = m.MonthlyBalance.objects.all()
-        self.assertEqual(mb.count(), 0)
-
-    @BaseTest.login
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('budgets:monthly_balance_categories',
                                          'Monthly Balance Categories')
@@ -421,6 +509,26 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         response = self.get_response_from_named_url(named_url)
         template_name = 'budgets/monthlybalancecategory_list.html'
         self.assertTemplateUsed(response, template_name)
+
+    def test_displays_only_current_monthly_balance_categories(self):
+        # Note: _sign_up() is executed on BaseTest.setUp()
+        self._login()
+
+        text = self.generateString(10)
+        self.create_monthly_balance_category(text)
+
+        # Current user can see it
+        response = self.get_response_from_named_url(
+                  'budgets:monthly_balance_categories')
+        self.assertContains(response, text)
+
+        self._logout()
+
+        # Create and login as a different user: can't see it
+        self.signup_and_login()
+        response = self.get_response_from_named_url(
+          'budgets:monthly_balance_categories')
+        self.assertNotContains(response, text)
 
 
 class MonthlyBalanceTest(BaseTest):
@@ -471,6 +579,26 @@ class MonthlyBalanceTest(BaseTest):
         pass
 
     @BaseTest.login
+    def test_delete_on_POST(self):
+        text = self.generateString(10)
+        self.create_monthly_balance_category(text)
+        new_category = m.MonthlyBalanceCategory.objects.first()
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        mb = self.create_monthly_balance(new_category, 42000, date)
+
+        show_delete = True
+        redirect_url = reverse('budgets:monthly_balances')
+        arg = {'pk': mb.id}
+        response = self.get_response_from_named_url(
+                  'budgets:monthly_balances_delete', arg)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], redirect_url)
+
+        mb = m.MonthlyBalance.objects.all()
+        self.assertEqual(mb.count(), 0)
+
+    @BaseTest.login
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('budgets:monthly_balances',
                                          'Monthly Balances')
@@ -486,6 +614,44 @@ class MonthlyBalanceTest(BaseTest):
         response = self.get_response_from_named_url('budgets:monthly_balances')
         self.assertTemplateUsed(response, 'budgets/monthlybalance_list.html')
 
+    def test_displays_only_current_user_monhtly_balances(self):
+        # Note: _sign_up() is executed on BaseTest.setUp()
+        self._login()
+
+        text = self.generateString(10)
+        balance_category = self.create_monthly_balance_category(text)
+
+        amount = random.randint(1, 90000)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        self.create_monthly_balance(balance_category, amount=amount, date=date)
+
+        # Current user can see it
+        # response = self.get_response_from_named_url('budgets:monthly_balances')
+        mb = m.MonthlyBalance.objects.first()
+
+        # Check amount in summary page
+        response = self.get_response_from_named_url('budgets:monthly_balances')
+        self.assertContains(response, '{:,}'.format(amount))
+
+        url = utils.append_year_and_month_to_url(mb, 'monthly_balances')
+        response = self.client.get(url)
+
+        # Check both text and amount in detailed page
+        self.assertContains(response, text)
+        self.assertContains(response, '{:,}'.format(amount))
+        self._logout()
+
+        # Create and login as a different user: can't see it
+        self.signup_and_login()
+        response = self.get_response_from_named_url('budgets:monthly_balances')
+        self.assertNotContains(response, '{:,}'.format(amount))
+
+        url = utils.append_year_and_month_to_url(mb, 'monthly_balances')
+        response = self.client.get(url)
+        self.assertNotContains(response, text)
+        self.assertNotContains(response, '{:,}'.format(amount))
+        self._logout()
+
 
 class GoalPageTest(BaseTest):
 
@@ -493,3 +659,25 @@ class GoalPageTest(BaseTest):
     def test_title_is_displayed(self):
         self.check_if_title_is_displayed('budgets:goals',
                                          'Goals')
+
+    def test_displays_only_current_user_goals(self):
+        # Note: _sign_up() is executed on BaseTest.setUp()
+        self._login()
+        text = self.generateString(10)
+        note = self.generateString(10)
+        amount = random.randint(1, 90000)
+        self.create_goal(amount=amount, text=text, note=note)
+
+        # Current user can see it
+        response = self.get_response_from_named_url('budgets:goals')
+        self.assertContains(response, text)
+        self.assertContains(response, note)
+        self.assertContains(response, '{:,}'.format(amount))
+        self._logout()
+
+        # Create and login as a different user: can't see it
+        self.signup_and_login()
+        response = self.get_response_from_named_url('budgets:goals')
+        self.assertNotContains(response, text)
+        self.assertNotContains(response, note)
+        self.assertNotContains(response, '{:,}'.format(amount))

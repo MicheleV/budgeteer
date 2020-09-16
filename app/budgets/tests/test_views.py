@@ -100,7 +100,7 @@ class CategoriesPageTest(BaseTest):
         text = self.generateString(10)
         category = self.create_category(text)
 
-        # Current user can see it
+        # Current user: can see it
         response = self.get_response_from_named_url('budgets:categories')
         self.assertContains(response, text)
         self._logout()
@@ -185,7 +185,7 @@ class MonthlyBudgetPageTest(BaseTest):
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
         mb = self.create_monthly_budgets(cat, amount, date)
 
-        # Current user can see it
+        # Current user: can see it
         url = view_url = reverse('budgets:monthly_budgets')
         response = self.client.get(url)
         self.assertContains(response, text)
@@ -194,7 +194,7 @@ class MonthlyBudgetPageTest(BaseTest):
 
         self._logout()
 
-        # Create and login as a different user
+        # Create and login as a different user: cant' see it
         self.signup_and_login()
         response = self.get_response_from_named_url('budgets:monthly_budgets')
         self.assertNotContains(response, text)
@@ -328,14 +328,14 @@ class ExpensesPageTest(BaseTest):
         expense = self.create_expense(category=category, amount=amount,
                                       note=note, date=date)
 
-        # Current user can see it
+        # Current user: can see it
         response = self.get_response_from_named_url('budgets:expenses')
         self.assertContains(response, category_text)
         self.assertContains(response, note)
         self.assertContains(response, '{:,}'.format(amount))
         self._logout()
 
-        # Create and login as a different user
+        # Create and login as a different user: cant' see it
         self.signup_and_login()
         response = self.get_response_from_named_url('budgets:expenses')
         self.assertNotContains(response, category_text)

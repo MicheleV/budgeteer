@@ -429,7 +429,7 @@ class MonthlyBudgetFormTest(BaseTest):
         date2 = '2019-08-02'
         note2 = self.generateString(20)
         inc_cat_form = f.IncomeCategoryForm(data={'text': text})
-        # NOTE: we need to manually set created_by, as we're skipping the view
+        # NOTE: we need to manually set created_by, as we're not passing through the view logic
         inc_cat_form.instance.created_by = self.user
         inc_cat_form.full_clean()
         inc_cat_form.save()

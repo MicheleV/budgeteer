@@ -8,7 +8,6 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
-# https://levelup.gitconnected.com/how-to-implement-login-logout-and-registration-with-djangos-user-model-59442164db73
 @login_required
 def index(request):
     return render(request, 'accounts/index.html')

@@ -48,8 +48,6 @@ class Expense(models.Model):
 
 
 class MonthlyBudget(models.Model):
-    # TODO: unique should be (category + created_by), as we now have
-    # multiple users now
     category = models.ForeignKey(Category, default=None, null=True,
                                  on_delete=models.SET_NULL)
     amount = models.IntegerField()
@@ -57,8 +55,6 @@ class MonthlyBudget(models.Model):
     created_by = models.ForeignKey(User, default=None,
                                    null=True, on_delete=models.SET_NULL)
 
-    # TODO: unique should be (name + created_by) not only name, as we have
-    # multiple users now
     class Meta:
         unique_together = ('category', 'date')
 
@@ -134,7 +130,7 @@ class MonthlyBalance(models.Model):
         return f"{id}: {amount}, {date}"
 
     class Meta:
-        # TODO: unique should be (name + created_by) not only name, as we have
+        # FIXME: unique should be (name + created_by) not only name, as we have
         # multiple users now
         unique_together = ('category', 'date')
 
@@ -147,7 +143,7 @@ class Goal(models.Model):
     # TODO: unique should be (name + created_by) not only name, as we have
     # multiple users now
     text = models.CharField(max_length=20, default=None, unique=True)
-    # FIXME: we do not need note to be unique ?
+    # FIXME: we do not need note field to be unique
     note = models.CharField(max_length=50, default=None, unique=True)
     is_archived = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, default=None,

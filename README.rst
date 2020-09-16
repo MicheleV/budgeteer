@@ -155,20 +155,31 @@ References and useful links
 ===========================
 
 1. `TDD with Python and Django <http://obeythetestinggoat.com/>`_
-2. `About custom selinux policies <https://serverfault.com/a/763507/332670>`_
-# replace nginx link with nginx official docs
-# change link order
-3. `CentOS and nginx <https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-virtual-hosts-server-blocks-on-centos-6>`_
-4. `Tmp folder permissions in RHEL like distro <https://stackoverflow.com/a/33223403>`_
-5. `More about it <https://serverfault.com/a/464025>`_
-6. `Fedora wiki on this feature <https://fedoraproject.org/wiki/Features/ServicesPrivateTmp>`_
-7. `Django documentation <https://docs.djangoproject.com/en/2.2/>`_
-8. `Selenium documentation <https://seleniumhq.github.io/selenium/docs/api/py/api.html>`_
-9. `Ansible documentation <https://docs.ansible.com/>`_
-10. `Get geckodriver <https://github.com/mozilla/geckodriver>`_
-11. `Executing queries on init (e.g. Models.py populating dropdown) <https://stackoverflow.com/a/39084645/2535658>`_
-12. `Imports order convention <https://docs.openstack.org/hacking/latest/user/hacking.html#imports>`_
-13. `Migrate django from sqlite3 to postgreSQL <https://web.archive.org/web/20200802014537/https://www.vphventures.com/how-to-migrate-your-django-project-from-sqlite-to-postgresql/>`_
+
+2. `Django documentation <https://docs.djangoproject.com/en/2.2/>`_
+
+3. `Selenium documentation <https://seleniumhq.github.io/selenium/docs/api/py/api.html>`_
+
+4. `NGINX <https://nginx.org/en/docs/>`_
+
+5. `Ansible documentation <https://docs.ansible.com/>`_
+
+6. `Get geckodriver <https://github.com/mozilla/geckodriver>`_
+
+7. `Imports order convention <https://docs.openstack.org/hacking/latest/user/hacking.html#imports>`_
+
+8. `Migrate django from sqlite3 to postgreSQL <https://web.archive.org/web/20200802014537/https://www.vphventures.com/how-to-migrate-your-django-project-from-sqlite-to-postgresql/>`_
+
+9. `Tmp folder permissions in RHEL like distro <https://stackoverflow.com/a/33223403>`_
+
+10. `Fedora wiki on this feature <https://fedoraproject.org/wiki/Features/ServicesPrivateTmp>`_
+
+11. `More about it <https://serverfault.com/a/464025>`_
+
+12. `About custom selinux policies <https://serverfault.com/a/763507/332670>`_
+
+13. `Executing queries on init (e.g. Models.py populating dropdown) <https://stackoverflow.com/a/39084645/2535658>`_
+
 
 Self-memo
 =======
@@ -176,23 +187,20 @@ Self-memo
 Backup data:
 ---------------------
 Dump the postgres content to a file::
+
      docker exec -it --user root  budgeteer_web_1 pg_dump -h db -d budgeteer_db -U <db-user>  --data-only -W > data_only.sql
      docker cp budgeteer_web_1:/home/app/web/data_only.sql .
 
 Restore data:
 ---------------------
 Move the backup file to web container::
+
     docker cp data_only.sql budgeteer_web_1:/home/app/web/data.sql
 
 Inject the data(execute from inside the web container, as it requires manual pwd prompt)::
+
     psql -h db -U budgeteer_user -d budgeteer_db < data.sql
 
-
-Inspect data with GUI:
----------------------
-GUI postgre editor (n.b. the pdamin container should be on the same network the db container is using!)::
-    docker pull dpage/pgadmin4
-    sudo docker run --rm -d --network budgeteer_default  --name pgadmin4 -p 5050:80 --env PGADMIN_DEFAULT_EMAIL=admin@example.com --env PGADMIN_DEFAULT_PASSWORD=<super-safe-password>  dpage/pgadmin4
 
 Author
 =======
@@ -211,5 +219,6 @@ See `COPYING <COPYING>`_ to see the full text.
    :target: COPYING
    :alt: Repository License
 
-.. |Coverage| image:: https://img.shields.io/badge/coverage-78%25-yellow
+.. |Coverage| image:: https://img.shields.io/badge/coverage-83%25-yellow
+   :target: README.rst
    :alt: Code Coverage

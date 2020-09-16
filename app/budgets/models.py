@@ -72,7 +72,7 @@ class IncomeCategory(models.Model):
         # Different users can have monthly balance categories w/ the same text
         constraints = [
           models.UniqueConstraint(fields=['text', 'created_by'],
-                                  name="cat-per-user")
+                                  name="income-cat-per-user")
         ]
 
     def __str__(self):
@@ -108,7 +108,7 @@ class MonthlyBalanceCategory(models.Model):
         # Different users can have monthly balance categories w/ the same text
         constraints = [
           models.UniqueConstraint(fields=['text', 'created_by'],
-                                  name="cat-per-user")
+                                  name="monthly-balance-cat-per-user")
         ]
 
     def __str__(self):

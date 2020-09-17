@@ -67,7 +67,6 @@ def test_cant_create_duplicate_expense_categories(tester):
 @Helpers.register_and_login
 def test_cant_create_an_empty_income_category(tester):
     text = ''
-    # with tester.assertRaises(TimeoutException) as e:
     Helpers.create_a_category(tester, category_name=text,
                               is_income=True,
                               create_check=False,
@@ -122,7 +121,7 @@ def test_cant_create_duplicate_income_categories(tester):
                               midway_check=True)
 
 
-def users_cant_see_other_users_expense_categories(tester):
+def test_users_cant_see_other_users_expense_categories(tester):
     # Frank can create a category to log his expenses
     cat_name = Helpers.generateString()
 
@@ -139,7 +138,7 @@ def users_cant_see_other_users_expense_categories(tester):
     Helpers.logout_user(tester)
 
 
-def users_cant_see_other_users_income_categories(tester):
+def test_users_cant_see_other_users_income_categories(tester):
     # Frank can create a category to log his incomes
     cat_name = Helpers.generateString()
 

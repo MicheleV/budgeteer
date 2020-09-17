@@ -69,47 +69,33 @@ class FunctionalTest(LiveServerTestCase):
         super(FunctionalTest, self).setUpClass()
         self.browser.quit()
 
+    def _call_each_method_in_module(module, tester):
+        for name in dir(module):
+          if name.startswith('test'):
+            test_function = getattr(module, name)
+            if callable(test_function):
+                # TODO: this will print function decorated with @skip as well
+                # even if they are not actually called
+                print(f"Calling {module.__name__}.{name}")
+                test_function(tester)
+
     def test_categories(tester):
-        Categories.test_cant_create_an_empty_expense_category(tester)
-        Categories.test_can_create_multiple_expense_categories(tester)
-        Categories.test_cant_create_duplicate_expense_categories(tester)
-        Categories.test_cant_create_an_empty_income_category(tester)
-        Categories.test_cant_create_duplicate_income_categories(tester)
-        Categories.test_different_users_can_create_categories_with_the_same_name(tester)
-        Categories.users_cant_see_other_users_expense_categories(tester)
-        Categories.users_cant_see_other_users_income_categories(tester)
+        FunctionalTest._call_each_method_in_module(Categories, tester)
 
     def test_expenses(tester):
-        Expenses.test_cant_create_malformed_expenses(tester)
-        Expenses.test_expenses_sum_appear_on_home_page(tester)
-        Expenses.test_expenses_page_can_show_old_expenses(tester)
-        Expenses.test_expenses_wont_show_expenses_in_the_future(tester)
-        Expenses.test_creating_expenses_before_categories_will_fail(tester)
-        Expenses.test_cant_create_expenses_without_selecting_a_category(tester)
-        Expenses.test_only_expenses_in_range_are_shown(tester)
-        Expenses.users_cant_see_other_users_expenses(tester)
+        FunctionalTest._call_each_method_in_module(Expenses, tester)
 
     def test_monthly_budgets(tester):
-        MBudgets.test_cant_create_an_empty_monthly_budget(tester)
-        MBudgets.test_can_create_multiple_monthly_budgets(tester)
-        MBudgets.test_cant_create_multiple_monthly_budgets_for_same_month(tester)
-        MBudgets.users_cant_see_other_users_monthly_budgets(tester)
+        FunctionalTest._call_each_method_in_module(MBudgets, tester)
 
     def test_monthly_balances(tester):
-        MonthlyBalances.test_diff_users_can_create_monthly_balance_cat_with_the_same_name(tester)
-        MonthlyBalances.test_image_is_not_displayed_without_data(tester)
-        MonthlyBalances.test_image_is_displayed_with_data(tester)
-        MonthlyBalances.users_cant_see_other_users_balance_categories(tester)
-        MonthlyBalances.users_cant_see_other_users_monthly_balance_entry(tester)
+        FunctionalTest._call_each_method_in_module(MonthlyBalances, tester)
 
     def test_access(tester):
-        PageAccess.test_access_to_all_pages(tester)
+        FunctionalTest._call_each_method_in_module(PageAccess, tester)
 
     def test_views_and_layout(tester):
-        ViewAndLayout.test_home_page_has_links_in_nav(tester)
-        ViewAndLayout.test_layout_and_styling(tester)
-        ViewAndLayout.check_autofocus(tester)
+        FunctionalTest._call_each_method_in_module(ViewAndLayout, tester)
 
     def test_api(tester):
-        API.test_create_and_retrieve_categories(tester)
-        API.test_users_can_not_see_other_users_categories(tester)
+        FunctionalTest._call_each_method_in_module(API, tester)

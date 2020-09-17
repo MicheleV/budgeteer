@@ -114,7 +114,7 @@ def test_cant_create_multiple_monthly_budgets_for_same_month(tester):
 # TODO: add tests for mass creation
 
 
-def users_cant_see_other_users_monthly_budgets(tester):
+def test_users_cant_see_other_users_monthly_budgets(tester):
     username, password = Helpers.create_user(tester)
 
     # Frank creates a category to log expenses related his rent

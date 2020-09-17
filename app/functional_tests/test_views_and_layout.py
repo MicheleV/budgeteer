@@ -46,7 +46,7 @@ def test_layout_and_styling(tester):
 
 
 @Helpers.register_and_login
-def check_autofocus(tester):
+def test_check_autofocus(tester):
     urls = [
      reverse('budgets:categories_create'),
      reverse('budgets:income_categories_create'),

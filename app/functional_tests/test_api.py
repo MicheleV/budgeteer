@@ -62,6 +62,6 @@ def test_users_can_not_see_other_users_categories(tester):
     html = tester.browser.find_element_by_tag_name('html')
     json_res = json.loads(html.text)
 
-    # Guido, however, can not see Frank category
+    # Guido, however, can not see Frank's category
     tester.assertEqual(len(json_res), 0)
     Helpers.logout_user(tester)

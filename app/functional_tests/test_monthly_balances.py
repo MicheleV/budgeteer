@@ -68,7 +68,7 @@ def test_check_both_graph_and_right_side_table_are_shown(tester):
 # TODO: add tests for mass creation
 
 
-def users_cant_see_other_users_balance_categories(tester):
+def test_users_cant_see_other_users_balance_categories(tester):
     # Frank can create a category to log his balance
     cat_name = Helpers.generateString()
 
@@ -84,7 +84,7 @@ def users_cant_see_other_users_balance_categories(tester):
     Helpers.logout_user(tester)
 
 
-def users_cant_see_other_users_monthly_balance_entry(tester):
+def test_users_cant_see_other_users_monthly_balance_entry(tester):
     # Frank can create a category to log his balance
     cat_name = Helpers.generateString()
 

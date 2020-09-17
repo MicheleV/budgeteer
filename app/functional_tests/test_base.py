@@ -28,8 +28,6 @@ import functional_tests.test_views_and_layout as ViewAndLayout
 # we avoid the overhead
 
 
-# TODO: let class call their methods instead of doing it manually
-# TODO: rename self to something more meaningful
 class FunctionalTest(LiveServerTestCase):
     BROWSER = "Firefox"
     HEADLESS = True

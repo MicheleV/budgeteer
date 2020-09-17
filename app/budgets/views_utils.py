@@ -167,8 +167,6 @@ def append_year_and_month_to_url(obj, named_url, delete=False):
     """
     format_str = '%Y-%m'
     date_ym = obj.date.strftime(format_str)
-    # HACK: We're hardcoding the namespace. This will fail hard when we have
-    # multiple apps using this function
     view_url = reverse('budgets:' + named_url)
     redirect_url = f"{view_url}/{date_ym}"
     if delete:

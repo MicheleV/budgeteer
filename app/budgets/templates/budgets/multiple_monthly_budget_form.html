@@ -13,6 +13,10 @@
   <script src="{% static 'js/main.js' %}" defer></script>
 
   <h1>Multiple new monthly budgets</h1>
+  <div class="alert alert-warning" role="alert">
+    This view does not update existing models, and fails if any of them already exist for a given category and date combination. Also, this expects date in YYYY-mm-01 format.
+    <br>Feel free to open a PR <a href="https://gitlab.com/micheleva/budgeteer">upstream</a> if you think you can help out :)
+  </div>
   <form method="POST" class="post-form">
     {% csrf_token %}
     {{ formset.management_form }}
@@ -21,6 +25,6 @@
         {% include "budgets/multiple_create_form.html" with form=form%}
     {% endfor %}
     <input type="submit" value="Create all monthly budgets">
-    <a href="{% url 'monthly_budgets' %}">cancel</a>
+    <a href="{% url 'budgets:monthly_budgets' %}">cancel</a>
   </form>
 {% endblock %}

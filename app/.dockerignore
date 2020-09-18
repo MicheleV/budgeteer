@@ -4,3 +4,4 @@ htmlcov
 virtualenv
 .coverage
 geckodriver.log
+db.sqlite3

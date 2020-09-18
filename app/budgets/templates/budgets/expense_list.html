@@ -9,11 +9,11 @@
   <div class="row">
     <div class="col">
       <h3>Expenses</h3>
-      <a href="{% url 'expenses_create' %}">Create expense</a>
+      <a href="{% url 'budgets:expenses_create' %}">Create expense</a>
       {% if show_delete %}
-        <a href="{% url 'expenses' %}">Hide delete buttons</a>
+        <a href="{% url 'budgets:expenses' %}">Hide delete buttons</a>
       {% else %}
-        <a href="{% url 'expenses' %}?delete=1">Show delete buttons</a>
+        <a href="{% url 'budgets:expenses' %}?delete=1">Show delete buttons</a>
       {% endif %}
     </div>
   </div>
@@ -54,7 +54,7 @@
               <td>{{ expense.note }}</td>
               {% if show_delete %}
                 <td>
-                  <form method="POST" action="{% url 'expenses_delete' pk=expense.id %}">
+                  <form method="POST" action="{% url 'budgets:expenses_delete' pk=expense.id %}">
                     {% csrf_token %}
                     <input type="submit" id="id_submit" value="Yes, DELETE">
                   </form>
@@ -85,7 +85,7 @@
                   {% if value.budgeted is not None %}
                       <td> {{value.budgeted | intcomma }} </td>
                   {% else %}
-                      <td> <a href="{% url 'monthly_budgets_create' %}">Create Budget</a> </td>
+                      <td> <a href="{% url 'budgets:monthly_budgets_create' %}">Create Budget</a> </td>
                   {% endif %}
                   <td> <b>{{value.total | intcomma }}</b> </td>
                 </tr>

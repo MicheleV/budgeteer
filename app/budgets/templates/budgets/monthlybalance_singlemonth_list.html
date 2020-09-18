@@ -9,7 +9,7 @@
   <div class="row">
     <div class="col">
       <h3>Monhtly Balances</h3>
-      <a href="{% url 'monthly_balances_create' %}">Create Monhtly Balance</a>
+      <a href="{% url 'budgets:monthly_balances_create' %}">Create Monhtly Balance</a>
       {% if show_delete %}
         <a href="?delete=0">Hide delete buttons</a>
       {% else %}
@@ -52,11 +52,11 @@
                 {% endif %}
                 </td>
                 <td>
-                  <a href={% url 'edit_monthly_balance' monthly_balance.id %}>Edit</a>
+                  <a href={% url 'budgets:edit_monthly_balance' monthly_balance.id %}>Edit</a>
                 </td>
                 {% if show_delete %}
                    <td>
-                    <form method="POST" action="{% url 'monthly_balances_delete' pk=monthly_balance.id %}">
+                    <form method="POST" action="{% url 'budgets:monthly_balances_delete' pk=monthly_balance.id %}">
                       {% csrf_token %}
                       <input type="submit" id="id_submit" value="Yes, DELETE">
                     </form>

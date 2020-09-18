@@ -1,0 +1,41 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Budgeteer - Login</title>
+    <link href="{% static 'bootstrap/css/bootstrap.css' %}" rel="stylesheet" media="all">
+    {% block preload_js %}{% endblock %}
+  </head>
+
+  <body>
+    <div class="container-fluid">
+        <h2>Login Page</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{form.as_p}}
+            <input type="submit" value="Login">
+        </form>
+
+        <a href="{% url 'budgets:landing_page' %}">Back</a>
+        <a href="https://gitlab.com/micheleva/budgeteer/-/merge_requests/new" >Open a PR to give me stome styling</a>
+    </div>
+
+    <div class="col-md-12">
+      <div class="text-center">
+        <footer class="page-footer font-small">
+          <span id="footer_text">
+            If this is horizontally centered, CSS was loaded correctly ;)
+          </span>
+        </footer>
+      </div>
+    </div>
+
+  </body>
+
+</html>
+

@@ -12,6 +12,7 @@ from django.db.models import Sum
 from django.db.models import F
 from django.db.models import Case
 from django.db.models import When
+from django.db.utils import IntegrityError
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -166,7 +167,7 @@ def append_year_and_month_to_url(obj, named_url, delete=False):
     """
     format_str = '%Y-%m'
     date_ym = obj.date.strftime(format_str)
-    view_url = reverse(named_url)
+    view_url = reverse('budgets:' + named_url)
     redirect_url = f"{view_url}/{date_ym}"
     if delete:
         redirect_url = f"{redirect_url}?delete=1"
@@ -229,3 +230,21 @@ def calc_increase_perc(current_mb_total, prev_mb_total):
         # Truncate to two decimals
         two_months_diff_perc = '%.2f' % (two_months_diff_perc)
     return current_mb_total, two_months_diff, two_months_diff_perc
+
+
+# Issue: Unique together contraints are not checked, and it look like this
+# is not going to be working in Django **2.2** anytime soon [1]
+#
+# Workaround credits: [2], [3]
+# [1] https://code.djangoproject.com/ticket/30547#comment:8
+# [2] https://stackoverflow.com/a/57071005
+# [3] https://stackoverflow.com/a/5690705
+def check_constraints_workaround(self, form, already_exists_message, url):
+    category = form.save(commit=False)
+    category.created_by = self.request.user
+    try:
+        category.save()
+    except (ValidationError, IntegrityError) as e:
+        form.add_error('text', already_exists_message)
+        return self.form_invalid(form)
+    return redirect(url)

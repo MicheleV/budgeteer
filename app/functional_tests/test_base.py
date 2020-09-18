@@ -45,7 +45,7 @@ class FunctionalTest(LiveServerTestCase):
             if headless:
                 options.add_argument('-headless')
             self.browser = webdriver.Firefox(options=options)
-        # Uses chromium if not Firefox
+        # fallback to chromium otherwise
         else:
             options = webdriver.ChromeOptions()
             options.add_argument('--ignore-certificate-errors')
@@ -53,7 +53,7 @@ class FunctionalTest(LiveServerTestCase):
             options.add_argument('--no-proxy-server')
             if headless:
                 options.add_argument('--headless')
-                # You need this if running the tests as root (run as root!?)
+                # Note: if running the tests as root (why would we!?) add:
                 # options.add_argument('--no-sandbox')
             options.binary_location = "/usr/bin/chromium-browser"
             self.browser = webdriver.Chrome(chrome_options=options)
@@ -67,37 +67,33 @@ class FunctionalTest(LiveServerTestCase):
         super(FunctionalTest, self).setUpClass()
         self.browser.quit()
 
-    # Actual tests
-    def test_categories(self):
-        Categories.test_cant_create_an_empty_expense_category(self)
-        Categories.test_can_create_multiple_expense_categories(self)
-        Categories.test_cant_create_duplicate_expense_categories(self)
+    def _call_each_method_in_module(module, tester):
+        for name in dir(module):
+          if name.startswith('test'):
+            test_function = getattr(module, name)
+            if callable(test_function):
+                # TODO: this will print function decorated with @skip as well
+                # even if they are not actually called
+                print(f"Calling {module.__name__}.{name}")
+                test_function(tester)
 
-    def test_expenses(self):
-        Expenses.test_cant_create_malformed_expenses(self)
-        Expenses.test_expenses_sum_appear_on_home_page(self)
-        Expenses.test_expenses_page_can_show_old_expenses(self)
-        Expenses.test_expenses_wont_show_expenses_in_the_future(self)
-        Expenses.test_creating_expenses_before_categories_will_fail(self)
-        Expenses.test_cant_create_expenses_without_selecting_a_category(self)
-        Expenses.test_only_expenses_in_range_are_shown(self)
+    def test_categories(tester):
+        FunctionalTest._call_each_method_in_module(Categories, tester)
 
-    def test_monthly_budgets(self):
-        MBudgets.test_cant_create_an_empty_monthly_budget(self)
-        MBudgets.test_can_create_multiple_monthly_budgets(self)
-        MBudgets.test_cant_create_multiple_monthly_budgets_for_same_month(self)
+    def test_expenses(tester):
+        FunctionalTest._call_each_method_in_module(Expenses, tester)
 
-    def test_monthly_balances(self):
-        MonthlyBalances.test_image_is_not_displayed_without_data(self)
-        MonthlyBalances.test_image_is_displayed_with_data(self)
+    def test_monthly_budgets(tester):
+        FunctionalTest._call_each_method_in_module(MBudgets, tester)
 
-    def test_access(self):
-        PageAccess.test_access_to_all_pages(self)
+    def test_monthly_balances(tester):
+        FunctionalTest._call_each_method_in_module(MonthlyBalances, tester)
 
-    def test_views_and_layout(self):
-        ViewAndLayout.test_home_page_has_links_in_nav(self)
-        ViewAndLayout.test_layout_and_styling(self)
-        ViewAndLayout.check_autofocus(self)
+    def test_access(tester):
+        FunctionalTest._call_each_method_in_module(PageAccess, tester)
 
-    def test_api(self):
-        API.test_create_and_delete_expenses(self)
+    def test_views_and_layout(tester):
+        FunctionalTest._call_each_method_in_module(ViewAndLayout, tester)
+
+    def test_api(tester):
+        FunctionalTest._call_each_method_in_module(API, tester)

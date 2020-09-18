@@ -34,9 +34,14 @@ class CategoryForm(forms.models.ModelForm):
 
 class ExpenseForm(forms.models.ModelForm):
 
+    def __init__(self, user, *args, **kwargs):
+        super(ExpenseForm, self).__init__(*args, **kwargs)
+        self.fields['category'].queryset = m.Category.objects.filter(
+                                           created_by=user)
+
     class Meta:
         model = m.Expense
-        fields = ('date', 'amount', 'note', 'category')
+        fields = ('category', 'amount', 'date', 'note', )
         widgets = {
             'amount': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter the spended amount',
@@ -58,6 +63,10 @@ class DeleteExpenseForm(forms.models.ModelForm):
 
 
 class MonthlyBudgetForm(forms.models.ModelForm):
+
+    def __init__(self, user, *args, **kwargs):
+        super(MonthlyBudgetForm, self).__init__(*args, **kwargs)
+        self.fields['category'].queryset = m.Category.objects.filter(created_by=user)
 
     class Meta:
         model = m.MonthlyBudget
@@ -99,9 +108,14 @@ class IncomeCategoryForm(forms.models.ModelForm):
 
 class IncomeForm(forms.models.ModelForm):
 
+    def __init__(self, user, *args, **kwargs):
+        super(IncomeForm, self).__init__(*args, **kwargs)
+        self.fields['category'].queryset = m.IncomeCategory.objects.filter(
+                                           created_by=user)
+
     class Meta:
         model = m.Income
-        fields = ('amount', 'note', 'date', 'category')
+        fields = ('category', 'amount',  'date', 'note',)
         widgets = {
             'amount': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter the earned amount',
@@ -134,6 +148,11 @@ class MonthlyBalanceCategoryForm(forms.models.ModelForm):
 
 
 class MonthlyBalanceForm(forms.models.ModelForm):
+
+    def __init__(self, user, *args, **kwargs):
+        super(MonthlyBalanceForm, self).__init__(*args, **kwargs)
+        self.fields['category'].queryset = m.MonthlyBalanceCategory.objects.filter(
+                                           created_by=user)
 
     class Meta:
         model = m.MonthlyBalance

@@ -1,0 +1,101 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Budgeteer</title>
+    <link href="{% static 'bootstrap/css/bootstrap.css' %}" rel="stylesheet" media="all">
+    {% block preload_js %}{% endblock %}
+  </head>
+
+  <body>
+
+  <div class="container">
+
+    <header class="jumbotron my-4">
+      <h1 class="display-3">This is <b>not</b> the landing page you were expecting</h1>
+
+      <p class="lead">
+        I've been postoponing making a real landing page for a while...as you have already noticed already.
+      </p>
+      <a href="https://gitlab.com/micheleva/budgeteer" class="btn btn-primary btn-lg">Look at the source</a>
+    </header>
+
+
+<!-- Theme https://github.com/StartBootstrap/startbootstrap-heroic-features -->
+<!-- License: MIT -->
+    <div class="row text-center">
+
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h4 class="card-title">Existing user</h4>
+            <p class="card-text">You already know how it works: press the button, enter your credentials, and you will <b>magically</b> get access to the data you've entered previously. Technology, eh?</p>
+          </div>
+          <div class="card-footer">
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary">Login</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h4 class="card-title">New user</h4>
+            <p class="card-text">No email needed, no tracking, no ads... and probably this is proabably being hosted by you yourself. Please mind the software has been developed for being used on secure network (if such a thing exists): i.e. no hardening has been done so far whatsoever, use carefully</p>
+          </div>
+          <div class="card-footer">
+            <a href="{% url 'accounts:signup' %}" class="btn btn-primary">Signup</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h4 class="card-title">Lost password</h4>
+            <p class="card-text">Even though Django comes with <a href="https://docs.djangoproject.com/en/2.2/topics/auth/default/#module-django.contrib.auth.views">handy default routes</a>, this has not been hooked up yet. For the moment being reset the password <a href="https://docs.djangoproject.com/en/2.2/topics/auth/default/#changing-passwords">from the command line</a>. Feel free to make a PR if you want to hook it up.</p>
+          </div>
+          <div class="card-footer">
+            <a href="https://gitlab.com/micheleva/budgeteer/-/merge_requests/new" class="btn btn-primary">Implement me!</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h4 class="card-title">I've found a bug!</h4>
+            <p class="card-text">Thank you very much, you must be a very nice person (or a very nice <a href="http://web.archive.org/web/20200121061254im_/https://upload.wikimedia.org/wikipedia/en/thumb/f/f8/Internet_dog.jpg/220px-Internet_dog.jpg">dog</a>). Post a concise reproducer, expected behaviour, and actual behaviour. If you have time, please read the comments in the code before submitting: many features are not implemented yet: you might find a TODO or a FIXME comment to point me at.</p>
+          </div>
+          <div class="card-footer">
+            <a href="https://gitlab.com/micheleva/budgeteer/-/issues/new" class="btn btn-primary">Open a ticket</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="col-md-12">
+    <div class="text-center">
+      <footer class="page-footer font-small">
+        <span id="footer_text">
+          If this is horizontally centered, CSS was loaded correctly ;)
+        </span>
+      </footer>
+    </div>
+  </div>
+
+  </body>
+
+
+</html>
+
+
+

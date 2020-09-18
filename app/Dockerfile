@@ -26,13 +26,12 @@ MAINTAINER Michele Valsecchi
 LABEL Vendor="budgeteer"
 LABEL Version=0.0.1
 
-RUN dnf -y install python36 nc
-RUN alternatives --set python /usr/bin/python3
-RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
-
-# This enable us to install the correct pg_dump version (i.e. need to debug)
 RUN dnf -y module disable postgresql:10
 RUN dnf -y module enable postgresql:12
+
+RUN dnf -y install python36 nc postgresql
+RUN alternatives --set python /usr/bin/python3
+RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
 
 RUN mkdir -p /home/app
 RUN groupadd -r app && adduser -r app -g app

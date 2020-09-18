@@ -5,31 +5,34 @@
   <div class="navbar-nav-scroll">
     <ul class="navbar-nav bd-navbar-nav flex-row">
       <li class="nav-item">
-        <a class="nav-link active" href="{% url 'home' %}">Home</a>
+        <a class="nav-link active" href="{% url 'budgets:home' %}">Home</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link active" href="{% url 'categories' %}">Categories</a>
+        <a class="nav-link active" href="{% url 'budgets:categories' %}">Categories</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'monthly_budgets' %}">Monthly Budgets</a>
+        <a class="nav-link" href="{% url 'budgets:monthly_budgets' %}">Monthly Budgets</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'expenses' %}">Expenses</a>
+        <a class="nav-link" href="{% url 'budgets:expenses' %}">Expenses</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'income_categories' %}">Income Categories</a>
+        <a class="nav-link" href="{% url 'budgets:income_categories' %}">Income Categories</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'incomes' %}">Incomes</a>
+        <a class="nav-link" href="{% url 'budgets:incomes' %}">Incomes</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'monthly_balance_categories' %}">Monthly balance category </a>
+        <a class="nav-link" href="{% url 'budgets:monthly_balance_categories' %}">Monthly balance category </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'monthly_balances' %}">Monthly balances</a>
+        <a class="nav-link" href="{% url 'budgets:monthly_balances' %}">Monthly balances</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'goals' %}">Goals</a>
+        <a class="nav-link" href="{% url 'budgets:goals' %}">Goals</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'accounts:logout' %}">(Not {{ request.user }}?) Logout</a>
       </li>
     </ul>
   </div>

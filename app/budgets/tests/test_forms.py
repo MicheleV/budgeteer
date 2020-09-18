@@ -2,6 +2,10 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 import random
+from datetime import datetime
+
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 import budgets.forms as f
 import budgets.models as m
@@ -35,12 +39,12 @@ class CategoriesTest(BaseTest):
           f.MonthlyBalanceCategoryForm
         ]
         text = self.generateString(50)
-
         for form in forms:
-            filled_form = form(data={'text': text})
+            filled_form = form(data={'text': text, 'created_by': self.user})
+
             self.assertFalse(filled_form.is_valid())
             self.assertIn(
-              'Ensure this value has at most 20 characters',
+              'Ensure this value has at most 40 characters',
               filled_form.errors['text'].as_text(),
             )
 
@@ -87,7 +91,7 @@ class MonthlyBalanceCategoryFormTest(BaseTest):
 
 class IncomeFormTest(BaseTest):
     def test_form_renders_correctly(self):
-        form = f.IncomeForm()
+        form = f.IncomeForm(self.user)
         self.assertIn('placeholder="Enter the earned amount"', form.as_p())
         self.assertIn('placeholder="Keyword about this entry"', form.as_p())
         self.assertIn('placeholder="%Y-%m-%d format"', form.as_p())
@@ -99,7 +103,7 @@ class IncomeFormTest(BaseTest):
             'category': category.id,
             'amount': None,
             'date': '2019-09-23'
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'amount',
@@ -122,7 +126,7 @@ class IncomeFormTest(BaseTest):
             'amount': amount,
             'date': date,
             'note': long_text
-        })
+        }, user=self.user)
         self.assertTrue(form.is_valid())
         self.assertNotIn(
           'note',
@@ -138,7 +142,7 @@ class IncomeFormTest(BaseTest):
             'amount': amount,
             'date': date,
             'note': None
-        })
+        }, user=self.user)
         self.assertTrue(form.is_valid())
         self.assertNotIn(
           'note',
@@ -158,7 +162,7 @@ class IncomeFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': None
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -174,7 +178,7 @@ class IncomeFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': ''
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -189,7 +193,7 @@ class IncomeFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': self.generateString(50)
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -206,7 +210,7 @@ class IncomeFormTest(BaseTest):
             'category': None,
             'amount': amount,
             'date': '2019-09-23'
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'category',
@@ -220,7 +224,7 @@ class IncomeFormTest(BaseTest):
 
 class MonthlyBalanceFormTest(BaseTest):
     def test_form_renders_correctly(self):
-        form = f.MonthlyBalanceForm()
+        form = f.MonthlyBalanceForm(self.user)
         self.assertIn('placeholder="Enter the balance"', form.as_p())
         self.assertIn('placeholder="%Y-%m-%d format"', form.as_p())
 
@@ -232,7 +236,7 @@ class MonthlyBalanceFormTest(BaseTest):
 class ExpenseFormTest(BaseTest):
 
     def test_form_renders_correctly(self):
-        form = f.ExpenseForm()
+        form = f.ExpenseForm(self.user)
         self.assertIn('placeholder="Enter the spended amount"', form.as_p())
         self.assertIn('placeholder="What did you buy?"', form.as_p())
         self.assertIn('placeholder="%Y-%m-%d format"', form.as_p())
@@ -242,7 +246,7 @@ class ExpenseFormTest(BaseTest):
             'category': None,
             'amount': 5000,
             'date': '2019-09-23'
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'category',
@@ -259,8 +263,8 @@ class ExpenseFormTest(BaseTest):
         form = f.ExpenseForm(data={
             'category': category.id,
             'amount': None,
-            'date': '2019-09-23'
-        })
+            'date': '2019-09-23',
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'amount',
@@ -279,8 +283,8 @@ class ExpenseFormTest(BaseTest):
         form = f.ExpenseForm(data={
             'category': category.id,
             'amount': amount,
-            'date': None
-        })
+            'date': None,
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -295,7 +299,7 @@ class ExpenseFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': ''
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -310,7 +314,7 @@ class ExpenseFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': self.generateString(50)
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -325,7 +329,7 @@ class ExpenseFormTest(BaseTest):
 class MonthlyBudgetFormTest(BaseTest):
 
     def test_form_renders_correctly(self):
-        form = f.MonthlyBudgetForm()
+        form = f.MonthlyBudgetForm(self.user)
         self.assertIn('placeholder="Enter the budget amount"', form.as_p())
         self.assertIn('placeholder="%Y-%m-%d format"', form.as_p())
 
@@ -334,7 +338,7 @@ class MonthlyBudgetFormTest(BaseTest):
             'category': None,
             'amount': 5000,
             'date': '2019-09-23'
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'category',
@@ -350,8 +354,8 @@ class MonthlyBudgetFormTest(BaseTest):
         form = f.MonthlyBudgetForm(data={
             'category': category.id,
             'amount': None,
-            'date': '2019-09-23'
-        })
+            'date': '2019-09-23',
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'amount',
@@ -370,7 +374,7 @@ class MonthlyBudgetFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': None
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -385,7 +389,7 @@ class MonthlyBudgetFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': ''
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -400,7 +404,7 @@ class MonthlyBudgetFormTest(BaseTest):
             'category': category.id,
             'amount': amount,
             'date': self.generateString(50),
-        })
+        }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
           'date',
@@ -415,6 +419,7 @@ class MonthlyBudgetFormTest(BaseTest):
         """
         Test whether the models are saved and updated correctly or not
         """
+
         amount = random.randint(1, 90000)
         date = '2019-08-01'
         text = self.generateString(20)
@@ -424,18 +429,22 @@ class MonthlyBudgetFormTest(BaseTest):
         date2 = '2019-08-02'
         note2 = self.generateString(20)
         inc_cat_form = f.IncomeCategoryForm(data={'text': text})
+        # NOTE: we need to manually set created_by, as we're not passing through the view logic
+        inc_cat_form.instance.created_by = self.user
         inc_cat_form.full_clean()
         inc_cat_form.save()
 
         saved_income_category = m.IncomeCategory.objects.first()
         self.assertEqual(saved_income_category.text, text)
+        self.assertEqual(saved_income_category.created_by.id, self.user.id)
 
         income_form = f.IncomeForm(data={
             'category': saved_income_category.id,
             'amount': amount,
             'note': note,
             'date': date
-        })
+        }, user=self.user)
+
         income_form.full_clean()
         income_form.save()
 
@@ -443,13 +452,15 @@ class MonthlyBudgetFormTest(BaseTest):
         self.assertEqual(saved_income.amount, amount)
         self.assertEqual(saved_income.note, note)
         self.assertEqual(saved_income.date.strftime("%Y-%m-%d"), date)
+        # NOTE: we bypass the view, hence set user is not set
 
+        # Update does not throw errors
         income_form = f.IncomeForm(data={
             'category': saved_income_category.id,
             'amount': amount2,
             'note': note2,
             'date': date2
-        }, instance=saved_income)
+        }, instance=saved_income, user=self.user)
         income_form.full_clean()
         income_form.save()
 
@@ -463,6 +474,7 @@ class MonthlyBudgetFormTest(BaseTest):
         self.assertEqual(updated_income.note, note2)
         self.assertEqual(updated_income.date.strftime("%Y-%m-%d"),
                          date2)
+        # NOTE: we bypass the view, hence set user is not set
 
 
 class GoalFormTest(BaseTest):

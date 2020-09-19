@@ -470,7 +470,7 @@ class MonthlyBalanceDeleteView(DeleteView):
 @login_required
 @require_http_methods(["GET", "POST"])
 def multiple_new_monthly_budget(request):
-    categories = m.Category.objects.filter(is_archived=False)
+    categories = m.Category.objects.filter(is_archived=False, created_by=request.user)
     cats = categories.count()
     MBFormSet = formset_factory(form=f.MonthlyBudgetForm, extra=cats,
                                 max_num=cats)
@@ -568,16 +568,16 @@ def home_page(request):
     # rates to be edited inside the app: drop the value from .env file)
     rate = int(os.getenv("EXCHANGE_RATE"))
     (start, end) = utils.current_month_boundaries()
+    user = request.user
 
     # Get current and preivous month balances
-    current_balance = utils.get_total_of_monthly_balances(start)
+    current_balance = utils.get_total_of_monthly_balances(start, user)
     prev_month = utils.get_previous_month_first_day_date(start)
-    starting_balance = utils.get_total_of_monthly_balances(prev_month)
+    starting_balance = utils.get_total_of_monthly_balances(prev_month, user)
 
-    # FIX ME: check permissions here
     # Fetch previous month data to compare it with the current month's
-    prev_mb, prev_tot = utils.get_month_balance_stats(prev_month, rate)
-    current_mb, curr_tot = utils.get_month_balance_stats(start, rate)
+    prev_mb, prev_tot = utils.get_month_balance_stats(prev_month, rate, user)
+    current_mb, curr_tot = utils.get_month_balance_stats(start, rate, user)
 
     # Display pie graph
     pie_graph = utils.generate_current_monthly_balance_pie_graph(current_mb)

@@ -29,12 +29,12 @@ def get_previous_month_first_day_date(date):
     return (date - relativedelta(months=1)).replace(day=1)
 
 
-def get_total_of_monthly_balances(date):
+def get_total_of_monthly_balances(date, user):
     """
-    Return the sum of the monthly balances for the input date
+    Return the sum of the monthly balances fdate/user combination passed as args
     """
     rate = int(os.getenv("EXCHANGE_RATE"))
-    balances = m.MonthlyBalance.objects.select_related('category').filter(date=date)
+    balances = m.MonthlyBalance.objects.select_related('category').filter(date=date, created_by=user)
     return balances.aggregate(correct_sum=Sum(Case(
       When(category__is_foreign_currency=False, then='amount'),
       When(category__is_foreign_currency=True, then=F('amount') * rate)
@@ -197,12 +197,12 @@ def get_goals_and_time_to_completions(current_mb_total, two_months_diff):
     return goals
 
 
-def get_month_balance_stats(date, rate):
+def get_month_balance_stats(date, rate, user):
     """
     Return monthly balances and their sum (adjusted to local currency)
     """
     prev_mb = m.MonthlyBalance.objects.select_related('category').filter(
-              date=date).order_by('category_id')
+              date=date, created_by=user).order_by('category_id')
     total = 0
     for mv in prev_mb:
         if mv.category.is_foreign_currency:

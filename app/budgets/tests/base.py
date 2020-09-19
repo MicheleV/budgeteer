@@ -202,7 +202,7 @@ class BaseTest(TestCase):
         mb.save()
         return mb
 
-    def create_goal(self, amount, text, note, is_archived=False):
+    def create_goal(self, amount, text,note, is_archived=False):
         """
         Create a goal
         """
@@ -211,7 +211,10 @@ class BaseTest(TestCase):
         g.text = text
         g.note = note
         g.is_archived = is_archived
-        g.created_by = self.user
+        g.created_by =    self.user
         g.full_clean()
         g.save()
         return g
+
+
+

@@ -201,7 +201,6 @@ def get_month_balance_stats(date, rate):
     """
     Return monthly balances and their sum (adjusted to local currency)
     """
-    import pdb
     prev_mb = m.MonthlyBalance.objects.select_related('category').filter(
               date=date).order_by('category_id')
     total = 0

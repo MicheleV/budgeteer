@@ -261,7 +261,7 @@ class ExpenseFormTest(BaseTest):
         text = self.generateString(20)
         category = self.create_category(text)
         form = f.ExpenseForm(data={
-            'category': category.id,
+            'category': category,
             'amount': None,
             'date': '2019-09-23',
         }, user=self.user)
@@ -281,7 +281,7 @@ class ExpenseFormTest(BaseTest):
         amount = random.randint(1, 90000)
         # Case None
         form = f.ExpenseForm(data={
-            'category': category.id,
+            'category': category,
             'amount': amount,
             'date': None,
         }, user=self.user)
@@ -296,7 +296,7 @@ class ExpenseFormTest(BaseTest):
         )
         # Case empty string
         form = f.ExpenseForm(data={
-            'category': category.id,
+            'category': category,
             'amount': amount,
             'date': ''
         }, user=self.user)
@@ -311,7 +311,7 @@ class ExpenseFormTest(BaseTest):
         )
         # Case invalid string
         form = f.ExpenseForm(data={
-            'category': category.id,
+            'category': category,
             'amount': amount,
             'date': self.generateString(50)
         }, user=self.user)

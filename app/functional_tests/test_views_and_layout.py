@@ -47,6 +47,7 @@ def test_layout_and_styling(tester):
 
 @Helpers.register_and_login
 def test_check_autofocus(tester):
+    """Check autofocus for text fields in forms"""
     urls = [
      reverse('budgets:categories_create'),
      reverse('budgets:income_categories_create'),
@@ -57,3 +58,7 @@ def test_check_autofocus(tester):
         tester.browser.get(f"{tester.live_server_url}{url}")
         inputbox = tester.browser.find_element_by_id('id_text')
         tester.assertTrue(inputbox.get_attribute("autofocus"))
+
+
+def test_goal_legend_is_ordered_by_amount_desc(self):
+    """WRITE ME"""

@@ -3,9 +3,7 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.urls import path
 from django.urls import re_path
-import debug_toolbar
 from budgets import views
-from django.urls import include, path
 
 app_name = 'budgets'
 urlpatterns = [

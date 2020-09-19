@@ -1,10 +1,7 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-import calendar
 import datetime
-from dateutil.relativedelta import relativedelta
-import math
 import os
 
 from django.contrib.auth.decorators import login_required
@@ -13,11 +10,9 @@ from django.db.models import F
 from django.db.models import Case
 from django.db.models import When
 from django.forms import formset_factory
-from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.views.decorators.http import require_http_methods
@@ -26,13 +21,9 @@ from django.views.generic import DeleteView
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
-from graphs import plot
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 
 import budgets.forms as f
 import budgets.models as m
-from budgets.serializers import CategorySerializer
 import budgets.views_utils as utils
 
 
@@ -77,7 +68,6 @@ class ExpenseCreateView(CreateView):
         kwargs['user'] = self.request.user
         return kwargs
 
-    # FIX ME: check permissions here
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super(ExpenseCreateView, self).form_valid(form)
@@ -93,8 +83,8 @@ class ExpenseListView(ListView):
     ordering = ['id']
 
     def start_end(self):
-        start = yymm_date = self.kwargs.get('start', None)
-        end = yymm_date = self.kwargs.get('end', None)
+        start = self.kwargs.get('start', None)
+        end  = self.kwargs.get('end', None)
         if end is None:
             (start, end) = utils.get_month_boundaries(start)
         else:
@@ -185,7 +175,6 @@ class MonthlyBudgetsCreateView(CreateView):
         return kwargs
 
     def form_valid(self, form):
-        # FIX ME: check for permissions
         form.instance.created_by = self.request.user
         return super(MonthlyBudgetsCreateView, self).form_valid(form)
 
@@ -216,6 +205,7 @@ class MonthlyBudgetListView(ListView):
 @method_decorator(login_required, name='dispatch')
 class MonthlyBudgetDetailView(DetailView):
     model = m.MonthlyBudget
+    # FIX ME: check for permissions
 
 
 @method_decorator(login_required, name='dispatch')
@@ -291,7 +281,6 @@ class IncomCreateView(CreateView):
         kwargs['user'] = self.request.user
         return kwargs
 
-    # FIX ME: check permissions here
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super(IncomCreateView, self).form_valid(form)
@@ -308,12 +297,12 @@ class IncomeView(ListView):
     template_name = 'budgets/income_list.html'
 
     def get_queryset(self):
-        start = yymm_date = self.kwargs.get('start', None)
-        end = yymm_date = self.kwargs.get('end', None)
+        start = self.kwargs.get('start', None)
+        end = self.kwargs.get('end', None)
 
         # TODO: add a route to filter by start and end
         if end is None:
-            (start, end) = utils.get_month_boundaries(start)
+            (start, end)           = utils.get_month_boundaries(start)
         else:
             format_str = '%Y-%m-%d'
             start = datetime.datetime.strptime(start, format_str).date()
@@ -560,6 +549,7 @@ def multiple_new_monthly_balance(request):
 @require_http_methods(["GET", "POST"])
 def edit_new_monthly_balance(request):
     pass
+    # FIX ME: check permissions here
 
 
 @require_http_methods(["GET"])
@@ -597,6 +587,7 @@ def home_page(request):
 
     # Display bar graph: only draw active goals
     goals = utils.get_goals_and_time_to_completions(curr_tot, diff)
+    # FIXME: filter by current user
     mb = m.MonthlyBalance.objects.select_related('category').values('date'). \
         annotate(actual_amount=Sum(Case(
           When(category__is_foreign_currency=False, then='amount'),
@@ -605,7 +596,7 @@ def home_page(request):
 
     bar_graph = utils.generate_monthly_balance_bar_graph(mb, goals)
 
-    return render(request, 'home.html', {
+    return render(request, 'home.html',  {
         'current_balance': current_balance,
         'starting_balance': starting_balance,
         # TODO: do this on the template side
@@ -620,3 +611,4 @@ def home_page(request):
         'two_months_diff_perc': diff_perc,
         'goals': goals,
     })
+

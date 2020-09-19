@@ -3,10 +3,6 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 import datetime
 import random
-from unittest import skip
-
-from django.urls import resolve
-from django.urls import reverse
 
 import functional_tests.helpers as Helpers
 
@@ -115,7 +111,7 @@ def test_cant_create_multiple_monthly_budgets_for_same_month(tester):
 
 
 def test_users_cant_see_other_users_monthly_budgets(tester):
-    username, password = Helpers.create_user(tester)
+    Helpers.create_user(tester)
 
     # Frank creates a category to log expenses related his rent
     category_name = Helpers.generateString()
@@ -130,7 +126,7 @@ def test_users_cant_see_other_users_monthly_budgets(tester):
     Helpers.logout_user(tester)
 
     # Guido can not see Frank's monthly budget
-    username_2, password_2 = Helpers.create_user(tester)
+    Helpers.create_user(tester)
 
     Helpers.visit_and_verify_month_budget_creation(tester=tester,
                                                    category_name=category_name,

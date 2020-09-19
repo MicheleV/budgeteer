@@ -2,7 +2,6 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.urls import reverse
-from django.urls import resolve
 
 import functional_tests.helpers as Helpers
 
@@ -72,12 +71,12 @@ def test_users_cant_see_other_users_balance_categories(tester):
     # Frank can create a category to log his balance
     cat_name = Helpers.generateString()
 
-    username, password = Helpers.create_user(tester)
+    Helpers.create_user(tester)
     Helpers.create_a_category(tester, category_name=cat_name, is_balance=True)
     Helpers.logout_user(tester)
 
     # Guido can not see Frank's balance income category
-    username_2, password_2 = Helpers.create_user(tester)
+    Helpers.create_user(tester)
 
     Helpers.visit_and_verify_categories(tester, cat_name, is_income=False,
                                         should_exist=False, is_balance=True)

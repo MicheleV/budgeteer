@@ -10,7 +10,7 @@ import string
 import random
 # Docs at https://seleniumhq.github.io/selenium/docs/api/py/webdriver_support/
 #  selenium.webdriver.support.expected_conditions.html
-from django.urls import resolve, reverse
+from django.urls import reverse
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC

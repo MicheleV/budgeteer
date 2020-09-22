@@ -31,7 +31,7 @@ class FunctionalTest(LiveServerTestCase):
     # Setup
     @classmethod
     def setUpClass(self):
-        super(FunctionalTest, self).setUpClass()
+        super().setUpClass()
         self.setup_browser(self.BROWSER, self.HEADLESS)
 
     @classmethod

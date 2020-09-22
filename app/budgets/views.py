@@ -73,7 +73,7 @@ class ExpenseCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-        return super(ExpenseCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         """Redirect on create success"""
@@ -182,7 +182,7 @@ class MonthlyBudgetsCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-        return super(MonthlyBudgetsCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         """Redirect on create success"""
@@ -222,7 +222,7 @@ class GoalCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-        return super(GoalCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         """Redirect on create success"""
@@ -293,7 +293,7 @@ class IncomCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-        return super(IncomCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         """Redirect on create success"""
@@ -373,7 +373,7 @@ class MonthlyBalancesCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-        return super(MonthlyBalancesCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         """Redirect on create success"""
@@ -469,7 +469,7 @@ class MonthlyBalanceUpdateView(UpdateView):
         """Check object ownership"""
         obj = super().get_object(*args, **kwargs)
         if obj.created_by != self.request.user:
-            # TODO: create syled 403 page
+            # TODO: create a proper 403 page
             raise PermissionDenied()
         return obj
 

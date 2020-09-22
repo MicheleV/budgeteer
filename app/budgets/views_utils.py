@@ -90,7 +90,7 @@ def generate_monthly_balance_bar_graph(data, goals):
             dates.append(val['date'])
             try:
                 amounts.append(val['actual_amount'])
-            except (AttributeError, NameError, KeyError) as e:
+            except (AttributeError, NameError, KeyError) as e:  # pylint: disable=W0612,C0103; # noqa
                 print("You've forgot to add actual_amount somewhere (bar)")
                 amounts.append(val['amount'])
         return plot.generateBarGraph(dates, amounts, goals)
@@ -111,7 +111,7 @@ def generate_current_monthly_balance_pie_graph(data):
             # passing monthly budgets with actual_ammount attribute
             try:
                 values.append(mb.actual_amount)
-            except AttributeError as e:
+            except AttributeError as e:  # pylint: disable=W0612,C0103; # noqa
                 print("You've forgot to add actual_amount somewhere (pie)")
                 values.append(mb.amount)
         return plot.generatePieGraph(labels, values)
@@ -243,7 +243,7 @@ def check_constraints_workaround(self, form, already_exists_message, url):
     category.created_by = self.request.user
     try:
         category.save()
-    except (ValidationError, IntegrityError) as e:
+    except (ValidationError, IntegrityError) as e:  # pylint: disable=W0612,C0103; # noqa
         form.add_error('text', already_exists_message)
         return self.form_invalid(form)
     return redirect(url)

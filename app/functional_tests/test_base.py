@@ -30,7 +30,7 @@ class FunctionalTest(LiveServerTestCase):
 
     # Setup
     @classmethod
-    def setUpClass(self):
+    def setUpClass(self):  # pylint: disable=C0103; # noqa
         super().setUpClass()
         self.setup_browser(self.BROWSER, self.HEADLESS)
 
@@ -59,7 +59,7 @@ class FunctionalTest(LiveServerTestCase):
             self.live_server_url = f"http://{test_target}"
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(self):  # pylint: disable=C0103; # noqa
         super().setUpClass()
         self.browser.quit()
 

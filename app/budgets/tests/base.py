@@ -22,24 +22,18 @@ load_dotenv()
 
 class BaseTest(TestCase):
 
-    def setUp(self):
-        """
-        BaseTest signup, called once per test (method)
-        """
+    def setUp(self):  # pylint: disable=C0103; # noqa
+        """BaseTest signup, called once per test (method)"""
         self._sign_up()
 
     @staticmethod
-    def generateString(length=10):
-        """
-        Generate a random string of a given length
-        """
+    def generate_string(length=10):
+        """Generate a random string of a given length"""
         char = string.ascii_lowercase
         return ''.join(random.choice(char) for i in range(length))
 
     def check_if_title_is_displayed(self, url_name, title):
-        """
-        Check whether the page has a title or not
-        """
+        """Check whether the page has a title or not"""
         response = self.get_response_from_named_url(url_name)
         self.assertContains(response, title)
 
@@ -52,9 +46,7 @@ class BaseTest(TestCase):
         self.assertEqual(found.func, view_func)
 
     def get_response_from_named_url(self, named_url, args=None):
-        """
-        Wrapper for get/post methods for a given named url
-        """
+        """Wrapper for get/post methods for a given named url"""
         if args:
             url = reverse(named_url, kwargs=args)
             response = self.client.post(url)
@@ -64,9 +56,7 @@ class BaseTest(TestCase):
         return response
 
     def check_if_error_matches(self, text, rows):
-        """
-        Compare the error text
-        """
+        """Compare the error text"""
         self.assertTrue(
             any(text in row for row in rows),
             f"No {text} in rows. Contents were\n{rows}",
@@ -77,25 +67,21 @@ class BaseTest(TestCase):
         Create an user, and add a reference to self.user
         self.credentials is a dictionary containing both username and password
         """
-        text = self.generateString(50)
-        pwd = self.generateString(10)
-        username = self.generateString(10) + str(datetime.now())
+        text = self.generate_string(50)
+        pwd = self.generate_string(10)
+        username = self.generate_string(10) + str(datetime.now())
         self.user = User.objects.create_user(
             username=username, password=pwd)
         self.credentials = {'username': username, 'password': pwd}
         self.password = pwd
 
     def _login(self):
-        """
-        Login an user
-        """
+        """Login an user"""
         url = reverse('accounts:login')
         response = self.client.post(url, self.credentials, follow=True)
 
     def login(func):
-        """
-        Login decorator
-        """
+        """Login decorator"""
         @wraps(func)
         def wrapper(self, *args, **kwargs):
             self._login()
@@ -109,16 +95,12 @@ class BaseTest(TestCase):
         self._login()
 
     def _logout(self):
-        """
-        Logout an user
-        """
+        """Logout an user"""
         url = reverse('accounts:logout')
         response = self.client.get(url)
 
     def create_category(self, text):
-        """
-        Create a category
-        """
+        """Create a category"""
         category = m.Category()
         category.text = text
         category.created_by = self.user
@@ -127,9 +109,7 @@ class BaseTest(TestCase):
         return category
 
     def create_expense(self, category, amount, note, date):
-        """
-        Create an expense
-        """
+        """Create an expense"""
         expense = m.Expense()
         expense.category = category
         expense.amount = amount
@@ -141,9 +121,7 @@ class BaseTest(TestCase):
         return expense
 
     def create_monthly_budgets(self, category, amount, date):
-        """
-        Create a monthly budget
-        """
+        """Create a monthly budget"""
         budget = m.MonthlyBudget()
         budget.category = category
         budget.amount = amount
@@ -154,9 +132,7 @@ class BaseTest(TestCase):
         return budget
 
     def create_income_category(self, text):
-        """
-        Create an income category
-        """
+        """Create an income category"""
         category = m.IncomeCategory()
         category.text = text
         category.created_by = self.user
@@ -165,9 +141,7 @@ class BaseTest(TestCase):
         return category
 
     def create_income(self, category, amount, note, date):
-        """
-        Create an income
-        """
+        """Create an income"""
         income = m.Income()
         income.category = category
         income.amount = amount
@@ -179,9 +153,7 @@ class BaseTest(TestCase):
         return income
 
     def create_monthly_balance_category(self, text):
-        """
-        Create a monthly balance category
-        """
+        """Create a monthly balance category"""
         mbc = m.MonthlyBalanceCategory()
         mbc.text = text
         mbc.created_by = self.user
@@ -190,9 +162,7 @@ class BaseTest(TestCase):
         return mbc
 
     def create_monthly_balance(self, category, amount, date):
-        """
-        Create a monthly balance
-        """
+        """Create a monthly balance"""
         mb = m.MonthlyBalance()
         mb.category = category
         mb.amount = amount
@@ -203,9 +173,7 @@ class BaseTest(TestCase):
         return mb
 
     def create_goal(self, amount, text,note, is_archived=False):
-        """
-        Create a goal
-        """
+        """Create a goal"""
         g = m.Goal()
         g.amount = amount
         g.text = text
@@ -215,6 +183,3 @@ class BaseTest(TestCase):
         g.full_clean()
         g.save()
         return g
-
-
-

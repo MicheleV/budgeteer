@@ -34,6 +34,7 @@ import budgets.views_utils as utils
 
 @method_decorator(login_required, name='dispatch')
 class CategoryCreateView(CreateView):
+    """Create Expense Category View"""
     model = m.Category
     form_class = f.CategoryForm
     error_msg = 'Category with this Text already exists'
@@ -50,7 +51,7 @@ class CategoryCreateView(CreateView):
 
 
 @method_decorator(login_required, name='dispatch')
-class CategoryListView(ListView):
+class CategoryListView(ListView):  # pylint: disable=R0903; # noqa
     model = m.Category
     paginate_by = 15
     ordering = ['id']
@@ -88,7 +89,7 @@ class ExpenseListView(ListView):
 
     def start_end(self):
         start = self.kwargs.get('start', None)
-        end  = self.kwargs.get('end', None)
+        end = self.kwargs.get('end', None)
         if end is None:
             (start, end) = utils.get_month_boundaries(start)
         else:
@@ -154,11 +155,11 @@ class ExpenseListView(ListView):
 
 
 @method_decorator(login_required, name='dispatch')
-class ExpenseDeleteView(DeleteView):
+class ExpenseDeleteView(DeleteView):  # pylint: disable=R0903; # noqa
     model = m.Expense
 
     # FIX ME: check for permissions here
-    def get_success_url(self):
+    def get_success_url(self):  # pylint: disable=R0201; # noqa
         """Redirect on delete success"""
         return reverse('budgets:expenses')
 
@@ -184,13 +185,13 @@ class MonthlyBudgetsCreateView(CreateView):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
-    def get_success_url(self):
+    def get_success_url(self):  # pylint: disable=R0201; # noqa
         """Redirect on create success"""
         return reverse('budgets:monthly_budgets')
 
 
 @method_decorator(login_required, name='dispatch')
-class MonthlyBudgetListView(ListView):
+class MonthlyBudgetListView(ListView):  # pylint: disable=R0903; # noqa
     model = m.MonthlyBudget
     paginate_by = 15
     ordering = ['id']
@@ -224,13 +225,13 @@ class GoalCreateView(CreateView):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
-    def get_success_url(self):
+    def get_success_url(self):  # pylint: disable=R0201; # noqa
         """Redirect on create success"""
         return reverse('budgets:goals')
 
 
 @method_decorator(login_required, name='dispatch')
-class GoalListView(ListView):
+class GoalListView(ListView):  # pylint: disable=R0903; # noqa
     model = m.Goal
     paginate_by = 15
     ordering = ['id']
@@ -258,13 +259,13 @@ class IncomeCategoryCreateView(CreateView):
                                                   IncomeCategoryCreateView.error_msg,
                                                   IncomeCategoryCreateView.url)
 
-    def get_success_url(self):
+    def get_success_url(self):  # pylint: disable=R0201; # noqa
         """Redirect on create success"""
         return reverse('budgets:income_categories')
 
 
 @method_decorator(login_required, name='dispatch')
-class IncomeCategoryView(ListView):
+class IncomeCategoryView(ListView):  # pylint: disable=R0903; # noqa
     model = m.IncomeCategory
     paginate_by = 15
     ordering = ['id']
@@ -295,13 +296,13 @@ class IncomCreateView(CreateView):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
-    def get_success_url(self):
+    def get_success_url(self):  # pylint: disable=R0201; # noqa
         """Redirect on create success"""
         return reverse('budgets:incomes')
 
 
 @method_decorator(login_required, name='dispatch')
-class IncomeView(ListView):
+class IncomeView(ListView):  # pylint: disable=R0903; # noqa
     model = m.Income
     paginate_by = 15
     ordering = ['id']
@@ -338,24 +339,24 @@ class MonthlyBalanceCategoryCreateView(CreateView):
                                                   MonthlyBalanceCategoryCreateView.error_msg,
                                                   MonthlyBalanceCategoryCreateView.url)
 
-    def get_success_url(self):
+    def get_success_url(self):  # pylint: disable=R0201; # noqa
         """Redirect on create success"""
         return reverse('budgets:monthly_balance_categories')
 
 
 @method_decorator(login_required, name='dispatch')
-class MonthlyBalanceCategoryView(ListView):
+class MonthlyBalanceCategoryView(ListView):  # pylint: disable=R0903; # noqa
     model = m.MonthlyBalanceCategory
     paginate_by = 15
     ordering = ['id']
 
-    def get_queryset(self):
+    def get_queryset(self):  # pylint: disable=R0201; # noqa
         return m.MonthlyBalanceCategory.objects.filter(
                  created_by=self.request.user).order_by('id')
 
 
 @method_decorator(login_required, name='dispatch')
-class MonthlyBalanceCategoryDetailView(DetailView):
+class MonthlyBalanceCategoryDetailView(DetailView):  # pylint: disable=R0903; # noqa
     model = m.MonthlyBalanceCategory
     # FIX ME: check permissions here
 
@@ -375,13 +376,13 @@ class MonthlyBalancesCreateView(CreateView):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
-    def get_success_url(self):
+    def get_success_url(self):  # pylint: disable=R0201; # noqa
         """Redirect on create success"""
         return reverse('budgets:monthly_balances')
 
 
 @method_decorator(login_required, name='dispatch')
-class MonthlyBalancesView(ListView):
+class MonthlyBalancesView(ListView):  # pylint: disable=R0903; # noqa
     model = m.MonthlyBalance
 
     def get_context_data(self, **kwargs):
@@ -418,7 +419,7 @@ class MonthlyBalancesView(ListView):
 
 
 @method_decorator(login_required, name='dispatch')
-class MonthlyBalancesSingleMonthView(ListView):
+class MonthlyBalancesSingleMonthView(ListView):  # pylint: disable=R0903; # noqa
     """
     Show monhtly balances for a given month
     """
@@ -584,9 +585,7 @@ def landing_page(request):
 @login_required
 @require_http_methods(["GET"])
 def home_page(request):
-    """
-    Display the home page
-    """
+    """Display the home page"""
     currency = os.getenv("CURRENCY")
     # TODO: refactor this to enable multiple currencies (and enable currency
     # rates to be edited inside the app: drop the value from .env file)

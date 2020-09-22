@@ -9,6 +9,7 @@ from django.db.models import Sum
 from django.db.models import F
 from django.db.models import Case
 from django.db.models import When
+from django.core.exceptions import PermissionDenied
 from django.forms import formset_factory
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -44,6 +45,7 @@ class CategoryCreateView(CreateView):
                                                   CategoryCreateView.url)
 
     def get_success_url(self):
+        """Redirect on create success"""
         return reverse('budgets:categories')
 
 
@@ -64,6 +66,7 @@ class ExpenseCreateView(CreateView):
     form_class = f.ExpenseForm
 
     def get_form_kwargs(self):
+        """Inject user object in the form"""
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
@@ -73,6 +76,7 @@ class ExpenseCreateView(CreateView):
         return super(ExpenseCreateView, self).form_valid(form)
 
     def get_success_url(self):
+        """Redirect on create success"""
         return reverse('budgets:expenses_create')
 
 
@@ -155,6 +159,7 @@ class ExpenseDeleteView(DeleteView):
 
     # FIX ME: check for permissions here
     def get_success_url(self):
+        """Redirect on delete success"""
         return reverse('budgets:expenses')
 
 
@@ -170,6 +175,7 @@ class MonthlyBudgetsCreateView(CreateView):
         return initial
 
     def get_form_kwargs(self):
+        """Inject user object in the form"""
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
@@ -179,6 +185,7 @@ class MonthlyBudgetsCreateView(CreateView):
         return super(MonthlyBudgetsCreateView, self).form_valid(form)
 
     def get_success_url(self):
+        """Redirect on create success"""
         return reverse('budgets:monthly_budgets')
 
 
@@ -218,6 +225,7 @@ class GoalCreateView(CreateView):
         return super(GoalCreateView, self).form_valid(form)
 
     def get_success_url(self):
+        """Redirect on create success"""
         return reverse('budgets:goals')
 
 
@@ -251,7 +259,8 @@ class IncomeCategoryCreateView(CreateView):
                                                   IncomeCategoryCreateView.url)
 
     def get_success_url(self):
-        return reverse(url)
+        """Redirect on create success"""
+        return reverse('budgets:income_categories')
 
 
 @method_decorator(login_required, name='dispatch')
@@ -277,6 +286,7 @@ class IncomCreateView(CreateView):
     form_class = f.IncomeForm
 
     def get_form_kwargs(self):
+        """Inject user object in the form"""
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
@@ -286,6 +296,7 @@ class IncomCreateView(CreateView):
         return super(IncomCreateView, self).form_valid(form)
 
     def get_success_url(self):
+        """Redirect on create success"""
         return reverse('budgets:incomes')
 
 
@@ -328,6 +339,7 @@ class MonthlyBalanceCategoryCreateView(CreateView):
                                                   MonthlyBalanceCategoryCreateView.url)
 
     def get_success_url(self):
+        """Redirect on create success"""
         return reverse('budgets:monthly_balance_categories')
 
 
@@ -354,6 +366,7 @@ class MonthlyBalancesCreateView(CreateView):
     form_class = f.MonthlyBalanceForm
 
     def get_form_kwargs(self):
+        """Inject user object in the form"""
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
@@ -363,6 +376,7 @@ class MonthlyBalancesCreateView(CreateView):
         return super(MonthlyBalancesCreateView, self).form_valid(form)
 
     def get_success_url(self):
+        """Redirect on create success"""
         return reverse('budgets:monthly_balances')
 
 
@@ -446,12 +460,21 @@ class MonthlyBalanceUpdateView(UpdateView):
     form_class = f.MonthlyBalanceForm
 
     def get_form_kwargs(self):
+        """Inject user object in the form"""
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
 
-    # FIX ME: check permissions here
+    def get_object(self, *args, **kwargs):
+        """Check object ownership"""
+        obj = super().get_object(*args, **kwargs)
+        if obj.created_by != self.request.user:
+            # TODO: create syled 403 page
+            raise PermissionDenied()
+        return obj
+
     def get_success_url(self):
+        """Redirect on update success"""
         return reverse('budgets:monthly_balances')
 
 
@@ -461,6 +484,7 @@ class MonthlyBalanceDeleteView(DeleteView):
 
     # FIX ME: check permissions here
     def get_success_url(self):
+        """Redirect on delete success"""
         return reverse('budgets:monthly_balances')
 
 
@@ -512,13 +536,13 @@ def multiple_new_monthly_budget(request):
 def multiple_new_monthly_balance(request):
     categories = m.MonthlyBalanceCategory.objects.filter(created_by=request.user)
     cats = categories.count()
-    MBFormSet = formset_factory(form=f.MonthlyBalanceForm, extra=cats,
+    MbFormSet = formset_factory(form=f.MonthlyBalanceForm, extra=cats,
                                 max_num=cats)
 
     curr_month_start = utils.get_month_boundaries()[0]
     prev_month_start = utils.get_previous_month_first_day_date(curr_month_start)
     if request.method == 'POST':
-        formset = MBFormSet(data=request.POST, form_kwargs={'user': request.user})
+        formset = MbFormSet(data=request.POST, form_kwargs={'user': request.user})
         # FIXME: we are not handling when the user submit forms with the same
         # category, and we're also not handling creation of monthly_balance
         # that already exists for that (category - date combination)
@@ -531,7 +555,7 @@ def multiple_new_monthly_balance(request):
         intial_data = []
         for c in categories:
             intial_data.append({'date': curr_month_start, 'category': c.id})
-        formset = MBFormSet(initial=intial_data, form_kwargs={'user': request.user})
+        formset = MbFormSet(initial=intial_data, form_kwargs={'user': request.user})
 
     prev_month_monthly_balances = m.MonthlyBalance.objects.filter(
                                   date=prev_month_start, created_by=request.user)

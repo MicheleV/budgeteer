@@ -706,3 +706,15 @@ def home_page(request):
         'goals': goals,
     })
 
+
+###############################################################################
+# Permission errors views
+###############################################################################
+def permission_denied_view(request, exception=None):
+    """Show a custom permission denied page"""
+    return render(request, "errors/403.html", {})
+
+
+def page_not_found_view(request, exception=None):
+    """Show a custom page not found page"""
+    return render(request, "errors/404.html", {})

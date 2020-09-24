@@ -31,3 +31,6 @@ if 'y' in os.getenv("DJANGO_DEBUG_MODE"):
     urlpatterns = [
                       url(r'^__debug__/', include(debug_toolbar.urls)),
                   ] + urlpatterns
+
+handler403 = 'budgets.views.permission_denied_view'  # pylint: disable=C0103; # noqa
+# handler404 = 'budgets.views.page_not_found_view'  # pylint: disable=C0103; # noqa # Need to update tests to stop checking for 404, and check for error message instead

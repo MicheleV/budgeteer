@@ -3,9 +3,9 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 import calendar
 import datetime
-from dateutil.relativedelta import relativedelta
 import math
 import os
+from dateutil.relativedelta import relativedelta
 
 from django.core.exceptions import ValidationError
 from django.db.models import Sum
@@ -14,11 +14,9 @@ from django.db.models import Case
 from django.db.models import When
 from django.db.utils import IntegrityError
 from django.shortcuts import redirect
-from django.shortcuts import render
 from django.urls import reverse
 from graphs import plot
 
-import budgets.forms as f
 import budgets.models as m
 
 
@@ -105,37 +103,39 @@ def generate_current_monthly_balance_pie_graph(data):
     if len(data) > 1:
         labels = []
         values = []
-        for mb in filter(lambda y: y.amount > 0, data):
-            labels.append(mb.category.text)
+        for m_b in filter(lambda y: y.amount > 0, data):
+            labels.append(m_b.category.text)
             # TODO: remove this once all places calling this function are
             # passing monthly budgets with actual_ammount attribute
             try:
-                values.append(mb.actual_amount)
+                values.append(m_b.actual_amount)
             except AttributeError as e:  # pylint: disable=W0612,C0103; # noqa
                 print("You've forgot to add actual_amount somewhere (pie)")
-                values.append(mb.amount)
+                values.append(m_b.amount)
         return plot.generatePieGraph(labels, values)
     return False
 
 
 # Credits https://stackoverflow.com/a/58612038
-def findInList(List, item):
+def find_in_list(_list, item):
     """
     Return the index of item inside List, or -1 if not found
     """
     try:
-        return List.index(item)
+        # 'list' is a reserved keyword, using workaround
+        return _list.index(item)
     except ValueError:
         return -1
 
 
 def aggregate_expenses_by_category(data):
+    """WRITE ME."""
     results = {}
-    for mb in filter(lambda y: y.amount > 0, data):
-        if mb.category.text in results:
-            results[mb.category.text] += mb.amount
+    for m_b in filter(lambda y: y.amount > 0, data):
+        if m_b.category.text in results:
+            results[m_b.category.text] += m_b.amount
         else:
-            results[mb.category.text] = mb.amount
+            results[m_b.category.text] = m_b.amount
     return results
 
 
@@ -149,13 +149,13 @@ def generate_current_month_expenses_pie_graph(data):
         values = []
 
         # NOTE: this ugly block saves us one query... is it worth it?
-        for mb in filter(lambda y: y.amount > 0, data):
-            index = findInList(labels, mb.category.text)
+        for m_b in filter(lambda y: y.amount > 0, data):
+            index = find_in_list(labels, m_b.category.text)
             if index == -1:
-                labels.append(mb.category.text)
-                values.append(mb.amount)
+                labels.append(m_b.category.text)
+                values.append(m_b.amount)
             else:
-                values[index] = values[index] + mb.amount
+                values[index] = values[index] + m_b.amount
 
         return plot.generatePieGraph(labels, values)
     return False
@@ -239,6 +239,7 @@ def calc_increase_perc(current_mb_total, prev_mb_total):
 # [2] https://stackoverflow.com/a/57071005
 # [3] https://stackoverflow.com/a/5690705
 def check_constraints_workaround(self, form, already_exists_message, url):
+    """Force unique together contraints"""
     category = form.save(commit=False)
     category.created_by = self.request.user
     try:

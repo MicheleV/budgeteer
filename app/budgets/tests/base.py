@@ -3,7 +3,6 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from datetime import datetime
 from functools import wraps
-import os
 import random
 import string
 
@@ -21,6 +20,7 @@ load_dotenv()
 
 
 class BaseTest(TestCase):
+    """WRITE ME."""
 
     def setUp(self):  # pylint: disable=C0103; # noqa
         """BaseTest signup, called once per test (method)"""

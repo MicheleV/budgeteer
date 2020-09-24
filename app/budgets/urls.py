@@ -5,7 +5,8 @@ from django.urls import path
 from django.urls import re_path
 from budgets import views
 
-app_name = 'budgets'
+app_name = 'budgets'  # pylint: disable=C0103; # noqa
+
 urlpatterns = [
     # ############### Class based routes #################
     path('categories', views.CategoryListView.as_view(), name='categories'),

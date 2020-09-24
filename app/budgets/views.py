@@ -361,7 +361,7 @@ class IncomeView(ListView):  # pylint: disable=R0903; # noqa
 
         # TODO: add a route to filter by start and end
         if end is None:
-            (start, end)           = utils.get_month_boundaries(start)
+            (start, end) = utils.get_month_boundaries(start)
         else:
             format_str = '%Y-%m-%d'
             start = datetime.datetime.strptime(start, format_str).date()

@@ -216,7 +216,8 @@ class MonthlyBudgetPageTest(BaseTest):
         amount = random.randint(1, 90000)
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
 
-        # Guido can not create monthly budgets using Frank's category
+        # The second user can not create monthly budgets using first user's
+        # category
 
         # Obtain reference to the first user's category
         mb = m.Category.objects.first()
@@ -376,12 +377,12 @@ class ExpensesPageTest(BaseTest):
         category_text = self.generate_string(10)
         category = self.create_category(category_text)
 
-        # Frank can see his category
+        # The first user user can see his category
         response = self.get_response_from_named_url('budgets:categories')
         self.assertContains(response, category_text)
         self._logout()
 
-        # Guido can create a new category
+        # The second user can create a new category
         self.signup_and_login()
 
         second_category_text = self.generate_string(10)
@@ -392,7 +393,7 @@ class ExpensesPageTest(BaseTest):
         self.assertNotContains(response, category_text)
         self.assertContains(response, second_category_text)
 
-        # Guido can use his own category to create expenses
+        # The second user can use his own category to create expenses
         redirect_url = url = reverse('budgets:expenses_create')
         # Note: we redirect to the creation page on success
 
@@ -406,7 +407,8 @@ class ExpensesPageTest(BaseTest):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
 
-        # Guido can not create expenses using Frank's category
+        # The second user can not create expenses using the first users's
+        # category
         expected_error_msg = 'Select a valid choice. That choice is not one of the available choices'
         response = self.get_response_from_named_url('budgets:expenses')
         self.assertContains(response, note)

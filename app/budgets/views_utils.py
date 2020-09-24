@@ -29,7 +29,7 @@ def get_previous_month_first_day_date(date):
 
 def get_total_of_monthly_balances(date, user):
     """
-    Return the sum of the monthly balances fdate/user combination passed as args
+    Return the sum of the monthly balances date/user combination passed as args
     """
     rate = int(os.getenv("EXCHANGE_RATE"))
     balances = m.MonthlyBalance.objects.select_related('category').filter(date=date, created_by=user)

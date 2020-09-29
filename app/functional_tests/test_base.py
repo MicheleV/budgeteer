@@ -25,6 +25,7 @@ import functional_tests.test_views_and_layout as ViewAndLayout
 
 
 class FunctionalTest(LiveServerTestCase):
+    """Base Functional test class"""
     BROWSER = "Firefox"
     HEADLESS = True
 

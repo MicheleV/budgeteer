@@ -6,6 +6,7 @@ import json
 from django.urls import reverse
 import functional_tests.helpers as Helpers
 
+
 # Use this syntax to get plain json
 # http://example.com/<route-name>?format=json&json=true'
 @Helpers.register_and_login
@@ -44,7 +45,7 @@ def test_create_and_retrieve_categories(tester):
 
 def test_users_can_not_see_other_users_categories(tester):
     # Frank can create a category to log his expenses
-    cat_name = Helpers.generateString()
+    cat_name = Helpers.generate_string()
 
     Helpers.create_user(tester)
     Helpers.create_a_category(tester, category_name=cat_name)

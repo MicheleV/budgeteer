@@ -69,6 +69,7 @@ class BaseTest(TestCase):
         """
         text = self.generate_string(50)
         pwd = self.generate_string(10)
+        # TODO: convert date to unix timestamp instead
         username = self.generate_string(10) + str(datetime.now())
         self.user = User.objects.create_user(
             username=username, password=pwd)

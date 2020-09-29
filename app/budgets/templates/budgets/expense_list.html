@@ -13,7 +13,11 @@
       {% if show_delete %}
         <a href="{{ request.path}}?page={{ page_obj.number}}">Hide delete buttons</a>
       {% else %}
-        <a href="{{ request.get_full_path}}&delete=1">Show delete buttons</a>
+        {% if 'page' in request.GET %}
+          <a href="{{ request.get_full_path}}&delete=1">Show delete buttons</a>
+        {% else %}
+          <a href="{{ request.get_full_path}}?delete=1">Show delete buttons</a>
+        {% endif %}
       {% endif %}
     </div>
   </div>

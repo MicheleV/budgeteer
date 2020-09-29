@@ -11,9 +11,9 @@
       <h3>Expenses</h3>
       <a href="{% url 'budgets:expenses_create' %}">Create expense</a>
       {% if show_delete %}
-        <a href="{% url 'budgets:expenses' %}">Hide delete buttons</a>
+        <a href="{{ request.path}}?page={{ page_obj.number}}">Hide delete buttons</a>
       {% else %}
-        <a href="{% url 'budgets:expenses' %}?delete=1">Show delete buttons</a>
+        <a href="{{ request.get_full_path}}&delete=1">Show delete buttons</a>
       {% endif %}
     </div>
   </div>

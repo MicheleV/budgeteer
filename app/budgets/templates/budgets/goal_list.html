@@ -25,7 +25,7 @@
             </tr>
             {% for goal in goal_list %}
               <tr>
-                <td><a href="{% url "budgets:goals_detail" goal.pk %}">{{ goal.id }}</a></td>
+                <td><a href="{% url "budgets:goals_edit" goal.pk %}">{{ goal.id }}</a></td>
                 <td>{{ goal.amount | intcomma }}</td>
                 <td>{{ goal.text }}</td>
                 <td>{{ goal.note }}</td>

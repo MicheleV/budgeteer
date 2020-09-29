@@ -271,17 +271,29 @@ class GoalListView(ListView):  # pylint: disable=R0903; # noqa
     ordering = ['id']
 
     def get_queryset(self):
-        """WRITE ME."""
+        """Display goals of the current logged in user."""
         return m.Goal.objects.filter(
                  created_by=self.request.user).order_by('id')
 
 
 @method_decorator(login_required, name='dispatch')
-class GoalDetailView(DetailView):  # pylint: disable=R0903; # noqa
-    """Display a single goal."""
+class GoalUpdateView(UpdateView):
+    """Update a goal."""
 
     model = m.Goal
-    # FIX ME: check permissions here
+    form_class = f.GoalForm
+
+    def get_object(self, *args, **kwargs):
+        """Check object ownership"""
+        obj = super().get_object(*args, **kwargs)
+        if obj.created_by != self.request.user:
+            # TODO: create a proper 403 page
+            raise PermissionDenied()
+        return obj
+
+    def get_success_url(self):  # pylint: disable=R0201; # noqa
+        """Redirect on update success"""
+        return reverse('budgets:goals')
 
 
 @method_decorator(login_required, name='dispatch')

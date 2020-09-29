@@ -243,7 +243,14 @@ class MonthlyBudgetListView(ListView):  # pylint: disable=R0903; # noqa
 class MonthlyBudgetDetailView(DetailView):  # pylint: disable=R0903; # noqa
     """Display a single Monthly Budget"""
     model = m.MonthlyBudget
-    # FIX ME: check for permissions
+
+    def get_object(self, *args, **kwargs):
+        """Check object ownership."""
+        obj = super().get_object(*args, **kwargs)
+        if obj.created_by != self.request.user:
+            # TODO: create a proper 403 page
+            raise PermissionDenied()
+        return obj
 
 
 @method_decorator(login_required, name='dispatch')
@@ -324,7 +331,7 @@ class IncomeCategoryView(ListView):  # pylint: disable=R0903; # noqa
     ordering = ['id']
 
     def get_queryset(self):
-        """WRITE ME."""
+        """Display income categories of the current logged in user."""
         return m.IncomeCategory.objects.filter(
                  created_by=self.request.user).order_by('id')
 
@@ -333,7 +340,14 @@ class IncomeCategoryView(ListView):  # pylint: disable=R0903; # noqa
 class IncomeCategoryDetailView(DetailView):  # pylint: disable=R0903; # noqa
     """WRITE ME."""
     model = m.IncomeCategory
-    # FIX ME: check permissions here
+
+    def get_object(self, *args, **kwargs):
+        """Check object ownership."""
+        obj = super().get_object(*args, **kwargs)
+        if obj.created_by != self.request.user:
+            # TODO: create a proper 403 page
+            raise PermissionDenied()
+        return obj
 
 
 @method_decorator(login_required, name='dispatch')
@@ -423,7 +437,14 @@ class MonthlyBalanceCategoryView(ListView):  # pylint: disable=R0903; # noqa
 class MonthlyBalanceCategoryDetailView(DetailView):  # pylint: disable=R0903; # noqa
     """WRITE ME."""
     model = m.MonthlyBalanceCategory
-    # FIX ME: check permissions here
+
+    def get_object(self, *args, **kwargs):
+        """Check object ownership."""
+        obj = super().get_object(*args, **kwargs)
+        if obj.created_by != self.request.user:
+            # TODO: create a proper 403 page
+            raise PermissionDenied()
+        return obj
 
 
 @method_decorator(login_required, name='dispatch')
@@ -554,7 +575,7 @@ class MonthlyBalanceUpdateView(UpdateView):
 
 @method_decorator(login_required, name='dispatch')
 class MonthlyBalanceDeleteView(DeleteView):
-    """WRITE ME."""
+    """Dlete a monthly balance."""
     model = m.MonthlyBalance
 
     def get_object(self, *args, **kwargs):
@@ -662,7 +683,7 @@ def edit_new_monthly_balance(request):  # pylint: disable=W0613; # noqa
 
 @require_http_methods(["GET"])
 def landing_page(request):
-    """WRITE ME."""
+    """Render the langing page"""
     return render(request, 'landing_page.html')
 
 

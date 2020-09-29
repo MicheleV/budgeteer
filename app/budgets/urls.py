@@ -34,6 +34,9 @@ urlpatterns = [
     path('goals/edit/<int:pk>',
          views.GoalUpdateView.as_view(),
          name='goals_edit'),
+    path('goals/delete/<int:pk>', views.GoalDeleteView.as_view(),
+         name='goals_delete'),
+
 
     # Monthly balance categories
     path('monthly_balance_categories/create',

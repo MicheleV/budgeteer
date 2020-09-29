@@ -8,6 +8,20 @@
     <div class="col-md-12">
       <h3>Goals</h3>
       <a href="{% url 'budgets:goals_create' %}">Create goal</a>
+      <!-- TODO: refactor this spaghetti ball and move it to its own file -->
+      {% if show_delete %}
+        {% if 'page' in request.GET %}
+          <a href="{{ request.path }}?page={{ page_obj.number }}">Hide delete buttons</a>
+        {% else %}
+          <a href="{{ request.path }}?page={{ page_obj.number }}">Hide delete buttons</a>
+        {% endif %}
+      {% else %}
+        {% if 'page' in request.GET %}
+          <a href="{{ request.get_full_path}}&delete=1">Show delete buttons</a>
+        {% else %}
+          <a href="{{ request.get_full_path}}?delete=1">Show delete buttons</a>
+        {% endif %}
+      {% endif %}
     </div>
   </div>
 
@@ -22,6 +36,9 @@
               <th>Text</th>
               <th>Note</th>
               <th>Archived?</th>
+              {% if show_delete %}
+                <th>Delete</th>
+              {% endif %}
             </tr>
             {% for goal in goal_list %}
               <tr>
@@ -30,6 +47,14 @@
                 <td>{{ goal.text }}</td>
                 <td>{{ goal.note }}</td>
                 <td>{{ goal.is_archived }}</td>
+                {% if show_delete %}
+                  <td>
+                    <form method="POST" action="{% url 'budgets:goals_delete' pk=goal.id %}">
+                      {% csrf_token %}
+                      <input type="submit" id="id_submit" value="Yes, DELETE">
+                    </form>
+                  </td>
+                {% endif %}
               </tr>
             {% endfor %}
           </table>

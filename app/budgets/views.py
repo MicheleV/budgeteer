@@ -278,9 +278,18 @@ class GoalListView(ListView):  # pylint: disable=R0903; # noqa
     ordering = ['id']
 
     def get_queryset(self):
-        """Display goals of the current logged in user."""
+        """Display goals of the current logged in user"""
         return m.Goal.objects.filter(
                  created_by=self.request.user).order_by('id')
+
+    def get_context_data(self, **kwargs):
+        """Inject toggle delete button param"""
+        context = super().get_context_data(**kwargs)
+
+        # Toggle delete buttons
+        show_delete = self.request.GET.get('delete', False) == '1'
+        context['show_delete'] = show_delete
+        return context
 
 
 @method_decorator(login_required, name='dispatch')
@@ -300,6 +309,24 @@ class GoalUpdateView(UpdateView):
 
     def get_success_url(self):  # pylint: disable=R0201; # noqa
         """Redirect on update success"""
+        return reverse('budgets:goals')
+
+
+@method_decorator(login_required, name='dispatch')
+class GoalDeleteView(DeleteView):  # pylint: disable=R0903; # noqa
+    """Delete a Goal"""
+    model = m.Goal
+
+    def get_object(self, *args, **kwargs):
+        """Check object ownership."""
+        obj = super().get_object(*args, **kwargs)
+        if obj.created_by != self.request.user:
+            # TODO: create a proper 403 page
+            raise PermissionDenied()
+        return obj
+
+    def get_success_url(self):  # pylint: disable=R0201; # noqa
+        """Redirect on delete success"""
         return reverse('budgets:goals')
 
 

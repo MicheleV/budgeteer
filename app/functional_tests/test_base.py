@@ -4,13 +4,9 @@
 import os
 
 from django.test import LiveServerTestCase
-from django.urls import resolve
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
-from budgets.models import Category
-import functional_tests.helpers as Helpers
 import functional_tests.test_api as API
 import functional_tests.test_categories as Categories
 import functional_tests.test_expenses as Expenses
@@ -34,8 +30,8 @@ class FunctionalTest(LiveServerTestCase):
 
     # Setup
     @classmethod
-    def setUpClass(self):
-        super(FunctionalTest, self).setUpClass()
+    def setUpClass(self):  # pylint: disable=C0103; # noqa
+        super().setUpClass()
         self.setup_browser(self.BROWSER, self.HEADLESS)
 
     @classmethod
@@ -63,19 +59,19 @@ class FunctionalTest(LiveServerTestCase):
             self.live_server_url = f"http://{test_target}"
 
     @classmethod
-    def tearDownClass(self):
-        super(FunctionalTest, self).setUpClass()
+    def tearDownClass(self):  # pylint: disable=C0103; # noqa
+        super().setUpClass()
         self.browser.quit()
 
     def _call_each_method_in_module(module, tester):
         for name in dir(module):
-          if name.startswith('test'):
-            test_function = getattr(module, name)
-            if callable(test_function):
-                # TODO: this will print function decorated with @skip as well
-                # even if they are not actually called
-                print(f"Calling {module.__name__}.{name}")
-                test_function(tester)
+            if name.startswith('test'):
+                test_function = getattr(module, name)
+                if callable(test_function):
+                    # TODO: this will print function decorated with @skip as
+                    # well even if they are not actually called
+                    print(f"Calling {module.__name__}.{name}")
+                    test_function(tester)
 
     def test_categories(tester):
         FunctionalTest._call_each_method_in_module(Categories, tester)

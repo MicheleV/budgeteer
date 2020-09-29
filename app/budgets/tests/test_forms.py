@@ -38,7 +38,7 @@ class CategoriesTest(BaseTest):
           f.IncomeCategoryForm,
           f.MonthlyBalanceCategoryForm
         ]
-        text = self.generateString(50)
+        text = self.generate_string(50)
         for form in forms:
             filled_form = form(data={'text': text, 'created_by': self.user})
 
@@ -97,7 +97,7 @@ class IncomeFormTest(BaseTest):
         self.assertIn('placeholder="%Y-%m-%d format"', form.as_p())
 
     def test_form_validation_amount_field(self):
-        text = self.generateString(20)
+        text = self.generate_string(20)
         category = self.create_income_category(text)
         form = f.IncomeForm(data={
             'category': category.id,
@@ -115,9 +115,9 @@ class IncomeFormTest(BaseTest):
         )
 
     def test_form_validation_note_field(self):
-        text = self.generateString(20)
+        text = self.generate_string(20)
         # Note has max length of 150 (set in models.py)
-        long_text = self.generateString(150)
+        long_text = self.generate_string(150)
         category = self.create_income_category(text)
         amount = random.randint(1, 90000)
         date = '2020-03-01'
@@ -155,7 +155,7 @@ class IncomeFormTest(BaseTest):
 
     def test_form_validation_date_field(self):
         # Case None
-        text = self.generateString(20)
+        text = self.generate_string(20)
         category = self.create_income_category(text)
         amount = random.randint(1, 90000)
         form = f.IncomeForm(data={
@@ -192,7 +192,7 @@ class IncomeFormTest(BaseTest):
         form = f.ExpenseForm(data={
             'category': category.id,
             'amount': amount,
-            'date': self.generateString(50)
+            'date': self.generate_string(50)
         }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
@@ -258,10 +258,10 @@ class ExpenseFormTest(BaseTest):
         )
 
     def test_form_validation_amount_field(self):
-        text = self.generateString(20)
+        text = self.generate_string(20)
         category = self.create_category(text)
         form = f.ExpenseForm(data={
-            'category': category.id,
+            'category': category,
             'amount': None,
             'date': '2019-09-23',
         }, user=self.user)
@@ -276,12 +276,12 @@ class ExpenseFormTest(BaseTest):
         )
 
     def test_form_validation_date_field(self):
-        text = self.generateString(20)
+        text = self.generate_string(20)
         category = self.create_category(text)
         amount = random.randint(1, 90000)
         # Case None
         form = f.ExpenseForm(data={
-            'category': category.id,
+            'category': category,
             'amount': amount,
             'date': None,
         }, user=self.user)
@@ -296,7 +296,7 @@ class ExpenseFormTest(BaseTest):
         )
         # Case empty string
         form = f.ExpenseForm(data={
-            'category': category.id,
+            'category': category,
             'amount': amount,
             'date': ''
         }, user=self.user)
@@ -311,9 +311,9 @@ class ExpenseFormTest(BaseTest):
         )
         # Case invalid string
         form = f.ExpenseForm(data={
-            'category': category.id,
+            'category': category,
             'amount': amount,
-            'date': self.generateString(50)
+            'date': self.generate_string(50)
         }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
@@ -403,7 +403,7 @@ class MonthlyBudgetFormTest(BaseTest):
         form = f.MonthlyBudgetForm(data={
             'category': category.id,
             'amount': amount,
-            'date': self.generateString(50),
+            'date': self.generate_string(50),
         }, user=self.user)
         self.assertFalse(form.is_valid())
         self.assertIn(
@@ -422,12 +422,12 @@ class MonthlyBudgetFormTest(BaseTest):
 
         amount = random.randint(1, 90000)
         date = '2019-08-01'
-        text = self.generateString(20)
-        note = self.generateString(20)
+        text = self.generate_string(20)
+        note = self.generate_string(20)
 
         amount2 = random.randint(1, 90000)
         date2 = '2019-08-02'
-        note2 = self.generateString(20)
+        note2 = self.generate_string(20)
         inc_cat_form = f.IncomeCategoryForm(data={'text': text})
         # NOTE: we need to manually set created_by, as we're not passing through the view logic
         inc_cat_form.instance.created_by = self.user
@@ -510,8 +510,8 @@ class GoalFormTest(BaseTest):
         Test whether the models are saved and updated correctly or not
         """
         amount = random.randint(1, 90000)
-        text = self.generateString(20)
-        note = self.generateString(20)
+        text = self.generate_string(20)
+        note = self.generate_string(20)
         is_archived = False
         goal_form = f.GoalForm(data={
             'amount': amount,

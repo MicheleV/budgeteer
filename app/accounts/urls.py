@@ -1,10 +1,9 @@
-from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path
 
 from accounts import views
 
-app_name = 'accounts'
+app_name = 'accounts'  # pylint: disable=C0103; # noqa
 urlpatterns = [
   path('index/', views.index, name='index'),
 

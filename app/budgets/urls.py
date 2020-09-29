@@ -3,11 +3,10 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from django.urls import path
 from django.urls import re_path
-import debug_toolbar
 from budgets import views
-from django.urls import include, path
 
-app_name = 'budgets'
+app_name = 'budgets'  # pylint: disable=C0103; # noqa
+
 urlpatterns = [
     # ############### Class based routes #################
     path('categories', views.CategoryListView.as_view(), name='categories'),

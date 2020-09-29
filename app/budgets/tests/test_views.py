@@ -39,7 +39,7 @@ class CategoriesPageTest(BaseTest):
     def test_save_on_POST(self):
         url = reverse('budgets:categories_create')
         redirect_url = reverse('budgets:categories')
-        text = self.generateString(10)
+        text = self.generate_string(10)
 
         response = self.client.post(url,  data={'text': text})
 
@@ -51,7 +51,7 @@ class CategoriesPageTest(BaseTest):
     def test_redirect_on_POST(self):
         url = reverse('budgets:categories_create')
         redirect_url = reverse('budgets:categories')
-        text = self.generateString(10)
+        text = self.generate_string(10)
 
         response = self.client.post(url,  data={'text': text})
 
@@ -74,30 +74,20 @@ class CategoriesPageTest(BaseTest):
     #     self.assertIsInstance(response.context['form'], f.CategoryForm)
     @BaseTest.login
     def test_save_and_retrieve_categories(self):
-        text1 = self.generateString(10)
+        text1 = self.generate_string(10)
         first_category = self.create_category(text1)
-        text2 = self.generateString(10)
+        text2 = self.generate_string(10)
         second_category = self.create_category(text2)
 
         response = self.get_response_from_named_url('budgets:categories')
         self.assertContains(response, text1)
         self.assertContains(response, text2)
 
-    @BaseTest.login
-    def test_displays_all_categories(self):
-        text1 = self.generateString(10)
-        m.Category.objects.create(text=text1, created_by=self.user)
-        text2 = self.generateString(10)
-        m.Category.objects.create(text=text2, created_by=self.user)
-
-        response = self.get_response_from_named_url('budgets:categories')
-        self.assertContains(response, text1)
-        self.assertContains(response, text2)
-
     def test_displays_only_current_user_categories(self):
+        # Create and login as a user
         # Note: _sign_up() is executed on BaseTest.setUp()
         self._login()
-        text = self.generateString(10)
+        text = self.generate_string(10)
         category = self.create_category(text)
 
         # Current user: can see it
@@ -115,7 +105,7 @@ class MonthlyBudgetPageTest(BaseTest):
 
     @BaseTest.login
     def test_save_and_redirect_on_POST(self):
-        text = self.generateString(10)
+        text = self.generate_string(10)
         cat = self.create_category(text)
 
         url = reverse('budgets:monthly_budgets_create')
@@ -154,9 +144,9 @@ class MonthlyBudgetPageTest(BaseTest):
     #     self.assertIsInstance(response.context['form'], f.MonthlyBudgetForm)
     @BaseTest.login
     def test_save_and_retrieve_monthly_budget(self):
-        text1 = self.generateString(10)
+        text1 = self.generate_string(10)
         cat1 = self.create_category(text1)
-        text2 = self.generateString(10)
+        text2 = self.generate_string(10)
         cat2 = self.create_category(text2)
 
         amount1 = random.randint(1, 90000)
@@ -175,10 +165,11 @@ class MonthlyBudgetPageTest(BaseTest):
         self.assertContains(response, '{:,}'.format(amount2))
 
     def test_displays_only_current_user_monhtly_bugets(self):
+        # Create and login as a user
         # Note: _sign_up() is executed on BaseTest.setUp()
         self._login()
 
-        text = self.generateString(10)
+        text = self.generate_string(10)
         cat = self.create_category(text)
 
         amount = random.randint(1, 90000)
@@ -200,12 +191,48 @@ class MonthlyBudgetPageTest(BaseTest):
         self.assertNotContains(response, text)
         self.assertNotContains(response, '{:,}'.format(amount))
 
+    def test_cant_user_other_users_categories_for_monthly_budgets(self):
+        # Create and login as a user
+        # Note: _sign_up() is executed on BaseTest.setUp()
+        self._login()
+
+        category_text = self.generate_string(10)
+        category = self.create_category(category_text)
+
+        # Current user: can see it
+        response = self.get_response_from_named_url('budgets:categories')
+        self.assertContains(response, category_text)
+        self._logout()
+
+        # Create and login as a different user: cant' see it
+        self.signup_and_login()
+        response = self.get_response_from_named_url('budgets:categories')
+        self.assertNotContains(response, category_text)
+
+        # Note: we redirect to the creation page on success
+        redirect_url = url = reverse('budgets:monthly_budgets_create')
+
+        # The second user can't user first user's category
+        amount = random.randint(1, 90000)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+
+        # The second user can not create monthly budgets using first user's
+        # category
+
+        # Obtain reference to the first user's category
+        mb = m.Category.objects.first()
+        expected_error_msg = 'Select a valid choice. That choice is not one of the available choices'
+        response = self.client.post(url,  data={'amount': amount, 'date': date,
+                                    'category': category.id})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, expected_error_msg)
+
 
 class ExpensesPageTest(BaseTest):
 
     @BaseTest.login
     def test_save_and_redirect_on_POST(self):
-        text = self.generateString(10)
+        text = self.generate_string(10)
         cat = self.create_category(text)
 
         url = reverse('budgets:expenses_create')
@@ -218,7 +245,6 @@ class ExpensesPageTest(BaseTest):
 
         url = reverse('budgets:expenses_create')
         redirect_url = reverse('budgets:expenses_create')
-
         self.assertEqual(exp.amount, amount)
         self.assertEqual(exp.date.strftime("%Y-%m-%d"), date)
         self.assertEqual(exp.category.id, cat.id)
@@ -228,8 +254,8 @@ class ExpensesPageTest(BaseTest):
 
     @BaseTest.login
     def test_delete_expenses(self):
-        text = self.generateString(10)
-        text_2 = self.generateString(10)
+        text = self.generate_string(10)
+        text_2 = self.generate_string(10)
         category = self.create_category(text)
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
         expense = self.create_expense(category, 100, text_2,
@@ -269,9 +295,9 @@ class ExpensesPageTest(BaseTest):
 
     @BaseTest.login
     def test_delete_button_showed_with_param(self):
-        text = self.generateString(10)
-        text_2 = self.generateString(10)
-        text_3 = self.generateString(10)
+        text = self.generate_string(10)
+        text_2 = self.generate_string(10)
+        text_3 = self.generate_string(10)
         category = self.create_category(text)
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
         exp = self.create_expense(category, 100, text_2, date)
@@ -289,8 +315,8 @@ class ExpensesPageTest(BaseTest):
 
     @BaseTest.login
     def test_delete_button_missing_without_param(self):
-        text = self.generateString(10)
-        text_2 = self.generateString(10)
+        text = self.generate_string(10)
+        text_2 = self.generate_string(10)
         category = self.create_category(text)
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
         exp = self.create_expense(category, 100, text_2, date)
@@ -317,12 +343,13 @@ class ExpensesPageTest(BaseTest):
         pass
 
     def test_displays_only_current_user_expenses(self):
+        # Create and login as a user
         # Note: _sign_up() is executed on BaseTest.setUp()
         self._login()
 
-        category_text = self.generateString(10)
+        category_text = self.generate_string(10)
         category = self.create_category(category_text)
-        note = self.generateString(10)
+        note = self.generate_string(10)
         amount = random.randint(1, 90000)
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
         expense = self.create_expense(category=category, amount=amount,
@@ -342,13 +369,64 @@ class ExpensesPageTest(BaseTest):
         self.assertNotContains(response, note)
         self.assertNotContains(response, '{:,}'.format(amount))
 
+    def test_cant_user_other_users_categories_for_expenses(self):
+        # Create and login as a user
+        # Note: _sign_up() is executed on BaseTest.setUp()
+        self._login()
+
+        category_text = self.generate_string(10)
+        category = self.create_category(category_text)
+
+        # The first user user can see his category
+        response = self.get_response_from_named_url('budgets:categories')
+        self.assertContains(response, category_text)
+        self._logout()
+
+        # The second user can create a new category
+        self.signup_and_login()
+
+        second_category_text = self.generate_string(10)
+        second_category = self.create_category(second_category_text)
+
+        # Guido only sees his own category, not Frank's
+        response = self.get_response_from_named_url('budgets:categories')
+        self.assertNotContains(response, category_text)
+        self.assertContains(response, second_category_text)
+
+        # The second user can use his own category to create expenses
+        redirect_url = url = reverse('budgets:expenses_create')
+        # Note: we redirect to the creation page on success
+
+        amount = random.randint(1, 90000)
+        note = self.generate_string(10)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+
+        response = self.client.post(url,  data={'amount': amount, 'date': date,
+                                    'category': second_category.id, 'note': note})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], redirect_url)
+
+        # The second user can not create expenses using the first users's
+        # category
+        expected_error_msg = 'Select a valid choice. That choice is not one of the available choices'
+        response = self.get_response_from_named_url('budgets:expenses')
+        self.assertContains(response, note)
+        self.assertContains(response, second_category_text)
+        self.assertContains(response, '{:,}'.format(amount))
+
+        response = self.client.post(url,  data={'amount': amount, 'date': date,
+                                    'category': category.id, 'note': note})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, expected_error_msg)
+
 
 class IncomeCategoriesPageTest(BaseTest):
 
     @BaseTest.login
     def test_save_on_POST(self):
         url = reverse('budgets:income_categories_create')
-        text = self.generateString(10)
+        text = self.generate_string(10)
         response = self.client.post(url,  data={'text': text})
         ic = m.IncomeCategory.objects.first()
 
@@ -358,7 +436,7 @@ class IncomeCategoriesPageTest(BaseTest):
     def test_redirect_on_POST(self):
         url = reverse('budgets:income_categories_create')
         redirect_url = reverse('budgets:income_categories')
-        text = self.generateString(10)
+        text = self.generate_string(10)
 
         response = self.client.post(url,  data={'text': text})
 
@@ -385,7 +463,7 @@ class IncomeCategoriesPageTest(BaseTest):
         # Note: _sign_up() is executed on BaseTest.setUp()
         self._login()
 
-        text = self.generateString(10)
+        text = self.generate_string(10)
         self.create_income_category(text)
 
         # Current user can see it
@@ -404,7 +482,7 @@ class IncomePageTest(BaseTest):
 
     @BaseTest.login
     def test_save_and_redirect_on_POST(self):
-        text = self.generateString(10)
+        text = self.generate_string(10)
         cat = self.create_income_category(text)
 
         url = reverse('budgets:incomes_create')
@@ -442,11 +520,11 @@ class IncomePageTest(BaseTest):
         # Note: _sign_up() is executed on BaseTest.setUp()
         self._login()
 
-        text = self.generateString(10)
+        text = self.generate_string(10)
         category = self.create_income_category(text)
         amount = random.randint(1, 90000)
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
-        note = self.generateString(10)
+        note = self.generate_string(10)
         income = self.create_income(
           category=category,
           amount=amount,
@@ -470,12 +548,85 @@ class IncomePageTest(BaseTest):
         self.assertNotContains(response, '{:,}'.format(amount))
 
 
+    def test_cant_use_other_users_income_categories_for_income(self):
+        # Note: _sign_up() is executed on BaseTest.setUp()
+        self._login()
+
+        text = self.generate_string(10)
+        category = self.create_income_category(text)
+        amount = random.randint(1, 90000)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        note = self.generate_string(10)
+        income = self.create_income(
+          category=category,
+          amount=amount,
+          note=note,
+          date=date
+        )
+
+        # First user can see it
+        response = self.get_response_from_named_url('budgets:incomes')
+        self.assertContains(response, text)
+        self.assertContains(response, note)
+        self.assertContains(response, '{:,}'.format(amount))
+
+        self._logout()
+
+        # Create and login as another user
+        self.signup_and_login()
+
+        # Obtain first user's Income Category details
+        income_cat = m.IncomeCategory.objects.first()
+
+       # Second user can use his own category to create his own income entry
+        second_text = self.generate_string(10)
+        second_category = self.create_income_category(second_text)
+
+        second_amount = random.randint(1, 90000)
+        second_note = self.generate_string(10)
+
+        second_income = self.create_income(
+          category=second_category,
+          amount=second_amount,
+          note=second_note,
+          date=date
+        )
+
+        response = self.get_response_from_named_url('budgets:incomes')
+        self.assertContains(response, second_note)
+        self.assertContains(response, second_text)
+        self.assertContains(response, '{:,}'.format(second_amount))
+
+        url = reverse('budgets:incomes_create')
+
+        third_amount = random.randint(1, 90000)
+        third_note = self.generate_string(10)
+
+        response = self.client.post(url,  data={'amount': amount, 'date': date,
+                                    'category': income_cat.id, 'note': note})
+
+        self.assertEqual(response.status_code, 200)
+
+        # Second user can not create expenses using First user's category
+        expected_error_msg = 'Select a valid choice. That choice is not one of the available choices'
+        response = self.get_response_from_named_url('budgets:incomes')
+
+        self.assertContains(response, second_note)
+        self.assertContains(response, second_text)
+        self.assertContains(response, '{:,}'.format(second_amount))
+
+        response = self.client.post(url,  data={'amount': amount, 'date': date,
+                                    'category': category.id, 'note': note})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, expected_error_msg)
+
+
 class MonthlyBalanceCategoriesTest(BaseTest):
 
     @BaseTest.login
     def test_save_on_POST(self):
         url = reverse('budgets:new_monthly_balance_category')
-        text = self.generateString(10)
+        text = self.generate_string(10)
         response = self.client.post(url,  data={'text': text})
         mb = m.MonthlyBalanceCategory.objects.all()
         self.assertEqual(mb.count(), 1)
@@ -485,7 +636,7 @@ class MonthlyBalanceCategoriesTest(BaseTest):
     @BaseTest.login
     def test_redirect_on_POST(self):
         url = reverse('budgets:new_monthly_balance_category')
-        text = self.generateString(10)
+        text = self.generate_string(10)
         response = self.client.post(url,  data={'text': text})
         redirect_url = reverse('budgets:monthly_balance_categories')
         self.assertEqual(response.status_code, 302)
@@ -514,7 +665,7 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         # Note: _sign_up() is executed on BaseTest.setUp()
         self._login()
 
-        text = self.generateString(10)
+        text = self.generate_string(10)
         self.create_monthly_balance_category(text)
 
         # Current user can see it
@@ -535,7 +686,7 @@ class MonthlyBalanceTest(BaseTest):
 
     @BaseTest.login
     def test_save_and_redirect_on_POST(self):
-        text = self.generateString(10)
+        text = self.generate_string(10)
         cat = self.create_monthly_balance_category(text)
 
         url = reverse('budgets:monthly_balances_create')
@@ -558,7 +709,7 @@ class MonthlyBalanceTest(BaseTest):
 
     @BaseTest.login
     def test_delete_button_showed_with_param(self):
-        text = self.generateString(10)
+        text = self.generate_string(10)
         cat = self.create_monthly_balance_category(text)
         amount = random.randint(1, 90000)
         date = datetime.date.today().replace(day=1)
@@ -580,7 +731,7 @@ class MonthlyBalanceTest(BaseTest):
 
     @BaseTest.login
     def test_delete_on_POST(self):
-        text = self.generateString(10)
+        text = self.generate_string(10)
         self.create_monthly_balance_category(text)
         new_category = m.MonthlyBalanceCategory.objects.first()
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
@@ -614,11 +765,11 @@ class MonthlyBalanceTest(BaseTest):
         response = self.get_response_from_named_url('budgets:monthly_balances')
         self.assertTemplateUsed(response, 'budgets/monthlybalance_list.html')
 
-    def test_displays_only_current_user_monhtly_balances(self):
+    def test_displays_only_current_user_monthly_balances(self):
         # Note: _sign_up() is executed on BaseTest.setUp()
         self._login()
 
-        text = self.generateString(10)
+        text = self.generate_string(10)
         balance_category = self.create_monthly_balance_category(text)
 
         amount = random.randint(1, 90000)
@@ -652,6 +803,8 @@ class MonthlyBalanceTest(BaseTest):
         self.assertNotContains(response, '{:,}'.format(amount))
         self._logout()
 
+    def test_cant_use_other_uers_balance_categories_for_monthly_balance(self):
+        pass
 
 class GoalPageTest(BaseTest):
 
@@ -663,8 +816,8 @@ class GoalPageTest(BaseTest):
     def test_displays_only_current_user_goals(self):
         # Note: _sign_up() is executed on BaseTest.setUp()
         self._login()
-        text = self.generateString(10)
-        note = self.generateString(10)
+        text = self.generate_string(10)
+        note = self.generate_string(10)
         amount = random.randint(1, 90000)
         self.create_goal(amount=amount, text=text, note=note)
 
@@ -677,7 +830,7 @@ class GoalPageTest(BaseTest):
 
         # Create and login as a different user: can't see it
         self.signup_and_login()
-        response = self.get_response_from_named_url('budgets:goals')
+        response =self.get_response_from_named_url('budgets:goals')
         self.assertNotContains(response, text)
         self.assertNotContains(response, note)
         self.assertNotContains(response, '{:,}'.format(amount))

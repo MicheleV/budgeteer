@@ -35,7 +35,7 @@ class CategoryForm(forms.models.ModelForm):
 class ExpenseForm(forms.models.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
-        super(ExpenseForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['category'].queryset = m.Category.objects.filter(
                                            created_by=user)
 
@@ -65,7 +65,7 @@ class DeleteExpenseForm(forms.models.ModelForm):
 class MonthlyBudgetForm(forms.models.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
-        super(MonthlyBudgetForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['category'].queryset = m.Category.objects.filter(created_by=user)
 
     class Meta:
@@ -83,7 +83,7 @@ class MonthlyBudgetForm(forms.models.ModelForm):
 
     # On save, make monthlybudgets be on the first day of the month
     def clean(self):
-        self.cleaned_data = super(MonthlyBudgetForm, self).clean()
+        self.cleaned_data = super().clean()
         if 'date' in self.cleaned_data:
             original_date = self.cleaned_data['date']
             final_date = original_date.replace(day=1)
@@ -109,7 +109,7 @@ class IncomeCategoryForm(forms.models.ModelForm):
 class IncomeForm(forms.models.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
-        super(IncomeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['category'].queryset = m.IncomeCategory.objects.filter(
                                            created_by=user)
 
@@ -150,7 +150,7 @@ class MonthlyBalanceCategoryForm(forms.models.ModelForm):
 class MonthlyBalanceForm(forms.models.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
-        super(MonthlyBalanceForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['category'].queryset = m.MonthlyBalanceCategory.objects.filter(
                                            created_by=user)
 

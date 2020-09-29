@@ -31,9 +31,11 @@
       <li class="nav-item">
         <a class="nav-link" href="{% url 'budgets:goals' %}">Goals</a>
       </li>
+      {% if not request.user.is_anonymous %}
       <li class="nav-item">
         <a class="nav-link" href="{% url 'accounts:logout' %}">(Not {{ request.user }}?) Logout</a>
       </li>
+      {% endif %}
     </ul>
   </div>
 

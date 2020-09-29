@@ -23,10 +23,8 @@ MAX_DELAY = 3
 
 
 # TODO: duplicate code from unit tests
-def generateString(length=10):
-    """
-    Generate a random string of a given length
-    """
+def generate_string(length=10):
+    """Generate a random string of a given length"""
     char = string.ascii_lowercase
     return ''.join(random.choice(char) for i in range(length))
 
@@ -115,13 +113,12 @@ def register_and_login(func):
 
 
 def create_user(tester, username=None, password=None):
-    """
-    Sign up, and automatically log in as said user
-    """
+    """Sign up, and automatically log in as said user"""
     if not username:
-        username = generateString()
+        # TODO: add unix timestamp just to avoid collision even more
+        username = generate_string()
     if not password:
-        password = generateString()
+        password = generate_string()
 
     url = reverse('accounts:signup')
     tester.browser.get(f"{tester.live_server_url}{url}")
@@ -146,9 +143,7 @@ def create_user(tester, username=None, password=None):
 
 
 def login_user(tester, username, password):
-    """
-    Log in an user
-    """
+    """Log in an user"""
     url = reverse('accounts:login')
     tester.browser.get(f"{tester.live_server_url}{url}")
 
@@ -156,7 +151,7 @@ def login_user(tester, username, password):
     user_input_box = tester.browser.find_element_by_id('id_username')
     user_input_box.send_keys(username)
 
-    # Frank then insert a 
+    # Frank then insert his favourite password
     pwd_input = tester.browser.find_element_by_id('id_password')
     pwd_input.send_keys(password)
 
@@ -166,9 +161,7 @@ def login_user(tester, username, password):
 
 
 def logout_user(tester):
-    """
-    Log out
-    """
+    """Log out"""
     url = reverse('accounts:logout')
     tester.browser.get(f"{tester.live_server_url}{url}")
 

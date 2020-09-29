@@ -17,7 +17,7 @@ def test_cant_create_an_empty_monthly_budget(tester):
 @Helpers.register_and_login
 def test_can_create_multiple_monthly_budgets(tester):
     # Frank creates a category to log expenses related his rent
-    category_name = Helpers.generateString()
+    category_name = Helpers.generate_string()
     Helpers.create_a_category(tester, category_name)
 
     budget_date = datetime.date.today().replace(day=1)
@@ -60,7 +60,7 @@ def test_can_create_multiple_monthly_budgets(tester):
     # Frank notices his error and logs the full amount of the rent
     # creating a new expenses (Frank can't find how to edit an entry)
     remainder = 5000
-    note = Helpers.generateString()
+    note = Helpers.generate_string()
     rent_date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
     is_income = False
     Helpers.create_entry(tester, amount=remainder, category_name=category_name,
@@ -82,7 +82,7 @@ def test_can_create_multiple_monthly_budgets(tester):
 def test_cant_create_multiple_monthly_budgets_for_same_month(tester):
 
     # Frank creates a category to log expenses related his rent
-    category_name = Helpers.generateString()
+    category_name = Helpers.generate_string()
     Helpers.create_a_category(tester, category_name)
 
     # Frank knows he also has to create a budget for the current month
@@ -114,7 +114,7 @@ def test_users_cant_see_other_users_monthly_budgets(tester):
     Helpers.create_user(tester)
 
     # Frank creates a category to log expenses related his rent
-    category_name = Helpers.generateString()
+    category_name = Helpers.generate_string()
     Helpers.create_a_category(tester, category_name)
 
     # Frank knows he also has to create a budget for the current month

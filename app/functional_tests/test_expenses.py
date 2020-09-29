@@ -100,7 +100,7 @@ def test_expenses_page_can_show_old_expenses(tester):
 def test_only_expenses_in_range_are_shown(tester):
 
     # Frank creates 2 expenses for January 2020
-    text = Helpers.generateString()
+    text = Helpers.generate_string()
     Helpers.create_a_category(tester, category_name=text)
 
     # Frank is not going to check if the expenses are created as he always does
@@ -112,7 +112,7 @@ def test_only_expenses_in_range_are_shown(tester):
     verify_creation = False
 
     amount = 4000
-    note = Helpers.generateString()
+    note = Helpers.generate_string()
     date = "2020-01-01"
     Helpers.create_entry(tester, amount, category_name=text, note=note,
                          expense_date=date, is_income=is_income,
@@ -120,7 +120,7 @@ def test_only_expenses_in_range_are_shown(tester):
 
     second_amount = 4200
     second_date = "2020-01-07"
-    second_note = Helpers.generateString()
+    second_note = Helpers.generate_string()
     Helpers.create_entry(tester, second_amount, category_name=text,
                          note=second_note, expense_date=date,
                          is_income=is_income, verify_creation=verify_creation)
@@ -157,7 +157,7 @@ def test_only_expenses_in_range_are_shown(tester):
     # Then, Frank remembers he also bought something during December 2019
     # He really wants to keep track of all his expenses!
     third_amount = 4200
-    third_note = Helpers.generateString()
+    third_note = Helpers.generate_string()
     older_date = "2019-12-31"
     Helpers.create_entry(tester, amount=third_amount, category_name=text,
                          note=third_note, expense_date=older_date,
@@ -197,12 +197,12 @@ def users_cant_see_other_users_expenses(tester):
     username, password = Helpers.create_user(tester)
 
     # Frank can create a category to log his expenses
-    cat_name = Helpers.generateString()
+    cat_name = Helpers.generate_string()
     Helpers.create_a_category(tester, category_name=cat_name, is_income=False)
 
     amount = random.randint(1, 90000)
     expense_date = str(date.today())
-    note = Helpers.generateString()
+    note = Helpers.generate_string()
 
     # Frank enters some data
     Helpers.create_entry(tester, amount, category_name=cat_name, note=note,

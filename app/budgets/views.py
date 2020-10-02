@@ -44,7 +44,7 @@ class CategoryCreateView(CreateView):
     url = 'budgets:categories'
 
     def form_valid(self, form):
-        """WRITE ME."""
+        """Applies workaround to enforce constraints."""
         return utils.check_constraints_workaround(self, form,
                                                   CategoryCreateView.error_msg,
                                                   CategoryCreateView.url)
@@ -56,13 +56,13 @@ class CategoryCreateView(CreateView):
 
 @method_decorator(login_required, name='dispatch')
 class CategoryListView(ListView):  # pylint: disable=R0903; # noqa
-    """Display (Expense) categories"""
+    """Display (Expense) categories."""
     model = m.Category
     paginate_by = 15
     ordering = ['id']
 
     def get_queryset(self):
-        """WRITE ME."""
+        """Retrieve object owned by the current logged in user."""
         return m.Category.objects.filter(created_by=self.request.user).order_by('id')  # pylint: disable=E501; # noqa
 
 
@@ -110,7 +110,7 @@ class ExpenseListView(ListView):
 
     @cached_property
     def profile(self):
-        """WRITE ME."""
+        """Retrieve object owned by the current logged in user."""
         start, end = self.start_end()
         expenses = m.Expense.objects.select_related('category').filter(
                    date__range=(start, end),
@@ -118,7 +118,7 @@ class ExpenseListView(ListView):
         return expenses
 
     def get_context_data(self, **kwargs):
-        """WRITE ME."""
+        """Fecth expense data and compute the total for each cateogory."""
         context = super().get_context_data(**kwargs)
         # Using double underscore to avoid collision in the for loop below
         start, __ = self.start_end()
@@ -171,7 +171,7 @@ class ExpenseListView(ListView):
 
 @method_decorator(login_required, name='dispatch')
 class ExpenseDeleteView(DeleteView):  # pylint: disable=R0903; # noqa
-    """Delete an Expense"""
+    """Delete an Expense."""
     model = m.Expense
 
     def get_object(self, *args, **kwargs):
@@ -195,7 +195,7 @@ class MonthlyBudgetsCreateView(CreateView):
     form_class = f.MonthlyBudgetForm
 
     def get_initial(self):
-        """WRITE ME."""
+        """Get the data parameter from the URL."""
         initial = super().get_initial()
 
         initial['date'] = self.request.GET.get('date', None)
@@ -219,13 +219,13 @@ class MonthlyBudgetsCreateView(CreateView):
 
 @method_decorator(login_required, name='dispatch')
 class MonthlyBudgetListView(ListView):  # pylint: disable=R0903; # noqa
-    """Display monthly budgets"""
+    """Display monthly budgets."""
     model = m.MonthlyBudget
     paginate_by = 15
     ordering = ['id']
 
     def get_queryset(self):
-        """WRITE ME."""
+        """Retrieve object owned by the current logged in user."""
         yymm_date = self.kwargs.get('date', None)
         if yymm_date is None:
             m_b = m.MonthlyBudget.objects.filter(
@@ -241,7 +241,7 @@ class MonthlyBudgetListView(ListView):  # pylint: disable=R0903; # noqa
 
 @method_decorator(login_required, name='dispatch')
 class MonthlyBudgetDetailView(DetailView):  # pylint: disable=R0903; # noqa
-    """Display a single Monthly Budget"""
+    """Display a single Monthly Budget."""
     model = m.MonthlyBudget
 
     def get_object(self, *args, **kwargs):
@@ -272,13 +272,13 @@ class GoalCreateView(CreateView):
 
 @method_decorator(login_required, name='dispatch')
 class GoalListView(ListView):  # pylint: disable=R0903; # noqa
-    """Display goals"""
+    """Display goals."""
     model = m.Goal
     paginate_by = 15
     ordering = ['id']
 
     def get_queryset(self):
-        """Display goals of the current logged in user"""
+        """Retrieve object owned by the current logged in user."""
         return m.Goal.objects.filter(
                  created_by=self.request.user).order_by('id')
 
@@ -455,7 +455,7 @@ class MonthlyBalanceCategoryView(ListView):  # pylint: disable=R0903; # noqa
     ordering = ['id']
 
     def get_queryset(self):  # pylint: disable=R0201; # noqa
-        """WRITE ME."""
+        """Retrieve object owned by the current logged in user."""
         return m.MonthlyBalanceCategory.objects.filter(
                  created_by=self.request.user).order_by('id')
 
@@ -602,7 +602,7 @@ class MonthlyBalanceUpdateView(UpdateView):
 
 @method_decorator(login_required, name='dispatch')
 class MonthlyBalanceDeleteView(DeleteView):
-    """Dlete a monthly balance."""
+    """Delete a monthly balance."""
     model = m.MonthlyBalance
 
     def get_object(self, *args, **kwargs):

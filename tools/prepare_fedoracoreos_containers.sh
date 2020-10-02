@@ -37,8 +37,8 @@ sudo cp budgeteer-fedoracoreos-ignition.ign /var/lib/libvirt/images/
 sudo chown qemu:qemu -Rvv /var/lib/libvirt/images/
 sudo restorecon -Rvv /var/lib/libvirt/images/
 
-# TODO: --cpu host is needed in order to avoid errors throw by "-fw_cfg" not recognized
-#      remove --cpu host and see if works.. https://github.com/coreos/bugs/issues/1783
+# TODO: --cpu host is needed in order to avoid errors thrown by qemu-kvm not recognizing "-fw_cfg" option
+#      see if this is qemu-kvm version specific https://github.com/coreos/bugs/issues/1783
 
 # TODO: use variables for cpu,ram, etc
 sudo virt-install --name=fcos --vcpus=2 --cpu host --ram=2048 --os-variant=fedora32 \

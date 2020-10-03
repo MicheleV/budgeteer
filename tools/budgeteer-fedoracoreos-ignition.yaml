@@ -1,0 +1,179 @@
+variant: fcos
+version: 1.1.0
+passwd:
+    users:
+      - name: core
+        # password = lol
+        password_hash: $y$j9T$kauao.zzJV7FnbNFcl0xF.$RoLzGPImKQEgd8ZzZ/wlLX2pmRmxsH4PuT4DS/PQYk5
+        ssh_authorized_keys:
+          - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2ZvcUAs3nn/63b/Z+gyYG9Mad4GwnUiH9g0vB2M9fuwLaOyyBIFxJvGdmaaiL6d61TURpeWzQdDx5hRLhPDqSXLFWtHMaP+Gn8JA+T8hq2XXv01ZWredElcX0XZw8Ngwdk2/Zsa7H9ZvP5E5bzXteqZiBGM1SArPjUe5FHw9sMpJUiOKOkpy+hQwtYBCYrxLt84xy2yftVN4cIR0nbyL5OW+DX0in4ioGozdFMfbyjX/MIDf1vLbUkZ7I+e5p2VfJX3PHZ/MJpk/M0b68r+avFFDchvgF/PWjxEJ0ADHC0k47Mrk50kdv08bRP7eKGuLUcBrgjP7aqBHpU87rBx3B21TSHoCsc545fFciN21JWhFZ1Cvdrfu6EtbpwnOTy/XUFLIrL1rCIgiRIeBD0MwjklHzcfIbN42583iO7ljcO3/yTYXKKHoN/5Wserst14++MXvzO0E+vb70++ITEC5SgTt1Mdyi/FARlj/LEG4+3xsZnIPU/bSav/E2WlWzc+8= michele@localhost.localdomain
+systemd:
+  units:
+    - name: serial-getty@ttyS0.service
+      dropins:
+      - name: autologin-core.conf
+        contents: |
+          [Service]
+          # Override Execstart in main unit
+          ExecStart=
+          # Add new Execstart with `-` prefix to ignore failure
+          ExecStart=-/usr/sbin/agetty --autologin core --noclear %I $TERM
+          TTYVTDisallocate=no
+    - name: issuegen-private-ipv4.service
+      enabled: true
+      contents: |
+        [Unit]
+        Before=console-login-helper-messages-issuegen.service
+        After=network-online.target
+        ConditionPathExists=!/var/lib/issuegen-private-ipv4
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/local/bin/private-ipv4.sh
+        ExecStartPost=/usr/bin/touch /var/lib/issuegen-private-ipv4
+        RemainAfterExit=yes
+
+        [Install]
+        WantedBy=console-login-helper-messages-issuegen.service
+    - name: install-docker-compose.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Install Docker Compose
+        ConditionFirstBoot=yes
+        Wants=network-online.target
+        After=network-online.target
+        After=multi-user.target
+        Before=boot-complete.target
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/local/bin/install-docker-compose.sh
+
+        [Install]
+        RequiredBy=boot-complete.target
+        WantedBy=multi-user.target
+    - name: enable-and-start-docker.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Enable and start docker service
+        Wants=network-online.target
+        After=network-online.target
+        After=multi-user.target
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/local/bin/enable-start-docker.sh
+        RemainAfterExit=true
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: clone-repo.service
+      enabled: true
+      # Note: this unit is only run when the folder is missing (i.e. operator need to pull/fetch on new commits)
+      contents: |
+        [Unit]
+        Description=Clone repo
+        Wants=network-online.target
+        After=network-online.target
+        After=multi-user.target
+
+        ConditionPathExists=!/home/core/budgeteer
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/local/bin/clone-repo.sh
+        RemainAfterExit=true
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: docker-compose-build.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Build the docker compose cluster
+        Wants=network-online.target
+        After=network-online.target
+        After=multi-user.target
+
+        ConditionPathExists=/home/core/.docker-composer_is_installed
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/local/bin/docker-compose-build-cluster.sh
+        RemainAfterExit=true
+
+        [Install]
+        WantedBy=multi-user.target
+storage:
+  files:
+    - path: /etc/hostname
+      mode: 0644
+      contents:
+        inline: |
+          budgeteer
+    - path: /etc/profile.d/systemd-pager.sh
+      mode: 0644
+      contents:
+        inline: |
+          # Tell systemd to not use a pager when printing information
+          export SYSTEMD_PAGER=cat
+    - path: /etc/sysctl.d/20-silence-audit.conf
+      mode: 0644
+      contents:
+        inline: |
+          # Raise console message logging level from DEBUG (7) to WARNING (4)
+          # to hide audit messages from the interactive console
+          kernel.printk=4
+    - path: /usr/local/bin/private-ipv4.sh
+      mode: 0755
+      contents:
+        inline: |
+          #!/bin/bash
+          echo "Detected Private IPv4: is $(ip a | grep 192 | cut -d ' ' -f 6 | cut -d '/' -f1)" > \
+              /run/console-login-helper-messages/issue.d/50_public-ipv4.issue
+    - path: /usr/local/bin/clone-repo.sh
+      mode: 0755
+      contents:
+        inline: |
+          #!/bin/bash
+          git clone https://gitlab.com/micheleva/budgeteer.git /home/core/budgeteer
+          chown -R core.core /home/core/budgeteer
+          cp /home/core/budgeteer/app/.env.sample /home/core/budgeteer/app/.env
+          chown core.core /home/core/budgeteer/app/.env
+    - path: /usr/local/bin/install-docker-compose.sh
+      mode: 0755
+      contents:
+        inline: |
+          #!/bin/bash
+          rpm-ostree install docker-compose
+          touch /home/core/.docker-composer_is_installed
+          chown core.core /home/core/.docker-composer_is_installed
+          systemctl reboot
+    - path: /usr/local/bin/docker-compose-build-cluster.sh
+      mode: 0755
+      contents:
+        inline: |
+          #!/bin/bash
+          cd /home/core/budgeteer
+          sudo docker-compose -f docker-compose.yml up -d --build
+    - path: /usr/local/bin/enable-start-docker.sh
+      mode: 0755
+      contents:
+        inline: |
+          #!/bin/bash
+          systemctl is-enabled docker.service
+          returncode=$?
+          if [[ $returncode -ne 0 ]]; then
+              systemctl start docker
+              systemctl enable docker
+          fi
+  directories:
+        - path: /home/core/web
+          overwrite: true
+          user:
+            name: core
+          group:
+            name: core
+          mode: 755

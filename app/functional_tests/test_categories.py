@@ -27,16 +27,16 @@ def test_cant_create_an_empty_expense_category(tester):
 @Helpers.register_and_login
 def test_can_create_multiple_expense_categories(tester):
     # Frank can create a category to log expenses related to his rent
-    cat_name1 = Helpers.generateString()
+    cat_name1 = Helpers.generate_string()
     Helpers.create_a_category(tester, cat_name1)
     # Frank can create a category to log his food expenses
-    cat_name2 = Helpers.generateString()
+    cat_name2 = Helpers.generate_string()
     Helpers.create_a_category(tester, cat_name2)
 
 
 def test_different_users_can_create_categories_with_the_same_name(tester):
     # Frank can create a category to log his expenses
-    cat_name = Helpers.generateString()
+    cat_name = Helpers.generate_string()
 
     Helpers.create_user(tester)
     Helpers.create_a_category(tester, category_name=cat_name)
@@ -53,7 +53,7 @@ def test_different_users_can_create_categories_with_the_same_name(tester):
 @Helpers.register_and_login
 def test_cant_create_duplicate_expense_categories(tester):
     # Frank can create a category to log expenses related to his rent
-    text = Helpers.generateString()
+    text = Helpers.generate_string()
     Helpers.create_a_category(tester, category_name=text, is_income=True)
 
     # Frank is not paying attention to what he is doing, and he tries
@@ -94,7 +94,7 @@ def test_can_create_multiple_income_categories(tester):
 
 def test_diff_users_can_create_income_categories_with_the_same_name(tester):
     # Frank can create a category to log his expenses
-    cat_name = Helpers.generateString()
+    cat_name = Helpers.generate_string()
 
     Helpers.create_user(tester)
     Helpers.create_a_category(tester, category_name=cat_name, is_income=True)
@@ -121,7 +121,7 @@ def test_cant_create_duplicate_income_categories(tester):
 
 def test_users_cant_see_other_users_expense_categories(tester):
     # Frank can create a category to log his expenses
-    cat_name = Helpers.generateString()
+    cat_name = Helpers.generate_string()
 
     username, password = Helpers.create_user(tester)
     Helpers.create_a_category(tester, category_name=cat_name, is_income=True)
@@ -138,7 +138,7 @@ def test_users_cant_see_other_users_expense_categories(tester):
 
 def test_users_cant_see_other_users_income_categories(tester):
     # Frank can create a category to log his incomes
-    cat_name = Helpers.generateString()
+    cat_name = Helpers.generate_string()
 
     username, password = Helpers.create_user(tester)
     Helpers.create_a_category(tester, category_name=cat_name, is_income=True)

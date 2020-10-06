@@ -31,8 +31,12 @@ urlpatterns = [
     # Goals
     path('goals/create', views.GoalCreateView.as_view(), name='goals_create'),
     path('goals', views.GoalListView.as_view(), name='goals'),
-    path('goals/<int:pk>', views.GoalDetailView.as_view(),
-         name='goals_detail'),
+    path('goals/edit/<int:pk>',
+         views.GoalUpdateView.as_view(),
+         name='goals_edit'),
+    path('goals/delete/<int:pk>', views.GoalDeleteView.as_view(),
+         name='goals_delete'),
+
 
     # Monthly balance categories
     path('monthly_balance_categories/create',
@@ -59,9 +63,11 @@ urlpatterns = [
     path('monthly_balances', views.MonthlyBalancesView.as_view(),
          name='monthly_balances'),
 
+    # TODO: update this URL to be "edit_monthly_balance/update/<int:pk>"
     path('edit_monthly_balance/<int:pk>',
          views.MonthlyBalanceUpdateView.as_view(),
          name='edit_monthly_balance'),
+    # TODO: update this route name to be "monthly_balance_edit"
 
     path('monthly_balances/delete/<int:pk>',
          views.MonthlyBalanceDeleteView.as_view(),

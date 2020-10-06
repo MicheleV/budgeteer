@@ -1,0 +1,130 @@
+{
+  "ignition": {
+    "version": "3.1.0"
+  },
+  "passwd": {
+    "users": [
+      {
+        "name": "core",
+        "passwordHash": "$y$j9T$kauao.zzJV7FnbNFcl0xF.$RoLzGPImKQEgd8ZzZ/wlLX2pmRmxsH4PuT4DS/PQYk5",
+        "sshAuthorizedKeys": [
+          "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2ZvcUAs3nn/63b/Z+gyYG9Mad4GwnUiH9g0vB2M9fuwLaOyyBIFxJvGdmaaiL6d61TURpeWzQdDx5hRLhPDqSXLFWtHMaP+Gn8JA+T8hq2XXv01ZWredElcX0XZw8Ngwdk2/Zsa7H9ZvP5E5bzXteqZiBGM1SArPjUe5FHw9sMpJUiOKOkpy+hQwtYBCYrxLt84xy2yftVN4cIR0nbyL5OW+DX0in4ioGozdFMfbyjX/MIDf1vLbUkZ7I+e5p2VfJX3PHZ/MJpk/M0b68r+avFFDchvgF/PWjxEJ0ADHC0k47Mrk50kdv08bRP7eKGuLUcBrgjP7aqBHpU87rBx3B21TSHoCsc545fFciN21JWhFZ1Cvdrfu6EtbpwnOTy/XUFLIrL1rCIgiRIeBD0MwjklHzcfIbN42583iO7ljcO3/yTYXKKHoN/5Wserst14++MXvzO0E+vb70++ITEC5SgTt1Mdyi/FARlj/LEG4+3xsZnIPU/bSav/E2WlWzc+8= michele@localhost.localdomain"
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "directories": [
+      {
+        "group": {
+          "name": "core"
+        },
+        "overwrite": true,
+        "path": "/home/core/web",
+        "user": {
+          "name": "core"
+        },
+        "mode": 755
+      }
+    ],
+    "files": [
+      {
+        "path": "/etc/hostname",
+        "contents": {
+          "source": "data:,budgeteer%0A"
+        },
+        "mode": 420
+      },
+      {
+        "path": "/etc/profile.d/systemd-pager.sh",
+        "contents": {
+          "source": "data:,%23%20Tell%20systemd%20to%20not%20use%20a%20pager%20when%20printing%20information%0Aexport%20SYSTEMD_PAGER%3Dcat%0A"
+        },
+        "mode": 420
+      },
+      {
+        "path": "/etc/sysctl.d/20-silence-audit.conf",
+        "contents": {
+          "source": "data:,%23%20Raise%20console%20message%20logging%20level%20from%20DEBUG%20(7)%20to%20WARNING%20(4)%0A%23%20to%20hide%20audit%20messages%20from%20the%20interactive%20console%0Akernel.printk%3D4%0A"
+        },
+        "mode": 420
+      },
+      {
+        "path": "/usr/local/bin/private-ipv4.sh",
+        "contents": {
+          "source": "data:;base64,IyEvYmluL2Jhc2gKZWNobyAiRGV0ZWN0ZWQgUHJpdmF0ZSBJUHY0OiBpcyAkKGlwIGEgfCBncmVwIDE5MiB8IGN1dCAtZCAnICcgLWYgNiB8IGN1dCAtZCAnLycgLWYxKSIgPiBcCiAgICAvcnVuL2NvbnNvbGUtbG9naW4taGVscGVyLW1lc3NhZ2VzL2lzc3VlLmQvNTBfcHVibGljLWlwdjQuaXNzdWUK"
+        },
+        "mode": 493
+      },
+      {
+        "path": "/usr/local/bin/clone-repo.sh",
+        "contents": {
+          "compression": "gzip",
+          "source": "data:;base64,H4sIAAAAAAAC/3yNMQ4CIRBF+z0Fxlp+7zG8AeDPQgLMZBnX6xsSk210mynevJ93vSCWjhhGXtZiLlXpdNlMxx1Yi9UQfZKGVlJm5R4QX8+VRm5+DpClEUk2Ho8lZXl3d3u4yf08fzz9yRFU4dl3P0LTynPpWztPHfYnAAD//xreN4jyAAAA"
+        },
+        "mode": 493
+      },
+      {
+        "path": "/usr/local/bin/install-docker-compose.sh",
+        "contents": {
+          "compression": "gzip",
+          "source": "data:;base64,H4sIAAAAAAAC/4zLMQrDMAyF4d2ncOmc6EghVh7Y1PYLkkrp7UugS7cu//R/95uUNqXsXpOdY6GHAblNj733fFAfsEU5TjpS8Kk1S+WAKA2y/g62Nd++FkfSytfM17he+R/62wNDo2dDISN9AgAA//+Siyz1pwAAAA=="
+        },
+        "mode": 493
+      },
+      {
+        "path": "/usr/local/bin/docker-compose-build-cluster.sh",
+        "contents": {
+          "source": "data:,%23!%2Fbin%2Fbash%0Acd%20%2Fhome%2Fcore%2Fbudgeteer%0Asudo%20docker-compose%20-f%20docker-compose.yml%20up%20-d%20--build%0A"
+        },
+        "mode": 493
+      },
+      {
+        "path": "/usr/local/bin/enable-start-docker.sh",
+        "contents": {
+          "compression": "gzip",
+          "source": "data:;base64,H4sIAAAAAAAC/1zNvarCUBDE8f48xVxu2hh7ER8kpDgfE7IYN7C7Cr69hUrAdv7wm/+/oYgOJfuS/OnBW40V4j01l5UNbatX2sFpD6lMxrib1q3x3F2SzBhHdPuIXokjpumEWKgJAHbWI1t8xJ/0vvu2WdIrAAD//53Duo+ZAAAA"
+        },
+        "mode": 493
+      }
+    ]
+  },
+  "systemd": {
+    "units": [
+      {
+        "dropins": [
+          {
+            "contents": "[Service]\n# Override Execstart in main unit\nExecStart=\n# Add new Execstart with `-` prefix to ignore failure\nExecStart=-/usr/sbin/agetty --autologin core --noclear %I $TERM\nTTYVTDisallocate=no\n",
+            "name": "autologin-core.conf"
+          }
+        ],
+        "name": "serial-getty@ttyS0.service"
+      },
+      {
+        "contents": "[Unit]\nBefore=console-login-helper-messages-issuegen.service\nAfter=network-online.target\nConditionPathExists=!/var/lib/issuegen-private-ipv4\n\n[Service]\nType=oneshot\nExecStart=/usr/local/bin/private-ipv4.sh\nExecStartPost=/usr/bin/touch /var/lib/issuegen-private-ipv4\nRemainAfterExit=yes\n\n[Install]\nWantedBy=console-login-helper-messages-issuegen.service\n",
+        "enabled": true,
+        "name": "issuegen-private-ipv4.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Install Docker Compose\nConditionFirstBoot=yes\nWants=network-online.target\nAfter=network-online.target\nAfter=multi-user.target\nBefore=boot-complete.target\n\n[Service]\nType=oneshot\nExecStart=/usr/local/bin/install-docker-compose.sh\n\n[Install]\nRequiredBy=boot-complete.target\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "install-docker-compose.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Enable and start docker service\nWants=network-online.target\nAfter=network-online.target\nAfter=multi-user.target\n\n[Service]\nType=oneshot\nExecStart=/usr/local/bin/enable-start-docker.sh\nRemainAfterExit=true\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "enable-and-start-docker.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Clone repo\nWants=network-online.target\nAfter=network-online.target\nAfter=multi-user.target\n\nConditionPathExists=!/home/core/budgeteer\n\n[Service]\nType=oneshot\nExecStart=/usr/local/bin/clone-repo.sh\nRemainAfterExit=true\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "clone-repo.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Build the docker compose cluster\nWants=network-online.target\nAfter=network-online.target\nAfter=multi-user.target\n\nConditionPathExists=/home/core/.docker-composer_is_installed\n\n[Service]\nType=oneshot\nExecStart=/usr/local/bin/docker-compose-build-cluster.sh\nRemainAfterExit=true\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "docker-compose-build.service"
+      }
+    ]
+  }
+}

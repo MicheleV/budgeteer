@@ -20,7 +20,7 @@ def test_image_is_not_displayed_without_data(tester):
 
 def test_diff_users_can_create_monthly_balance_cat_with_the_same_name(tester):
     # Frank can create a category to log his expenses
-    cat_name = Helpers.generateString()
+    cat_name = Helpers.generate_string()
 
     Helpers.create_user(tester)
     Helpers.create_a_category(tester, category_name=cat_name, is_balance=True)
@@ -69,7 +69,7 @@ def test_check_both_graph_and_right_side_table_are_shown(tester):
 
 def test_users_cant_see_other_users_balance_categories(tester):
     # Frank can create a category to log his balance
-    cat_name = Helpers.generateString()
+    cat_name = Helpers.generate_string()
 
     Helpers.create_user(tester)
     Helpers.create_a_category(tester, category_name=cat_name, is_balance=True)
@@ -85,7 +85,7 @@ def test_users_cant_see_other_users_balance_categories(tester):
 
 def test_users_cant_see_other_users_monthly_balance_entry(tester):
     # Frank can create a category to log his balance
-    cat_name = Helpers.generateString()
+    cat_name = Helpers.generate_string()
 
     Helpers.create_user(tester)
     Helpers.create_a_category(tester, category_name=cat_name, is_balance=True)

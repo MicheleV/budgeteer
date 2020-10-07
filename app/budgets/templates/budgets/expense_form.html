@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
 
 {% block title %}Create expense{% endblock %}
 
 {% block content %}
+<script src="{% static 'js/main.js' %}" defer></script>
 <div class="container-fluid">
   <div class="col-md-12">
       <h3>New Expense</h3>
@@ -14,6 +16,7 @@
       <form method="post">{% csrf_token %}
           {{ form.as_p }}
           <input id="id_submit" type="submit" value="Save">
+          <button type="button" class="btn btn-info" onclick="setToday(this)">Use today as date</button>
       </form>
     </div>
   </div>

@@ -1,5 +1,0 @@
-[staging]
-your-server-address ansible_become=yes ansible_user=your-username
-
-[development]
-your-server-address ansible_become=yes ansible_user=cloud_user

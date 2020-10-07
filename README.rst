@@ -12,7 +12,6 @@ Budgeteer
 
   - `Prerequisites <README.rst#prerequisites>`_
   - `Installation <README.rst#installation>`_
-  - `Provisioning and deploying <README.rst#provisioning-and-deploying>`_
 - `Usage <README.rst#usage>`_
 - `Testing <README.rst#testing>`_
 - `References and useful links <README.rst#references-and-useful-links>`_
@@ -35,7 +34,7 @@ Getting started
 
 Prerequisites
 --------------------------
-- Python 3.6 installed
+- Python 3.6 or later installed
 - geckodriver in your system $PATH (needed for functional tests)
 
 Installation
@@ -55,53 +54,27 @@ Gather the static files::
     cd app
     python manage.py collectstatic
 
-Provisioning and deploying
---------------------------
-
-Install ansible::
-
-    cd app
-    python3 -m venv virtualenv
-    pip install ansible
-
-Create your ansible inventory file inside ``app/tools/inventory.ansible`` ::
-
-    [development]
-    <your-server-address> ansible_become=yes ansible_ssh_user=<your-user>
-    
-    [staging]
-    <your-other-server-address> ansible_become=yes ansible_ssh_user=<your-user>
-    
-    [production]
-    <your-production-server-address> ansible_become=yes ansible_ssh_user=<your-user>
-
-Provision (on RHEL like distros)::
-
-    cd app/tools
-    ansible-playbook -i inventory.ansible provision.yaml [--limit=<env-name>] [--ask-become-pass]
-
-Deploy::
-
-    cd app/tools
-    ansible-playbook -i inventory.ansible deploy.yaml [--limit=<env-name>] [--ask-become-pass]
-
 Usage
 =======
-Run the development server::
+Run the django development server::
 
     cd app
     source virtualenv/bin/activate
     (virtualenv) $ python manage.py runserver [0.0.0.0:80]
 
-Run gunicorn::
+Run the app using gunicorn::
 
     cd app
     source virtualenv/bin/activate
     (virtualenv) $ gunicorn budgeteer.wsgi:application
 
-Run the dockerized version::
+Run the dockerized version of the app::
 
     docker-composer -f docker-compose.yml up -d --build
+
+Create and start a FedoraCoreOS VM with the dockerized version of the app::
+
+    ./tools/prepare_fedoracoreos_containers.sh
 
 
 Testing

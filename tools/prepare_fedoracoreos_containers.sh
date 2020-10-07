@@ -32,7 +32,7 @@
 ###############
 
 fcct --pretty --strict budgeteer-fedoracoreos-ignition.yaml --output budgeteer-fedoracoreos-ignition.ign
-ignition-validate budgeteer-fedoracoreos-ignition.ign && echo 'Success!' # TODO: add exit & error message on failure
+ignition-validate budgeteer-fedoracoreos-ignition.ign && echo 'Success!' # TODO: add exit 1 and show an error message on failure
 sudo cp budgeteer-fedoracoreos-ignition.ign /var/lib/libvirt/images/
 sudo chown qemu:qemu -Rvv /var/lib/libvirt/images/
 sudo restorecon -Rvv /var/lib/libvirt/images/

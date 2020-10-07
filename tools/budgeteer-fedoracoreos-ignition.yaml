@@ -3,8 +3,8 @@ version: 1.1.0
 passwd:
     users:
       - name: core
-        # password = lol
-        password_hash: $y$j9T$kauao.zzJV7FnbNFcl0xF.$RoLzGPImKQEgd8ZzZ/wlLX2pmRmxsH4PuT4DS/PQYk5
+        # password: development!
+        password_hash: $y$j9T$sAxG7KbXc651yV.sLTs2G/$nDYA79pc/6tSac52M253825nYHoF0ocBc8m00t5lk.
         ssh_authorized_keys:
           - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2ZvcUAs3nn/63b/Z+gyYG9Mad4GwnUiH9g0vB2M9fuwLaOyyBIFxJvGdmaaiL6d61TURpeWzQdDx5hRLhPDqSXLFWtHMaP+Gn8JA+T8hq2XXv01ZWredElcX0XZw8Ngwdk2/Zsa7H9ZvP5E5bzXteqZiBGM1SArPjUe5FHw9sMpJUiOKOkpy+hQwtYBCYrxLt84xy2yftVN4cIR0nbyL5OW+DX0in4ioGozdFMfbyjX/MIDf1vLbUkZ7I+e5p2VfJX3PHZ/MJpk/M0b68r+avFFDchvgF/PWjxEJ0ADHC0k47Mrk50kdv08bRP7eKGuLUcBrgjP7aqBHpU87rBx3B21TSHoCsc545fFciN21JWhFZ1Cvdrfu6EtbpwnOTy/XUFLIrL1rCIgiRIeBD0MwjklHzcfIbN42583iO7ljcO3/yTYXKKHoN/5Wserst14++MXvzO0E+vb70++ITEC5SgTt1Mdyi/FARlj/LEG4+3xsZnIPU/bSav/E2WlWzc+8= michele@localhost.localdomain
 systemd:
@@ -169,11 +169,11 @@ storage:
               systemctl start docker
               systemctl enable docker
           fi
-  directories:
-        - path: /home/core/web
-          overwrite: true
-          user:
-            name: core
-          group:
-            name: core
-          mode: 755
+  # directories:
+  #       - path: /home/core/web
+  #         overwrite: true
+  #         user:
+  #           name: core
+  #         group:
+  #           name: core
+  #         mode: 755

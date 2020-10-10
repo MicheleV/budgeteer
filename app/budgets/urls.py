@@ -18,7 +18,7 @@ urlpatterns = [
          name='expenses_create'),
     # Show all expenses
     path('expenses', views.ExpenseListView.as_view(), name='expenses'),
-    # Show expensece since YYYY-mm
+    # Show expensece for YYYY-mm
     re_path(r'expenses/(?P<start>(19|20)[0-9]{2}-(0[1-9]|1[012]))$',
             views.ExpenseListView.as_view(), name='expenses'),
     # Show expensece between YYYY-mm-dd and YYYY-mm-dd (extremes included)
@@ -101,8 +101,11 @@ urlpatterns = [
     re_path(r'monthly_budgets/(?P<date>(19|20)[0-9]{2}-(0[1-9]|1[012]))$',
             views.MonthlyBudgetListView.as_view(), name='monthly_budgets'),
     path('monthly_budgets/create',
-         views.MonthlyBudgetsCreateView.as_view(),
-         name='monthly_budgets_create'),
+          views.MonthlyBudgetsCreateView.as_view(),
+          name='monthly_budgets_create'),
+    re_path(r'monthly_budgets/create/(?P<date>(19|20)[0-9]{2}-(0[1-9]|1[012])-([0-3][0-9]))/(?P<category>[0-9]*).*$',
+            views.MonthlyBudgetsCreateView.as_view(),
+            name='monthly_budgets_create'),
     path('monthly_budgets/<int:pk>', views.MonthlyBudgetDetailView.as_view(),
          name='monthly_budgets_detail'),
 

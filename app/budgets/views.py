@@ -121,43 +121,42 @@ class ExpenseListView(ListView):
         """Fecth expense data and compute the total for each cateogory."""
         context = super().get_context_data(**kwargs)
         # Using double underscore to avoid collision in the for loop below
-        start, __ = self.start_end()
+        start, _ = self.start_end()
+        start_ymd = start.strftime('%Y-%m-%d')
 
         # Toggle delete buttons
         show_delete = self.request.GET.get('delete', False) == '1'
         context['show_delete'] = show_delete
 
+        monthly_budgets = m.MonthlyBudget.objects.select_related(
+                          'category').filter(date=start, created_by=self.request.user)
+
         expenses = self.profile
+
+        # Get monthly budgets only for categories having expenses in that month
+        exp_aggregates = utils.aggregate_expenses_by_category(expenses, start_ymd)
+
         expenses_sum = 0
         for _ in expenses:
             expenses_sum += _.amount
         context['expenses_sum'] = expenses_sum
 
-        # Get monthly budgets only for categoris having expenses in that month
-        exp_aggregates = utils.aggregate_expenses_by_category(expenses)
-
-        monthly_budgets = m.MonthlyBudget.objects.select_related(
-                          'category').filter(date=start, created_by=self.request.user)
-
-        # FIX ME: do not show budgets if both start and end are not None
-        # Just show the sum!
-
-        # TODO: show the sum even for non-budgeted categories
-
-        # Add budgeted amount to expenses aggregates
-        for _ in monthly_budgets:
-            if _.category.text in exp_aggregates:
-                total = exp_aggregates[_.category.text]
-                exp_aggregates[_.category.text] = {'total': total,
-                                                   'budgeted': _.amount}
-            else:
-                total = _.amount
-                exp_aggregates[_.category.text] = {'total': 0,
-                                                   'budgeted': _.amount}
-        context['exp_aggregates'] = exp_aggregates
-
-        # TODO: add a new route that autofills budgets based on get param
-        # e.g. /monthly_budgets/create?cat_id=32&date=2020-06
+        # NOTE: show budgets only if we do NOT filter by start & end dates
+        #       start is never None, hence we only check for end
+        if self.kwargs.get('end', None) is None:
+            # Add budgeted amount to expenses aggregates
+            for _ in monthly_budgets:
+                if _.category.text in exp_aggregates:
+                    total = exp_aggregates[_.category.text]['total']
+                    exp_aggregates[_.category.text] = {'total': total,
+                                                       'budgeted': _.amount,
+                                                       'category': _.category.id}
+                else:
+                    total = _.amount
+                    exp_aggregates[_.category.text] = {'total': 0,
+                                                       'budgeted': _.amount,
+                                                       'category': _.category.id}
+            context['exp_aggregates'] = exp_aggregates
 
         pie_graph = utils.generate_current_month_expenses_pie_graph(expenses)
         context['pie_graph'] = pie_graph
@@ -189,7 +188,7 @@ class ExpenseDeleteView(DeleteView):  # pylint: disable=R0903; # noqa
 
 @method_decorator(login_required, name='dispatch')
 class MonthlyBudgetsCreateView(CreateView):
-    """Display a Monthly budget."""
+    """Create a Monthly budget."""
 
     model = m.MonthlyBudget
     form_class = f.MonthlyBudgetForm
@@ -198,7 +197,8 @@ class MonthlyBudgetsCreateView(CreateView):
         """Get the data parameter from the URL."""
         initial = super().get_initial()
 
-        initial['date'] = self.request.GET.get('date', None)
+        initial['date'] = self.kwargs.get('date', None)
+        initial['category'] = self.kwargs.get('category', None)
         return initial
 
     def get_form_kwargs(self):
@@ -287,8 +287,7 @@ class GoalListView(ListView):  # pylint: disable=R0903; # noqa
         context = super().get_context_data(**kwargs)
 
         # Toggle delete buttons
-        show_delete = self.request.GET.get('delete', False) == '1'
-        context['show_delete'] = show_delete
+        context['show_delete'] = self.request.GET.get('delete', False) == '1'
         return context
 
 

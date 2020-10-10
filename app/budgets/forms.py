@@ -33,7 +33,7 @@ class CategoryForm(forms.models.ModelForm):
 
 
 class ExpenseForm(forms.models.ModelForm):
-
+    # TODO: fail if amount is 0 or less
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['category'].queryset = m.Category.objects.filter(
@@ -63,7 +63,7 @@ class DeleteExpenseForm(forms.models.ModelForm):
 
 
 class MonthlyBudgetForm(forms.models.ModelForm):
-
+    # TODO: fail if amount is 0 or less
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['category'].queryset = m.Category.objects.filter(created_by=user)
@@ -107,7 +107,7 @@ class IncomeCategoryForm(forms.models.ModelForm):
 
 
 class IncomeForm(forms.models.ModelForm):
-
+    # TODO: fail if amount is 0 or less
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['category'].queryset = m.IncomeCategory.objects.filter(

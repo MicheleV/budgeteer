@@ -173,7 +173,7 @@ class BaseTest(TestCase):
         mb.save()
         return mb
 
-    def create_goal(self, amount, text,note, is_archived=False):
+    def create_goal(self, amount, text, note, is_archived=False):
         """Create a goal"""
         g = m.Goal()
         g.amount = amount

@@ -128,14 +128,24 @@ def find_in_list(_list, item):
         return -1
 
 
-def aggregate_expenses_by_category(data):
-    """WRITE ME."""
+def aggregate_expenses_by_category(data, date=None):
+    """Return an array of dicts with expense sums, which keys are category.text
+
+    - If a date is passed, it will be added to each category expense aggregate
+    - Each dictionary will have a default budgeted key with value 0 and it will
+    also have a date if passed, otherwise date is None
+    """
     results = {}
-    for m_b in filter(lambda y: y.amount > 0, data):
-        if m_b.category.text in results:
-            results[m_b.category.text] += m_b.amount
+    for exp in filter(lambda y: y.amount > 0, data):
+        if exp.category.text in results:
+            results[exp.category.text]['total'] += exp.amount
         else:
-            results[m_b.category.text] = m_b.amount
+            results[exp.category.text] = {
+              'total': exp.amount,
+              'budgeted': 0,
+              'category': exp.category.id,
+              'date': date
+            }
     return results
 
 

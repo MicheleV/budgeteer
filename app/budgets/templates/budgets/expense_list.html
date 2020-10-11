@@ -91,10 +91,10 @@
             {% for key, value in exp_aggregates.items %}
                 <tr class="{% if value.budgeted < value.total %}text-danger{% else %}text-success{% endif %}">
                   <td> {{key}} </td>
-                  {% if value.budgeted is not None %}
+                  {% if value.budgeted > 0 %}
                       <td> {{value.budgeted | intcomma }} </td>
                   {% else %}
-                      <td> <a href="{% url 'budgets:monthly_budgets_create' %}">Create Budget</a> </td>
+                      <td> <a href="{% url 'budgets:monthly_budgets_create' date=value.date category=value.category %}">Create Budget</a> </td>
                   {% endif %}
                   <td> <b>{{value.total | intcomma }}</b> </td>
                 </tr>

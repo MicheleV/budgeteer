@@ -38,10 +38,8 @@ class CategoriesPageTest(BaseTest):
     @BaseTest.login
     def test_save_on_POST(self):
         url = reverse('budgets:categories_create')
-        redirect_url = reverse('budgets:categories')
         text = self.generate_string(10)
-
-        response = self.client.post(url,  data={'text': text})
+        self.client.post(url,  data={'text': text})
 
         self.assertEqual(m.Category.objects.count(), 1)
         new_category = m.Category.objects.first()

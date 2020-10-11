@@ -217,3 +217,31 @@ def users_cant_see_other_users_expenses(tester):
                                      category_name=cat_name, note=note,
                                      should_exist=False)
     Helpers.logout_user(tester)
+
+
+# TODO:write me
+def users_cant_create_expenses_with_other_users_categories(tester):
+    pass
+    # Create user account and log in with it
+    # create category, save the id
+    # create and expense normally
+    # execute the js below
+    # ES6 syntax, should work in recent (2015/2016+ versions) FF and Chromium
+    js_function = 'Array.from(document.getElementsByTagName("option")).forEach(function(item) {item.value = 1});'
+    tester.browser.execute_script(js_function)
+
+    # confirm you can see both expense (i.e. the js works)
+    # log out, create another user account and log in with it
+    # create category
+    # visit expense create page interpolate the previous user's category id in the js
+    # execute the js
+    # submit and confirm that an error is displayed
+
+# TODO:write me
+def users_cant_edit_other_users_expenses(tester):
+    pass
+
+
+# TODO:write me
+def users_cant_delete_other_users_expenses(tester):
+    pass

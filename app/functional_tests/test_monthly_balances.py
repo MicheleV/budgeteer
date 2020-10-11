@@ -64,7 +64,11 @@ def test_check_whether_image_contains_correct_currency(tester):
 def test_check_both_graph_and_right_side_table_are_shown(tester):
     pass
 
-# TODO: add tests for mass creation
+
+# TODO:write me
+def test_can_create_multiple_monthly_balance_at_once(tester):
+    pass
+    # TODO: add tests for mass creation
 
 
 def test_users_cant_see_other_users_balance_categories(tester):
@@ -83,6 +87,16 @@ def test_users_cant_see_other_users_balance_categories(tester):
     Helpers.logout_user(tester)
 
 
+# TODO:write me
+def test_users_cant_edit_other_users_balance_categories(tester):
+    pass
+
+
+# TODO:write me
+def test_users_cant_delete_other_users_balance_categories(tester):
+    pass
+
+
 def test_users_cant_see_other_users_monthly_balance_entry(tester):
     # Frank can create a category to log his balance
     cat_name = Helpers.generate_string()
@@ -96,3 +110,13 @@ def test_users_cant_see_other_users_monthly_balance_entry(tester):
     Helpers.visit_and_verify_categories(tester, cat_name, is_balance=True,
                                         should_exist=False)
     Helpers.logout_user(tester)
+
+
+# TODO:write me
+def test_users_cant_edit_other_users_monthly_balance_entry(tester):
+    pass
+
+
+# TODO:write me
+def test_users_cant_delete_other_users_monthly_balance_entry(tester):
+    pass

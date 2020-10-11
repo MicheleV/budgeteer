@@ -104,10 +104,15 @@ def test_cant_create_multiple_monthly_budgets_for_same_month(tester):
     Helpers.find_error(tester, error)
 
 
-# TODO: add a test to verify the monthly budgets are displayed
-# in date desc order
+# TODO:write me
+def test_can_monhtly_balances_are_displayed_in_date_desc_order(tester):
+    pass
 
-# TODO: add tests for mass creation
+
+# TODO:write me
+def test_can_create_multiple_monhtly_balances_at_once(tester):
+    pass
+    # TODO: add tests for mass creation
 
 
 def test_users_cant_see_other_users_monthly_budgets(tester):

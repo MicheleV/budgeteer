@@ -6,7 +6,7 @@ from datetime import timedelta
 import random
 from unittest import skip
 
-from django.urls import reverse, resolve
+from django.urls import reverse
 import functional_tests.helpers as Helpers
 
 
@@ -26,6 +26,7 @@ def test_cant_create_expenses_without_selecting_a_category(tester):
 @Helpers.register_and_login
 @skip
 def test_expenses_sum_appear_on_home_page(tester):
+    """Check that expenses are showed on the home paege after creation"""
 
     category_name = 'Rent'
     curr_mont_amount = 500
@@ -62,6 +63,7 @@ def test_expenses_sum_appear_on_home_page(tester):
 @Helpers.register_and_login
 @skip
 def test_expenses_page_can_show_old_expenses(tester):
+    """Check that old expenses are shown if a given url is used"""
     text = 'Rent'
     Helpers.create_a_category(tester, category_name=text)
 
@@ -98,6 +100,7 @@ def test_expenses_page_can_show_old_expenses(tester):
 
 @Helpers.register_and_login
 def test_only_expenses_in_range_are_shown(tester):
+    """Check that expenses are correctly filtered when using a given url"""
 
     # Frank creates 2 expenses for January 2020
     text = Helpers.generate_string()
@@ -194,6 +197,7 @@ def test_graph_is_displayed_in_expenses_page_with_only_one_expense(tester):
 
 
 def users_cant_see_other_users_expenses(tester):
+    """Check that the expenses are displayed only for the correct owner"""
     username, password = Helpers.create_user(tester)
 
     # Frank can create a category to log his expenses
@@ -212,36 +216,76 @@ def users_cant_see_other_users_expenses(tester):
     Helpers.logout_user(tester)
 
     # Guido can not see Frank's expense
-    username_2, password_2 = Helpers.create_user(tester)
+    Helpers.create_user(tester)
     Helpers.visit_and_verify_expense(tester, amount=amount,
                                      category_name=cat_name, note=note,
                                      should_exist=False)
     Helpers.logout_user(tester)
 
 
-# TODO:write me
 def users_cant_create_expenses_with_other_users_categories(tester):
-    pass
-    # Create user account and log in with it
-    # create category, save the id
-    # create and expense normally
-    # execute the js below
-    # ES6 syntax, should work in recent (2015/2016+ versions) FF and Chromium
-    js_function = 'Array.from(document.getElementsByTagName("option")).forEach(function(item) {item.value = 1});'
+    """Check that the expenses can not be created with other users's categories
+    """
+    # Frank logs in
+    Helpers.create_user(tester)
+
+    # Frank creates multiple categories
+    for _ in range(3):
+        cat_name = Helpers.generate_string()
+        Helpers.create_a_category(tester, category_name=cat_name, is_income=False)
+        category_id = Helpers.get_category_id_from_category_name(tester, cat_name)
+
+    # Frank confirm the id of the last category he created... he "has a plan"
+    category_id = Helpers.get_category_id_from_category_name(tester, cat_name)
+
+    # Frank knows some javascript, and he tries to fiddle with the form values
+    # ## ES6 syntax, will work in recent (2015/2016+ versions) FF and Chromium
+    js_function = 'Array.from(document.getElementsByTagName("option")).forEach(function(item) {item.value = "X"});'
+    js_function = js_function.replace('X', str(category_id))
     tester.browser.execute_script(js_function)
 
-    # confirm you can see both expense (i.e. the js works)
-    # log out, create another user account and log in with it
-    # create category
-    # visit expense create page interpolate the previous user's category id in the js
-    # execute the js
-    # submit and confirm that an error is displayed
+    amount = random.randint(1, 90000)
+    expense_date = str(date.today())
+    note = Helpers.generate_string()
+
+    # Frank enters some data, he wants to make sure his js does not break the
+    # app
+    # Frank also confirm that even after executing this js, the expense was
+    # created correctly
+    Helpers.create_entry(tester, amount, category_name=cat_name, note=note,
+                         expense_date=expense_date, is_income=False,
+                         verify_creation=True, js_to_execute=js_function)
+
+    # Franks challenges Guido to create an expense with a category he made
+    # Franks share his js script with Guido (Guido does not know any js!)
+
+    # Guido accepts to test out Frank's js and verify the app works correctly
+    Helpers.create_user(tester)
+
+    # Guido creates a category
+    cat_name = Helpers.generate_string()
+    Helpers.create_a_category(tester, category_name=cat_name, is_income=False)
+
+    # Guido enters some data, and execute the js code he got from Frank
+    # If the app is not checking for tampering the form values, this will fail
+    Helpers.create_entry(tester, amount, category_name=cat_name, note=note,
+                         expense_date=expense_date, is_income=False,
+                         verify_creation=False, js_to_execute=js_function)
+
+    # Guido confirms the app is not deceived by this trivial attack
+    Helpers.visit_and_verify_expense(tester, amount=amount,
+                                     category_name=cat_name, note=note,
+                                     should_exist=False)
+
 
 # TODO:write me
 def users_cant_edit_other_users_expenses(tester):
+    """Check that the expenses can not be edited to use other users's categories
+    """
     pass
 
 
 # TODO:write me
 def users_cant_delete_other_users_expenses(tester):
+    """Check that only the expenses owner can delete them"""
     pass

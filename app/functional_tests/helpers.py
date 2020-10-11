@@ -22,7 +22,7 @@ locale.setlocale(locale.LC_ALL, '')
 MAX_DELAY = 3
 
 
-# TODO: duplicate code from unit tests
+# TODO: this is duplicate code from unit tests
 def generate_string(length=10):
     """Generate a random string of a given length"""
     char = string.ascii_lowercase
@@ -240,6 +240,30 @@ def create_a_category(tester, category_name,
                                     is_balance=is_balance)
 
 
+def get_category_id_from_category_name(tester, category_name, is_income=False,
+                                       is_balance=False):
+    """
+    Find the categories id for a given the text
+
+    This does not work if the said category is not in the first page"""
+    if is_income:
+        url = reverse('budgets:income_categories')
+    elif is_balance:
+        url = reverse('budgets:monthly_balance_categories')
+    else:
+        url = reverse('budgets:categories')
+    tester.browser.get(f"{tester.live_server_url}{url}")
+
+    table = tester.browser.find_element_by_id('id_categories')
+
+    rows = table.find_elements_by_tag_name('tr')
+    for row in rows:
+        if category_name in row.text:
+            # Expected format for row text "'<id> <category_name>'"
+            return int(row.text.replace(category_name, '').strip())
+    return None
+
+
 def create_a_monthly_budget(tester, category_name, amount, date,
                             create_check=True):
     # Frank visits the monthly expenses page
@@ -276,13 +300,18 @@ def create_a_monthly_budget(tester, category_name, amount, date,
 
 # TODO: is_income is making the logic complex, refactor
 def create_entry(tester, amount, category_name, note, expense_date,
-                 is_income=False, verify_creation=True):
+                 is_income=False, verify_creation=True, js_to_execute=None):
     # Frank visits the expenses page
     url = reverse('budgets:expenses_create')
     if is_income:
         url = reverse('budgets:incomes_create')
 
     tester.browser.get(f"{tester.live_server_url}{url}")
+
+    if js_to_execute:
+        # Franks manually edits the form option values (Frank know some js)
+        tester.browser.execute_script(js_to_execute)
+
     # Frank sees an input box
     inputbox = tester.browser.find_element_by_id('id_amount')
     # Frank inputs the price of the expense item
@@ -394,13 +423,13 @@ def verify_expense_was_created(tester, amount, category_name, note):
 
 
 def visit_and_verify_expense(tester, amount, category_name, note,
-                             should_exist):
+                             should_exist):  # FIX ME: what should be should_exist default value?
     formatted_amount = f'{amount:,}'
     check_url = url = reverse('budgets:expenses')
     tester.browser.get(f"{tester.live_server_url}{url}")
 
     if should_exist:
-        verify_expense_was_created(tester, amount, category_name, note)
+        verify_expense_was_created(tester, formatted_amount, category_name, note)
     else:
         table = tester.browser.find_element_by_id('id_expenses')
         assert_text_is_not_inside_table(tester, category_name, table)

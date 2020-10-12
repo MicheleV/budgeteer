@@ -11,7 +11,7 @@ import functional_tests.helpers as Helpers
 # http://example.com/<route-name>?format=json&json=true'
 @Helpers.register_and_login
 def test_create_and_retrieve_categories(tester):
-
+    """Check that creation and retrival of categories works correctly"""
     # Frank can create a category to log his food expenses
     Helpers.create_a_category(tester, 'Food')
 
@@ -44,6 +44,7 @@ def test_create_and_retrieve_categories(tester):
 
 
 def test_users_can_not_see_other_users_categories(tester):
+    """Check that only current user categories are returned (in json format)"""
     # Frank can create a category to log his expenses
     cat_name = Helpers.generate_string()
 

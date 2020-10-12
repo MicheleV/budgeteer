@@ -15,13 +15,16 @@
   <body>
     <div class="container-fluid">
       <h2>Signup Page</h2>
+      <div class="alert alert-warning" role="alert">
+        This view has not style applied to it :O
+        <br>Feel free to open a PR <a href="https://gitlab.com/micheleva/budgeteer">upstream</a> if you think you can help out :)
+      </div>
       <form method="post">
           {% csrf_token %}
           {{ form.as_p }}
           <button type="submit">Register</button>
           <br><br>
           <a href="{% url 'budgets:landing_page' %}">Home</a>
-          <a href="https://gitlab.com/micheleva/budgeteer/-/merge_requests/new" >Give me stome styling</a>
       </form>
     </div>
 

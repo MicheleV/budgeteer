@@ -31,12 +31,16 @@ class FunctionalTest(LiveServerTestCase):
 
     # Setup
     @classmethod
-    def setUpClass(self):  # pylint: disable=C0103; # noqa
+    def setUpClass(self):  # pylint: disable=C0103,C0202; # noqa
         super().setUpClass()
         self.setup_browser(self.BROWSER, self.HEADLESS)
 
     @classmethod
-    def setup_browser(self, browser="Firefox", headless=True):
+    def setup_browser(self, browser="Firefox", headless=True):  # pylint: disable=C0202; # noqa
+        """Initialize the browser
+
+        This browser instance is re-used for all tests in order to improve
+        functional tests speed, as this operation is very expensive"""
         if browser == "Firefox":
             options = Options()
             if headless:
@@ -60,7 +64,7 @@ class FunctionalTest(LiveServerTestCase):
             self.live_server_url = f"http://{test_target}"
 
     @classmethod
-    def tearDownClass(self):  # pylint: disable=C0103; # noqa
+    def tearDownClass(self):  # pylint: disable=C0103,C0202; # noqa
         super().setUpClass()
         self.browser.quit()
 
@@ -71,26 +75,34 @@ class FunctionalTest(LiveServerTestCase):
                 if callable(test_function):
                     # TODO: this will print function decorated with @skip as
                     # well even if they are not actually called
-                    print(f"Calling {module.__name__}.{name}")
+                    print(f"Calling {module.__name__}.{name}")  # pylint: disable=E1101; # noqa
                     test_function(tester)
 
     def test_categories(tester):
+        """Execute functional tests related to all Categories"""
         FunctionalTest._call_each_method_in_module(Categories, tester)
 
     def test_expenses(tester):
+        """Execute functional tests related to Expenses"""
         FunctionalTest._call_each_method_in_module(Expenses, tester)
 
     def test_monthly_budgets(tester):
+        """Execute functional tests related to monthly budgets"""
         FunctionalTest._call_each_method_in_module(MBudgets, tester)
 
     def test_monthly_balances(tester):
+        """Execute functional tests related to monthly balances"""
         FunctionalTest._call_each_method_in_module(MonthlyBalances, tester)
 
     def test_access(tester):
+        """Execute functional tests to ensure all the pages in the nav are
+        accessibles"""
         FunctionalTest._call_each_method_in_module(PageAccess, tester)
 
     def test_views_and_layout(tester):
+        """Execute functional tests to confirm style is applied correctly"""
         FunctionalTest._call_each_method_in_module(ViewAndLayout, tester)
 
-    def test_api(tester):
+    def test_api(tester):  # TODO: this should be moved to the api own module
+        """Execute tests for the API app"""
         FunctionalTest._call_each_method_in_module(API, tester)

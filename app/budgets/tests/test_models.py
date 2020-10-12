@@ -90,8 +90,8 @@ class ModelsTest(BaseTest):
           date='2019-09-04'
         )
 
-        saved_category = m.Category.objects.first()
-        saved_expenses = m.Expense.objects.all()
+        saved_category = m.Category.objects.first()  # pylint: disable=E1101; # noqa
+        saved_expenses = m.Expense.objects.all()  # pylint: disable=E1101; # noqa
         saved_item_1 = saved_expenses[0]
         saved_item_2 = saved_expenses[1]
 
@@ -123,8 +123,8 @@ class ModelsTest(BaseTest):
           date='2019-09-10'
         )
 
-        saved_category = m.IncomeCategory.objects.first()
-        saved_expenses = m.Income.objects.all()
+        saved_category = m.IncomeCategory.objects.first()  # pylint: disable=E1101; # noqa
+        saved_expenses = m.Income.objects.all()  # pylint: disable=E1101; # noqa
         saved_item_1 = saved_expenses[0]
         saved_item_2 = saved_expenses[1]
 
@@ -299,8 +299,8 @@ class ModelsTest(BaseTest):
           date='2019-09-01'
         )
 
-        saved_category = m.Category.objects.first()
-        saved_budgets = m.MonthlyBudget.objects.all()
+        saved_category = m.Category.objects.first()  # pylint: disable=E1101; # noqa
+        saved_budgets = m.MonthlyBudget.objects.all()  # pylint: disable=E1101; # noqa
         first_saved_item = saved_budgets[0]
         second_saved_item = saved_budgets[1]
 

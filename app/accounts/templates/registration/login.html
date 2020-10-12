@@ -15,6 +15,10 @@
   <body>
     <div class="container-fluid">
         <h2>Login Page</h2>
+        <div class="alert alert-warning" role="alert">
+          This view has not style applied to it :O
+          <br>Feel free to open a PR <a href="https://gitlab.com/micheleva/budgeteer">upstream</a> if you think you can help out :)
+        </div>
         <form method="post">
             {% csrf_token %}
             {{form.as_p}}
@@ -22,7 +26,6 @@
         </form>
 
         <a href="{% url 'budgets:landing_page' %}">Back</a>
-        <a href="https://gitlab.com/micheleva/budgeteer/-/merge_requests/new" >Open a PR to give me stome styling</a>
     </div>
 
     <div class="col-md-12">

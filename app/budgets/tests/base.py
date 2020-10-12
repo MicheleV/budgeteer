@@ -70,7 +70,7 @@ class BaseTest(TestCase):
         text = self.generate_string(50)
         pwd = self.generate_string(10)
         # TODO: convert date to unix timestamp instead
-        username = self.generate_string(10) + str(datetime.now())
+        username = self.generate_string(10) + str(datetime.now().timestamp())
         self.user = User.objects.create_user(
             username=username, password=pwd)
         self.credentials = {'username': username, 'password': pwd}
@@ -173,7 +173,7 @@ class BaseTest(TestCase):
         mb.save()
         return mb
 
-    def create_goal(self, amount, text,note, is_archived=False):
+    def create_goal(self, amount, text, note, is_archived=False):
         """Create a goal"""
         g = m.Goal()
         g.amount = amount

@@ -192,6 +192,6 @@ See `COPYING <COPYING>`_ to see the full text.
    :target: COPYING
    :alt: Repository License
 
-.. |Coverage| image:: https://img.shields.io/badge/coverage-82%25-yellow
+.. |Coverage| image:: https://img.shields.io/badge/coverage-85%25-yellow
    :target: README.rst
    :alt: Code Coverage

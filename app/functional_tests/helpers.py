@@ -2,7 +2,7 @@
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # Docs at https://selenium-python.readthedocs.io/waits.html
-from datetime import date
+from datetime import date, datetime
 from datetime import timedelta
 from functools import wraps
 import locale
@@ -115,8 +115,7 @@ def register_and_login(func):
 def create_user(tester, username=None, password=None):
     """Sign up, and automatically log in as said user"""
     if not username:
-        # TODO: add unix timestamp just to avoid collision even more
-        username = generate_string()
+        username = generate_string() + str(datetime.now().timestamp())
     if not password:
         password = generate_string()
 

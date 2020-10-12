@@ -38,7 +38,7 @@ class HomePageTest(BaseTest):
 class CategoriesPageTest(BaseTest):
     """Unit tests related to the categories pages"""
     @BaseTest.login
-    def test_save_on_POST(self):
+    def test_save_on_post(self):
         url = reverse('budgets:categories_create')
         text = self.generate_string(10)
         self.client.post(url,  data={'text': text})
@@ -48,7 +48,7 @@ class CategoriesPageTest(BaseTest):
         self.assertEqual(new_category.text, text)
 
     @BaseTest.login
-    def test_redirect_on_POST(self):
+    def test_redirect_on_post(self):
         url = reverse('budgets:categories_create')
         redirect_url = reverse('budgets:categories')
         text = self.generate_string(10)
@@ -65,6 +65,7 @@ class CategoriesPageTest(BaseTest):
 
     # def test_uses_correct_view(self):
     #     self.check_if_correct_view('categories', v.categories_page)
+
     @BaseTest.login
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('budgets:categories')
@@ -73,6 +74,7 @@ class CategoriesPageTest(BaseTest):
     # def test_uses_category_form(self):
     #     response = self.get_response_from_named_url('budgets:categories')
     #     self.assertIsInstance(response.context['form'], f.CategoryForm)
+
     @BaseTest.login
     def test_save_and_retrieve_categories(self):
         """Checks creation and retrieval of categories"""
@@ -134,9 +136,9 @@ class CategoriesPageTest(BaseTest):
 
 
 class MonthlyBudgetPageTest(BaseTest):
-
+    """Unit tests related to monthly budget pages"""
     @BaseTest.login
-    def test_save_and_redirect_on_POST(self):
+    def test_save_and_redirect_on_post(self):
         text = self.generate_string(10)
         cat = self.create_category(text)
 
@@ -175,6 +177,7 @@ class MonthlyBudgetPageTest(BaseTest):
     # def test_uses_category_form(self):
     #     response = self.get_response_from_named_url('budgets:monthly_budgets')
     #     self.assertIsInstance(response.context['form'], f.MonthlyBudgetForm)
+
     @BaseTest.login
     def test_save_and_retrieve_monthly_budget(self):
         text1 = self.generate_string(10)
@@ -246,7 +249,7 @@ class MonthlyBudgetPageTest(BaseTest):
         self.assertNotContains(response, category_text)
 
         # Note: we redirect to the creation page on success
-        redirect_url = url = reverse('budgets:monthly_budgets_create')  # FIXME
+        url = reverse('budgets:monthly_budgets_create')  # FIXME
 
         # The second user can't user first user's category
         amount = random.randint(1, 90000)
@@ -265,9 +268,9 @@ class MonthlyBudgetPageTest(BaseTest):
 
 
 class ExpensesPageTest(BaseTest):
-
+    """Unit tests related to the expenses pages"""
     @BaseTest.login
-    def test_save_and_redirect_on_POST(self):
+    def test_save_and_redirect_on_post(self):
         text = self.generate_string(10)
         cat = self.create_category(text)
 
@@ -341,7 +344,7 @@ class ExpensesPageTest(BaseTest):
         exp2 = self.create_expense(category, 100, text_3, date)
 
         url = f"{reverse('budgets:expenses')}?delete=1"
-        response = second_response = self.client.get(url)
+        response = self.client.get(url)
 
         form = f"form method=\"POST\" action=\"/expenses/delete/{exp.id}\""
         form2 = f"form method=\"POST\" action=\"/expenses/delete/{exp2.id}\""
@@ -356,7 +359,7 @@ class ExpensesPageTest(BaseTest):
         text_2 = self.generate_string(10)
         category = self.create_category(text)
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
-        exp = self.create_expense(category, 100, text_2, date)
+        self.create_expense(category, 100, text_2, date)
 
         url = f"{reverse('budgets:expenses')}?delete=0"
         response = self.client.get(url)
@@ -391,8 +394,8 @@ class ExpensesPageTest(BaseTest):
         note = self.generate_string(10)
         amount = random.randint(1, 90000)
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
-        expense = self.create_expense(category=category, amount=amount,
-                                      note=note, date=date)
+        self.create_expense(category=category, amount=amount,
+                            note=note, date=date)
 
         # Current user: can see it
         response = self.get_response_from_named_url('budgets:expenses')
@@ -442,7 +445,7 @@ class ExpensesPageTest(BaseTest):
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
 
         response = self.client.post(url,  data={'amount': amount, 'date': date,
-                                    'category': second_category.id, 'note': note})
+                                    'category': second_category.id, 'note': note})  # pylint: disable=E1101; # noqa
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
@@ -462,9 +465,9 @@ class ExpensesPageTest(BaseTest):
 
 
 class IncomeCategoriesPageTest(BaseTest):
-
+    """Unit tests related to the income categories pages"""
     @BaseTest.login
-    def test_save_on_POST(self):
+    def test_save_on_post(self):
         url = reverse('budgets:income_categories_create')
         text = self.generate_string(10)
         self.client.post(url,  data={'text': text})
@@ -473,7 +476,7 @@ class IncomeCategoriesPageTest(BaseTest):
         self.assertEqual(i_c.text, text)
 
     @BaseTest.login
-    def test_redirect_on_POST(self):
+    def test_redirect_on_post(self):
         url = reverse('budgets:income_categories_create')
         redirect_url = reverse('budgets:income_categories')
         text = self.generate_string(10)
@@ -495,10 +498,40 @@ class IncomeCategoriesPageTest(BaseTest):
     #     self.check_if_correct_view('income_categories',
     #                                v.income_categories_page)
     #     response = self.get_response_from_named_url('budgets:income_categories')
+
     @BaseTest.login
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('budgets:income_categories')
         self.assertTemplateUsed(response, 'budgets/incomecategory_list.html')
+
+    @BaseTest.login
+    def test_correct_success_url(self):
+        """Check if the success_url returned by the view is correct"""
+        text = self.generate_string(10)
+        url = reverse("budgets:income_categories_create")
+        redirect_url = reverse("budgets:income_categories")
+
+        # As seen from the client
+        response = self.client.post(url,  data={'text': text})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, redirect_url)
+
+        # As seen from the View
+        url = reverse('budgets:categories_create')
+        resolve(url)  # TODO: do we really need this line?
+
+        factory = RequestFactory()
+        data = {text: self.generate_string(10)}
+        username = self.generate_string(10)
+        password = self.generate_string(10)
+        request = factory.post(url, data)
+        request.user = User.objects.create_user(
+            username=username, password=password)
+        view = v.CategoryCreateView.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(v.IncomeCategoryCreateView.get_success_url(request),
+                         redirect_url)
 
     def test_displays_only_current_user_income_categories(self):
         # Note: _sign_up() is executed on BaseTest.setUp()
@@ -520,9 +553,9 @@ class IncomeCategoriesPageTest(BaseTest):
 
 
 class IncomePageTest(BaseTest):
-
+    """Unit tests related to the Income pages"""
     @BaseTest.login
-    def test_save_and_redirect_on_POST(self):
+    def test_save_and_redirect_on_post(self):
         text = self.generate_string(10)
         cat = self.create_income_category(text)
 
@@ -539,7 +572,7 @@ class IncomePageTest(BaseTest):
         self.assertEqual(inc.date.strftime("%Y-%m-%d"), date)
         self.assertEqual(inc.category.id, cat.id)
 
-        # Merged test_redirect_on_POST(self)
+        # Merged test_redirect_on_post(self)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
 
@@ -553,6 +586,7 @@ class IncomePageTest(BaseTest):
     # def test_uses_correct_view(self):
     #     self.check_if_correct_view('incomes', v.incomes_page)
     #     response = self.get_response_from_named_url('budgets:incomes')
+
     @BaseTest.login
     def test_uses_correct_template(self):
         response = self.get_response_from_named_url('budgets:incomes')
@@ -666,9 +700,9 @@ class IncomePageTest(BaseTest):
 
 
 class MonthlyBalanceCategoriesTest(BaseTest):
-
+    """Unit tests related to the monhtly balance categories pages"""
     @BaseTest.login
-    def test_save_on_POST(self):
+    def test_save_on_post(self):
         url = reverse('budgets:new_monthly_balance_category')
         text = self.generate_string(10)
         self.client.post(url,  data={'text': text})
@@ -678,7 +712,7 @@ class MonthlyBalanceCategoriesTest(BaseTest):
         self.assertEqual(m_b.text, text)
 
     @BaseTest.login
-    def test_redirect_on_POST(self):
+    def test_redirect_on_post(self):
         url = reverse('budgets:new_monthly_balance_category')
         text = self.generate_string(10)
 
@@ -754,9 +788,9 @@ class MonthlyBalanceCategoriesTest(BaseTest):
 
 
 class MonthlyBalanceTest(BaseTest):
-
+    """Unit tests related to the monthly balances pages"""
     @BaseTest.login
-    def test_save_and_redirect_on_POST(self):
+    def test_save_and_redirect_on_post(self):
         text = self.generate_string(10)
         cat = self.create_monthly_balance_category(text)
 
@@ -770,7 +804,7 @@ class MonthlyBalanceTest(BaseTest):
         exp = m.MonthlyBalance.objects.first()  # pylint: disable=E1101; # noqa
         date = exp.date.strftime('%Y-%m-%d')
 
-        # Merged test_redirect_on_POST(self)
+        # Merged test_redirect_on_post(self)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
 
@@ -798,33 +832,60 @@ class MonthlyBalanceTest(BaseTest):
 
     # TODO: write me
     def test_delete_button_missing_without_param(self):
+        """Confirm delete buttons are shown when delete=True is in the url"""
         pass
 
     @BaseTest.login
-    def test_delete_on_POST(self):
+    def test_delete_on_post(self):
+        """Test monthly balance deletion"""
         text = self.generate_string(10)
         self.create_monthly_balance_category(text)
         new_category = m.MonthlyBalanceCategory.objects.first()  # pylint: disable=E1101; # noqa
         date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
-        mb = self.create_monthly_balance(new_category, 42000, date)
+        m_b = self.create_monthly_balance(new_category, 42000, date)
 
-        show_delete = True
         redirect_url = reverse('budgets:monthly_balances')
-        arg = {'pk': mb.id}
+        arg = {'pk': m_b.id}  # pylint: disable=E1101; # noqa
         response = self.get_response_from_named_url(
                   'budgets:monthly_balances_delete', arg)
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], redirect_url)
 
-        mb = m.MonthlyBalance.objects.all()  # pylint: disable=E1101; # noqa
-        self.assertEqual(mb.count(), 0)
+        m_b = m.MonthlyBalance.objects.all()  # pylint: disable=E1101; # noqa
+        self.assertEqual(m_b.count(), 0)
 
     @BaseTest.login
     def test_title_is_displayed(self):
         """Check the view title"""
         self.check_if_title_is_displayed('budgets:monthly_balances',
                                          'Monthly Balances')
+
+    @BaseTest.login
+    def test_update_on_post(self):
+        cat_text = self.generate_string(10)
+        m_b_c = self.create_monthly_balance_category(cat_text)
+
+        amount = random.randint(1, 90000)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        m_b = self.create_monthly_balance(m_b_c, amount, date)
+
+        self.assertEqual(m.MonthlyBalance.objects.all().count(), 1)  # pylint: disable=E1101; # noqa
+
+        new_amount = random.randint(1, 90000)
+
+        url = reverse('budgets:edit_monthly_balance', kwargs={'pk': m_b.id})
+        response = self.client.post(url, data={'amount': new_amount,
+                                    'date': date, 'category': m_b_c.id})
+
+        redirect_url = reverse('budgets:monthly_balances')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], redirect_url)
+
+        m_b_all = m.MonthlyBalance.objects  # pylint: disable=E1101; # noqa
+        self.assertEqual(m_b_all.all().count(), 1)
+        m_b_updated = m_b_all.first()
+        self.assertEqual(m_b_updated.amount, new_amount)
 
     # TODO: comment out as we can't compare functions with assertEquals().
     # Need some looking up
@@ -852,13 +913,13 @@ class MonthlyBalanceTest(BaseTest):
 
         # Current user can see it
         # response = self.get_response_from_named_url('budgets:monthly_balances')
-        mb = m.MonthlyBalance.objects.first()  # pylint: disable=E1101; # noqa
+        m_b = m.MonthlyBalance.objects.first()  # pylint: disable=E1101; # noqa
 
         # Check amount in summary page
         response = self.get_response_from_named_url('budgets:monthly_balances')
         self.assertContains(response, '{:,}'.format(amount))
 
-        url = utils.append_year_and_month_to_url(mb, 'monthly_balances')
+        url = utils.append_year_and_month_to_url(m_b, 'monthly_balances')
         response = self.client.get(url)
 
         # Check both text and amount in detailed page
@@ -871,19 +932,41 @@ class MonthlyBalanceTest(BaseTest):
         response = self.get_response_from_named_url('budgets:monthly_balances')
         self.assertNotContains(response, '{:,}'.format(amount))
 
-        url = utils.append_year_and_month_to_url(mb, 'monthly_balances')
+        url = utils.append_year_and_month_to_url(m_b, 'monthly_balances')
         response = self.client.get(url)
         self.assertNotContains(response, text)
         self.assertNotContains(response, '{:,}'.format(amount))
         self._logout()
 
-    def test_cant_use_other_uers_balance_categories_for_monthly_balance(self):
+    def test_cant_use_other_users_categories_for_monthly_balance(self):
         """Confirm ownership filter works correctly"""
-        pass
+
+        # Note: _sign_up() is executed on BaseTest.setUp()
+        self._login()
+        text = self.generate_string(10)
+        category = self.create_monthly_balance_category(text)
+
+        # Confirm it is created
+        response = self.get_response_from_named_url('budgets:monthly_balance_categories')
+        self.assertContains(response, text)
+        self._logout()
+
+        # Create and login as another user
+        self.signup_and_login()
+        # Second user can not create expenses using First user's category
+        expected_error_msg = 'Select a valid choice. That choice is not one of the available choices'
+        amount = random.randint(1, 90000)
+        date = datetime.date.today().replace(day=1).strftime("%Y-%m-%d")
+        url = reverse('budgets:monthly_balances_create')
+
+        response = self.client.post(url,  data={'amount': amount, 'date': date,
+                                    'category': category.id})  # pylint: disable=E1101; # noqa
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, expected_error_msg)
 
 
 class GoalPageTest(BaseTest):
-
+    """Unit tests related to the goals pages"""
     @BaseTest.login
     def test_title_is_displayed(self):
         """Check the view title"""
@@ -891,7 +974,7 @@ class GoalPageTest(BaseTest):
                                          'Goals')
 
     @BaseTest.login
-    def test_save_on_POST(self):
+    def test_save_on_post(self):
         url = reverse('budgets:goals_create')
         text = self.generate_string(10)
         amount = random.randint(1, 90000)
@@ -905,7 +988,7 @@ class GoalPageTest(BaseTest):
         self.assertEqual(new_goals.amount, amount)
 
     @BaseTest.login
-    def test_redirect_on_POST(self):
+    def test_redirect_on_post(self):
         url = reverse('budgets:goals_create')
         text = self.generate_string(10)
         note = self.generate_string(10)
@@ -940,7 +1023,7 @@ class GoalPageTest(BaseTest):
         self.assertNotContains(response, '{:,}'.format(amount))
 
     @BaseTest.login
-    def test_delete_on_POST(self):
+    def test_delete_on_post(self):
         redirect_url = reverse('budgets:goals')
         text = self.generate_string(10)
         note = self.generate_string(10)
@@ -960,7 +1043,7 @@ class GoalPageTest(BaseTest):
         self.assertEqual(goals.count(), 0)
 
     @BaseTest.login
-    def test_update_on_POST(self):
+    def test_update_on_post(self):
         text = self.generate_string(10)
         note = self.generate_string(10)
         amount = random.randint(1, 90000)

@@ -150,12 +150,14 @@ class ExpenseListView(ListView):
                     total = exp_aggregates[_.category.text]['total']
                     exp_aggregates[_.category.text] = {'total': total,
                                                        'budgeted': _.amount,
-                                                       'category': _.category.id}
+                                                       'category': _.category.id,
+                                                       'date': start_ymd}
                 else:
                     total = _.amount
                     exp_aggregates[_.category.text] = {'total': 0,
                                                        'budgeted': _.amount,
-                                                       'category': _.category.id}
+                                                       'category': _.category.id,
+                                                       'date': start_ymd}
             context['exp_aggregates'] = exp_aggregates
 
         pie_graph = utils.generate_current_month_expenses_pie_graph(expenses)

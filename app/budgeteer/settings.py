@@ -65,9 +65,9 @@ if 'y' in os.getenv("DJANGO_DEBUG_MODE"):
     MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
     # IPS able to see debug tools inside views
-    INTERNAL_IPS = [
-        '127.0.0.1',
-    ]
+    # FIXME: This will show the toolbar to the whole world when DEBUG is on!!!!
+    # Credits: https://stackoverflow.com/a/49818040/2535658
+    INTERNAL_IPS = type(str('c'), (), {'__contains__': lambda *a: True})()
 
     DEBUG_TOOLBAR_PANELS = [
       'debug_toolbar.panels.versions.VersionsPanel',

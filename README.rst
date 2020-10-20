@@ -161,7 +161,10 @@ Backup data:
 ---------------------
 Dump the postgres content to a file::
 
-     docker exec -it --user root  budgeteer_web_1 pg_dump -h db -d budgeteer_db -U <db-user>  --data-only -W > data_only.sql
+     docker-compose exec web sh
+     # Inside the container
+     pg_dump -h db -d budgeteer_db -U <db-user>  --data-only -W > data_only.sql
+     # From the host
      docker cp budgeteer_web_1:/home/app/web/data_only.sql .
 
 Restore data:

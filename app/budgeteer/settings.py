@@ -98,12 +98,12 @@ if 'y' in os.getenv("DJANGO_DEBUG_MODE"):
         },
         'root': {
             'handlers': ['console'],
-            'level': 'WARNING',
+            'level': 'DEBUG',
         },
         'loggers': {
             'django': {
                 'handlers': ['console'],
-                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
                 'propagate': False,
             },
         },

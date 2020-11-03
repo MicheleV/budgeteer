@@ -43,3 +43,4 @@ services:
 volumes:
   postgres_data:
   static_volume:
+  # add volume for pgadmin, so that it saves credentials for the db

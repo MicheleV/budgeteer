@@ -177,6 +177,10 @@ Inject the data(execute from inside the web container, as it requires manual pwd
 
     psql -h db -U budgeteer_user -d budgeteer_db < data.sql
 
+Force gunicorn to print inside container:
+---------------------
+    print("<result-to-print>", flush=True)
+
 
 Author
 =======

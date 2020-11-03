@@ -201,9 +201,10 @@ def get_goals_and_time_to_completions(current_mb_total, two_months_diff):
             diff = goal.amount - current_mb_total
             try:
                 months_to_go = diff / two_months_diff
+                goal.months_to_go = math.ceil(months_to_go)
             except ZeroDivisionError:
-                months_to_go = 0
-            goal.months_to_go = math.ceil(months_to_go)
+                # Handle the case where two last months have the same balance
+                goal.months_to_go = None
     return goals
 
 

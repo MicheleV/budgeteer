@@ -51,7 +51,7 @@
                 <td>{{ goal.text }}</td>
                 <td>{{ currency}} {{ goal.amount | intcomma }}</td>
                 {% if goal.months_to_go is None %}
-                  <td class="text-danger">Negative balance: N/A</td>
+                  <td class="text-danger">Negative or static balance: N/A</td>
                 {% elif goal.months_to_go > 0 %}
                   <td>{{ goal.months_to_go }}</td>
                 {% else %}

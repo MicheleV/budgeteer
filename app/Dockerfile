@@ -53,7 +53,7 @@ COPY . $APP_HOME
 RUN chown -R app:app $APP_HOME
 # Avoid permission issues on /static from nginx container
 RUN chmod -R 755 $APP_HOME/static
-# FIXME: We should have a share uid:guid between containers instead of using 755
+# FIXME: We should have a shard uid:guid between containers instead of using 755
 # example: https://github.com/rowdybeaver/sample-django-docker/blob/master/Dockerfile
 
 USER app

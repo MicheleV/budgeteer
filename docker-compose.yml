@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   web:
+    hostname: web
     build: ./app
     command: gunicorn budgeteer.wsgi:application --bind "0.0.0.0:8000"
     volumes: # TODO: find out why fedoraCoreOS needs this syntax for nginx to read files correctly
@@ -16,12 +17,14 @@ services:
       - db
   # FIXME: we're running the container as root :O
   db:
+    hostname: db
     image: postgres:12.0-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./app/.env
   nginx:
+    hostname: nginx
     build: ./nginx
     volumes:
       - static_volume:/home/app/web/static
@@ -32,6 +35,7 @@ services:
     restart: unless-stopped
 
   pgadmin4:
+    hostname: pgadmin4
     image: dpage/pgadmin4:latest
     container_name: pgadmin4
     ports:

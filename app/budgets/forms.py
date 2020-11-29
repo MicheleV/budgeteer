@@ -1,13 +1,7 @@
 # Copyright: (c) 2019, Michele Valsecchi <https://github.com/MicheleV>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-import datetime
-
 from django import forms
-
-from budgets.models import Category
-from budgets.models import Expense
-from budgets.models import MonthlyBudget
 import budgets.models as m
 
 
@@ -36,7 +30,7 @@ class ExpenseForm(forms.models.ModelForm):
     # TODO: fail if amount is 0 or less
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['category'].queryset = m.Category.objects.filter(
+        self.fields['category'].queryset = m.Category.objects.filter(  # pylint: disable=E1101; # noqa
                                            created_by=user)
 
     class Meta:
@@ -66,7 +60,7 @@ class MonthlyBudgetForm(forms.models.ModelForm):
     # TODO: fail if amount is 0 or less
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['category'].queryset = m.Category.objects.filter(created_by=user)
+        self.fields['category'].queryset = m.Category.objects.filter(created_by=user)  # pylint: disable=E1101; # noqa
 
     class Meta:
         model = m.MonthlyBudget
@@ -110,7 +104,7 @@ class IncomeForm(forms.models.ModelForm):
     # TODO: fail if amount is 0 or less
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['category'].queryset = m.IncomeCategory.objects.filter(
+        self.fields['category'].queryset = m.IncomeCategory.objects.filter(  # pylint: disable=E1101; # noqa
                                            created_by=user)
 
     class Meta:
@@ -151,7 +145,7 @@ class MonthlyBalanceForm(forms.models.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['category'].queryset = m.MonthlyBalanceCategory.objects.filter(
+        self.fields['category'].queryset = m.MonthlyBalanceCategory.objects.filter(  # pylint: disable=E1101; # noqa
                                            created_by=user)
 
     class Meta:

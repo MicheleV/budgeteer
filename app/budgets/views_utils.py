@@ -32,7 +32,7 @@ def get_total_of_monthly_balances(date, user):
     Return the sum of the monthly balances date/user combination passed as args
     """
     rate = int(os.getenv("EXCHANGE_RATE"))
-    balances = m.MonthlyBalance.objects.select_related('category').filter(date=date, created_by=user)
+    balances = m.MonthlyBalance.objects.select_related('category').filter(date=date, created_by=user)  # pylint: disable=E1101; # noqa
     return balances.aggregate(correct_sum=Sum(Case(
       When(category__is_foreign_currency=False, then='amount'),
       When(category__is_foreign_currency=True, then=F('amount') * rate)
@@ -189,7 +189,7 @@ def get_goals_and_time_to_completions(current_mb_total, two_months_diff):
     Returns non archived goals with how many months will it take to complete
     """
     # Display bar graph (only draw "active" goals)
-    goals = m.Goal.objects.filter(is_archived=False)
+    goals = m.Goal.objects.filter(is_archived=False)  # pylint: disable=E1101; # noqa
     # Calculate time to complete each goal given the last two months difference
     for goal in goals:
         if current_mb_total >= goal.amount:
@@ -212,7 +212,7 @@ def get_month_balance_stats(date, rate, user):
     """
     Return monthly balances and their sum (adjusted to local currency)
     """
-    prev_mb = m.MonthlyBalance.objects.select_related('category').filter(
+    prev_mb = m.MonthlyBalance.objects.select_related('category').filter(  # pylint: disable=E1101; # noqa
               date=date, created_by=user).order_by('category_id')
     total = 0
     for mv in prev_mb:

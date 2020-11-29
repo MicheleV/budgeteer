@@ -4,9 +4,18 @@
 from rest_framework import serializers
 
 from budgets.models import Category
+from budgets.models import Expense
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'text']
+
+
+class ExpenseSerializer(serializers.HyperlinkedModelSerializer):
+    category_text = serializers.CharField(source='category.text')
+
+    class Meta:
+        model = Expense
+        fields = ['id', 'amount', 'category_id', 'category_text', 'note', 'date']

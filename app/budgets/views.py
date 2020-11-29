@@ -63,7 +63,7 @@ class CategoryListView(ListView):  # pylint: disable=R0903; # noqa
 
     def get_queryset(self):
         """Retrieve object owned by the current logged in user."""
-        return m.Category.objects.filter(created_by=self.request.user).order_by('id')  # pylint: disable=E501; # noqa
+        return m.Category.objects.filter(created_by=self.request.user).order_by('id')  # pylint: disable=E1101; # noqa
 
 
 @method_decorator(login_required, name='dispatch')
@@ -112,7 +112,7 @@ class ExpenseListView(ListView):
     def profile(self):
         """Retrieve object owned by the current logged in user."""
         start, end = self.start_end()
-        expenses = m.Expense.objects.select_related('category').filter(
+        expenses = m.Expense.objects.select_related('category').filter(   # pylint: disable=E1101; # noqa
                    date__range=(start, end),
                    created_by=self.request.user).order_by('-date', '-id')
         return expenses
@@ -128,8 +128,8 @@ class ExpenseListView(ListView):
         show_delete = self.request.GET.get('delete', False) == '1'
         context['show_delete'] = show_delete
 
-        monthly_budgets = m.MonthlyBudget.objects.select_related(
-                          'category').filter(date=start, created_by=self.request.user)
+        monthly_budgets = m.MonthlyBudget.objects.select_related(   # pylint: disable=E1101; # noqa
+                          'category').filter(date=start, created_by=self.request.user)   # pylint: disable=E1101; # noqa
 
         expenses = self.profile
 
@@ -150,13 +150,13 @@ class ExpenseListView(ListView):
                     total = exp_aggregates[_.category.text]['total']
                     exp_aggregates[_.category.text] = {'total': total,
                                                        'budgeted': _.amount,
-                                                       'category': _.category.id,
+                                                       'category': _.category.id,  # pylint: disable=E1101; # noqa
                                                        'date': start_ymd}
                 else:
                     total = _.amount
                     exp_aggregates[_.category.text] = {'total': 0,
                                                        'budgeted': _.amount,
-                                                       'category': _.category.id,
+                                                       'category': _.category.id,  # pylint: disable=E1101; # noqa
                                                        'date': start_ymd}
             context['exp_aggregates'] = exp_aggregates
 
@@ -230,12 +230,12 @@ class MonthlyBudgetListView(ListView):  # pylint: disable=R0903; # noqa
         """Retrieve object owned by the current logged in user."""
         yymm_date = self.kwargs.get('date', None)
         if yymm_date is None:
-            m_b = m.MonthlyBudget.objects.filter(
+            m_b = m.MonthlyBudget.objects.filter(  # pylint: disable=E1101; # noqa
                  created_by=self.request.user).select_related(
                  'category').all().order_by('-date')
         else:
             full_date = f"{yymm_date}-01"
-            m_b = m.MonthlyBudget.objects.filter(
+            m_b = m.MonthlyBudget.objects.filter(  # pylint: disable=E1101; # noqa
                  date=full_date, created_by=self.request.user).select_related(
                  'category').order_by('-date')
         return m_b
@@ -281,7 +281,7 @@ class GoalListView(ListView):  # pylint: disable=R0903; # noqa
 
     def get_queryset(self):
         """Retrieve object owned by the current logged in user."""
-        return m.Goal.objects.filter(
+        return m.Goal.objects.filter(  # pylint: disable=E1101; # noqa
                  created_by=self.request.user).order_by('id')
 
     def get_context_data(self, **kwargs):
@@ -360,7 +360,7 @@ class IncomeCategoryView(ListView):  # pylint: disable=R0903; # noqa
 
     def get_queryset(self):
         """Display income categories of the current logged in user."""
-        return m.IncomeCategory.objects.filter(
+        return m.IncomeCategory.objects.filter(  # pylint: disable=E1101; # noqa
                  created_by=self.request.user).order_by('id')
 
 
@@ -420,7 +420,7 @@ class IncomeView(ListView):  # pylint: disable=R0903; # noqa
             format_str = '%Y-%m-%d'
             start = datetime.datetime.strptime(start, format_str).date()
 
-        incomes = m.Income.objects.filter(
+        incomes = m.Income.objects.filter(  # pylint: disable=E1101; # noqa
                   date__range=(start, end),
                   created_by=self.request.user).order_by('id')
         return incomes
@@ -457,7 +457,7 @@ class MonthlyBalanceCategoryView(ListView):  # pylint: disable=R0903; # noqa
 
     def get_queryset(self):  # pylint: disable=R0201; # noqa
         """Retrieve object owned by the current logged in user."""
-        return m.MonthlyBalanceCategory.objects.filter(
+        return m.MonthlyBalanceCategory.objects.filter(  # pylint: disable=E1101; # noqa
                  created_by=self.request.user).order_by('id')
 
 
@@ -525,7 +525,7 @@ class MonthlyBalancesView(ListView):  # pylint: disable=R0903; # noqa
             total += _['amount']
 
         # Display only not archived goals
-        goals = m.Goal.objects.filter(
+        goals = m.Goal.objects.filter(  # pylint: disable=E1101; # noqa
                 is_archived=False, created_by=self.request.user)
         if len(m_b) > 0:
             bar_graph = utils.generate_monthly_balance_bar_graph(m_b, goals)
@@ -556,7 +556,7 @@ class MonthlyBalancesSingleMonthView(ListView):  # pylint: disable=R0903; # noqa
         rate = int(os.getenv("EXCHANGE_RATE"))
         currency = os.getenv("CURRENCY")
 
-        m_b = m.MonthlyBalance.objects.select_related('category').filter(
+        m_b = m.MonthlyBalance.objects.select_related('category').filter(  # pylint: disable=E1101; # noqa
              date=complete_date, created_by=self.request.user).order_by('date')
 
         total = 0
@@ -626,7 +626,7 @@ class MonthlyBalanceDeleteView(DeleteView):
 @require_http_methods(["GET", "POST"])
 def multiple_new_monthly_budget(request):
     """WRITE ME."""
-    categories = m.Category.objects.filter(is_archived=False, created_by=request.user)
+    categories = m.Category.objects.filter(is_archived=False, created_by=request.user)  # pylint: disable=E1101; # noqa
     cats = categories.count()
     mb_formset = formset_factory(form=f.MonthlyBudgetForm, extra=cats,
                                  max_num=cats)
@@ -652,7 +652,7 @@ def multiple_new_monthly_budget(request):
             intial_data.append({'date': curr_month_start, 'category': c.id})
         formset = mb_formset(initial=intial_data, form_kwargs={'user': request.user})
 
-    prev_month_monthly_budgets = m.MonthlyBudget.objects.filter(
+    prev_month_monthly_budgets = m.MonthlyBudget.objects.filter(  # pylint: disable=E1101; # noqa
                                  date=prev_month_start)
     prev_month_dic = {}
     for _ in prev_month_monthly_budgets:
@@ -667,7 +667,7 @@ def multiple_new_monthly_budget(request):
 @require_http_methods(["GET", "POST"])
 def multiple_new_monthly_balance(request):
     """WRITE ME."""
-    categories = m.MonthlyBalanceCategory.objects.filter(created_by=request.user)
+    categories = m.MonthlyBalanceCategory.objects.filter(created_by=request.user)  # pylint: disable=E1101; # noqa
     cats = categories.count()
     mb_formset = formset_factory(form=f.MonthlyBalanceForm, extra=cats,
                                  max_num=cats)
@@ -690,7 +690,7 @@ def multiple_new_monthly_balance(request):
             intial_data.append({'date': curr_month_start, 'category': c.id})
         formset = mb_formset(initial=intial_data, form_kwargs={'user': request.user})
 
-    prev_month_monthly_balances = m.MonthlyBalance.objects.filter(
+    prev_month_monthly_balances = m.MonthlyBalance.objects.filter(  # pylint: disable=E1101; # noqa
                                   date=prev_month_start, created_by=request.user)
     prev_month_dic = {}
     for _ in prev_month_monthly_balances:
@@ -744,7 +744,7 @@ def home_page(request):
     # Display bar graph: only draw active goals
     goals = utils.get_goals_and_time_to_completions(curr_tot, diff)
     # FIXME: filter by current user
-    monthly_balance = m.MonthlyBalance.objects.select_related('category').values('date').annotate(actual_amount=Sum(Case(
+    monthly_balance = m.MonthlyBalance.objects.select_related('category').values('date').annotate(actual_amount=Sum(Case(  # pylint: disable=E1101; # noqa
                       When(category__is_foreign_currency=False, then='amount'),
                       When(category__is_foreign_currency=True, then=F('amount') * rate)
         ))).order_by('date')

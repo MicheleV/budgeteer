@@ -86,28 +86,28 @@ if 'y' in os.getenv("DJANGO_DEBUG_MODE"):
     ]
     RENDER_PANELS = True
 
-    import os
+    # import os
 
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-            },
-        },
-        'root': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
-                'propagate': False,
-            },
-        },
-    }
+    # LOGGING = {
+    #     'version': 1,
+    #     'disable_existing_loggers': False,
+    #     'handlers': {
+    #         'console': {
+    #             'class': 'logging.StreamHandler',
+    #         },
+    #     },
+    #     'root': {
+    #         'handlers': ['console'],
+    #         'level': 'DEBUG',
+    #     },
+    #     'loggers': {
+    #         'django': {
+    #             'handlers': ['console'],
+    #             'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
+    #             'propagate': False,
+    #         },
+    #     },
+    # }
 else:
     DEBUG = False
 
@@ -118,7 +118,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
-    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 200,
+
 }
 
 ROOT_URLCONF = 'budgeteer.urls'

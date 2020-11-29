@@ -5,6 +5,7 @@ import os
 
 from dotenv import load_dotenv
 from matplotlib import use as mpl_use
+from matplotlib import ticker
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 import matplotlib.cm as cmx
 from matplotlib.cm import get_cmap
@@ -166,6 +167,10 @@ def generateBarGraph(x, y, goals):
 
     # Force all dates labels to be displayed on the x axis
     ax.set_xticks(x)
+
+    # Formats y axis to use comma every 3 digits
+    ax.get_yaxis().set_major_formatter(
+      ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
 
     # Draw goals if present
     if goals:

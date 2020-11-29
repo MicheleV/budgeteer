@@ -157,13 +157,52 @@ References and useful links
 Self-memo
 =======
 
+
+Expense aggregate for each category:
+---------------------
+
+JS One-liner::
+
+    fetch('/api/categories').then(response => response.json()).then(data => data.forEach(element => fetch(`/api/expenses?category_id=${element.id}&format=json&huge_page=yes` ).then(response => response.json()).then(data => console.log(new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(data.reduce((accumulator, currentValue) => accumulator + currentValue.amount,0)),element.text))));
+
+
+Expense aggregate for a single category:
+---------------------
+
+JS One-liner ::
+
+    fetch('/api/expenses?category_name=<category-name>&format=json&huge_page=yes&start=<YYYY-mm-dd>&end=<YYYY-mm-dd>').then(response => response.json()).then(data => console.log(new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(data.reduce((accumulator, currentValue) => accumulator + currentValue.amount,0))));
+
+
+Expense aggregate, for a given category, and group by note text:
+---------------------
+
+JS Code::
+
+    const res = {}
+    const promise = fetch('/api/expenses?category_name=<category-name>&format=json&huge_page=yes&start=<YYYY-mm-dd>&end=<YYYY-mm-dd>').then( response => response.json()).then( data =>
+    data.forEach((el) => {
+      if (res[el.note] === undefined){
+        res[el.note] = el.amount
+      } else {
+        res[el.note] += el.amount
+      }
+    }))
+
+    Promise.resolve(promise).then( () =>
+    {
+      for (let k in res) {
+          console.log(k , new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(res[k]))
+      }
+    });
+
 Backup data:
 ---------------------
 Dump the postgres content to a file::
 
      docker-compose exec web sh
-     # Inside the container
-     pg_dump -h db -d budgeteer_db -U <db-user>  --data-only -W > data_only.sql
+     # Inside the container, as we need to type the password (TODO: find how to workaround this)
+     pg_dump -h db -d budgeteer_db -U <db-user> -n 'budgets*' -n 'auth_user' -N 'django*' -N 'auth_group*' -N 'auth_user_*' --data-only -W > data_only.sql
      # From the host
      docker cp budgeteer_web_1:/home/app/web/data_only.sql .
 
@@ -177,7 +216,7 @@ Inject the data(execute from inside the web container, as it requires manual pwd
 
     psql -h db -U budgeteer_user -d budgeteer_db < data.sql
 
-Force gunicorn to print inside container:
+Force python to print inside the container:
 ---------------------
     print("<result-to-print>", flush=True)
 
@@ -199,6 +238,6 @@ See `COPYING <COPYING>`_ to see the full text.
    :target: COPYING
    :alt: Repository License
 
-.. |Coverage| image:: https://img.shields.io/badge/coverage-83%25-yellow
+.. |Coverage| image:: https://img.shields.io/badge/coverage-82%25-yellow
    :target: README.rst
    :alt: Code Coverage

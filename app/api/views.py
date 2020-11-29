@@ -1,13 +1,14 @@
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage
+from django.core.paginator import PageNotAnInteger
 
-from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 import budgets.models as m
-from budgets.serializers import CategorySerializer, ExpenseSerializer
+from budgets.serializers import CategorySerializer
+from budgets.serializers import ExpenseSerializer
 
 ###############################################################################
 # API
@@ -25,8 +26,8 @@ def all_categories(request):
       'created_by': request.user
     }
 
+    # Case insensitive: "where name ILIKE '%xxx%'"
     if request.GET.get('name'):
-        # NOTE: result into a case insensitive SQL like statement, e.g. ILIKE '%xxx%'
         filters['text__icontains'] = request.GET['name']
 
     categories = m.Category.objects.filter(**filters).order_by('id')  # pylint: disable=E1101; # noqa
@@ -48,6 +49,8 @@ def all_expenses(request):
     # Filter by single category
     if request.GET.get('category_id'):
         filters['category__id'] = request.GET['category_id']
+    elif request.GET.get('category_name'):
+        filters['category__text'] = request.GET['category_name']
 
     # NOTE: filter by date: both extremes included
     if request.GET.get('start'):
@@ -56,13 +59,17 @@ def all_expenses(request):
     if request.GET.get('end'):
         filters['date__lte'] = request.GET['end']
 
+    # Case insensitive: "where note ILIKE '%xxx%'"
+    if request.GET.get('note'):
+        filters['note__icontains'] = request.GET['note']
+
     queryset = m.Expense.objects.select_related(  # pylint: disable=E1101; # noqa
                   'category').filter(**filters).order_by('id')
 
     # Return 100 results by default
-    # Return everything if "no_paging" param is set
-    if not request.GET.get('no_paging'):
-        paginator = Paginator(queryset, 200)
+    # Return everything if "huge_page" param is set
+    if not request.GET.get('huge_page'):
+        paginator = Paginator(queryset, 100)
         page = request.query_params.get('page')
 
         try:

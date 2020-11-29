@@ -3,7 +3,8 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from rest_framework import serializers
 
-from budgets.models import Category, Expense
+from budgets.models import Category
+from budgets.models import Expense
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):

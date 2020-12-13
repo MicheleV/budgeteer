@@ -15,7 +15,7 @@
         <table class="table" id="id_recap">
           <tr>
               <td>Starting balance</td>
-              <td>{{ currency}} {{ starting_balance | intcomma }}</td>
+              <td>{{ currency }} {{ starting_balance | intcomma }}</td>
           </tr>
           <tr>
               <td><b>Current balance</b></td>
@@ -94,7 +94,7 @@
             <td>{{ currency}}
               <!-- TODO: check for foreign currencies. Factor in the exchange rate, display correct currency symbol -->
               {% if monthly_balance.actual_amount %}
-                  {{ monthly_balance.actual_amount | intcomma }}</td>
+                  {{ monthly_balance.actual_amount | intcomma }} ( {{ monthly_balance.amount | intcomma }} )</td>
               {% else %}
                   {{ monthly_balance.amount | intcomma }}</td>
               {% endif %}
@@ -124,7 +124,7 @@
           <td>{{ currency}}
             <!-- TODO: check for foreign currencies. Factor in the exchange rate, display correct currency symbol -->
             {% if monthly_balance.actual_amount %}
-                {{ monthly_balance.actual_amount | intcomma }}</td>
+                {{ monthly_balance.actual_amount | intcomma }} ( {{ monthly_balance.amount | intcomma }} )</td>
             {% else %}
                 {{ monthly_balance.amount | intcomma }}</td>
             {% endif %}

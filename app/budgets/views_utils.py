@@ -218,6 +218,7 @@ def get_month_balance_stats(date, rate, user):
     for mv in prev_mb:
         if mv.category.is_foreign_currency:
             total += mv.amount * rate
+            mv.actual_amount = mv.amount * rate
         else:
             total += mv.amount
     return prev_mb, total

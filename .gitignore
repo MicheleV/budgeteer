@@ -9,3 +9,4 @@ db.sqlite3
 coverage_html
 htmlcov
 .coverage
+node_modules

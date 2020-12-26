@@ -35,6 +35,10 @@ const config: webpack.Configuration = {
     compress: true,
     port: 4000,
   },
+  // TODO: add logic to control this in dev/prod
+  optimization: {
+    minimize: false
+  },
   plugins: [
     new FileManagerPlugin({
       events: {

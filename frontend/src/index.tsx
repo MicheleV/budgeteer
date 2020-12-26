@@ -1,47 +1,39 @@
-import React, { useState } from "react";
+import React, { FC, useEffect, ReactElement, useRef, useState } from "react";
 import ReactDOM, { render } from "react-dom";
+import { ExpensebyCategoryTab, ReduceExpensebyCategoryTab, Tabs, Tab, Content } from "./components/tab";
+
 
 const App = () => {
-  const [state, setState] = useState("Fetch");
+  const [active, setActive] = useState(0);
+  const handleClick = (e: React.MouseEventHandler<HTMLElement>) => {
+    const index = parseInt(e.target.id, 0);
+    if (index !== active) {
+      setActive(index);
+    }
+  };
 
-  return <button onClick={() => {
-    setState("Fetched (or fetching...)");
 
-    fetch('http://localhost:1337/api/expenses?category_id=1&format=json&huge_page=yes&start=2020-01-01&end=2020-12-31')
-    .then(function(response) {
-        // When the page is loaded convert it to text
-        return response.text()
-    })
-    .then(function(html) {
-        // Initialize the DOM parser
-        console.log(html)
-        var token = html.match(/csrfmiddlewaretoken.*/g)[0].replace('csrfmiddlewaretoken" value="','').slice(0,-2)
-        return token
-    })
-    .then(function(token) {
-          var data = {
-            // csrfmiddlewaretoken: token,
-            username: 'xxx',
-            password: 'xxxx'
-          }
-          console.log(token)
-          fetch('http://localhost:1337/accounts/login/', {
-            method: 'POST',
-            body: JSON.stringify(data),
-            headers: { "X-CSRFToken": token },
-            credentials: 'same-origin'
-          })
-          .then(data => {
-            console.log(data); // JSON data parsed by `data.json()` call
-          });
+  return <div>
+      <Tabs>
+        <Tab onClick={handleClick} active={active === 0} id={0}>
+          Expenses
+        </Tab>
 
-    })
-    .catch(function(err) {  
-        console.log('Failed to fetch page: ', err);  
-    });
+        <Tab onClick={handleClick} active={active === 1} id={1}>
+          Expenses aggregate
+        </Tab>
+      </Tabs>
+      <>
+        <Content active={active === 0}>
+          <ExpensebyCategoryTab />
+        </Content>
+        <Content active={active === 1}>
+          <ReduceExpensebyCategoryTab />
+        </Content>
+      </>
+  </div>
+}
 
-  }}>{state}</button>
-};
 
 ReactDOM.render(
   <App />,

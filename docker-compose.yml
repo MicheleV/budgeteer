@@ -15,6 +15,7 @@ services:
       - ./app/.env
     depends_on:
       - db
+    restart: unless-stopped
   # FIXME: we're running the container as root :O
   db:
     hostname: db

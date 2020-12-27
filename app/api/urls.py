@@ -9,4 +9,5 @@ app_name = 'api'  # pylint: disable=C0103; # noqa
 urlpatterns = [
     path('categories', views.all_categories, name='categories'),
     path('expenses', views.all_expenses, name='expenses'),
+    path('monthly_balances', views.monthly_balances, name='monthly_balances'),
 ]

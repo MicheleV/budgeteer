@@ -66,9 +66,10 @@ def current_month_boundaries():
     Return a tuple composed of the first and the last day
     of the current month, as datetime objects
 
-    Note: set timezone when providing! Otherwise efault timezone will be UTC
-    If th server is actually in a different time zone, beware off-by-one
-    month errors when using this function
+    Note: be sure the server has the right timezone!
+    Otherwise efault timezone will be UTC
+    FIXME: If the server is actually in a different time zone,
+    beware off-by-one month errors when using this function
     """
     start = datetime.date.today().replace(day=1)
     month_range = calendar.monthrange(start.year, start.month)

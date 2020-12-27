@@ -9,6 +9,8 @@ from rest_framework.response import Response
 import budgets.models as m
 from budgets.serializers import CategorySerializer
 from budgets.serializers import ExpenseSerializer
+from budgets.serializers import MonthlyBalanceSerializer
+from budgets.views_utils import current_month_boundaries
 
 ###############################################################################
 # API
@@ -86,4 +88,24 @@ def all_expenses(request):
     else:
         serializer = ExpenseSerializer(queryset, many=True)
 
+    return Response(serializer.data)
+
+@login_required
+@api_view(['GET'])
+def monthly_balances(request):
+    """
+    List all monthly balances for a given month
+    """
+    filters = {
+      'created_by': request.user
+    }
+
+    # Show current month balances by default
+    if request.GET.get('date'):
+        filters['date'] = request.GET['date']
+    else:
+        filters['date'] = current_month_boundaries()[0]
+
+    mb = m.MonthlyBalance.objects.filter(**filters).order_by('id')  # pylint: disable=C0103,E1101; # noqa
+    serializer = MonthlyBalanceSerializer(mb, many=True)
     return Response(serializer.data)

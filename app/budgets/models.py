@@ -124,7 +124,7 @@ class MonthlyBalance(models.Model):
                                    null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        id = self.category.id
+        id = self.category.id   # pylint: disable=C0103; # noqa
         amount = self.amount
         date = self.date
         return f"{id}: {amount}, {date}"

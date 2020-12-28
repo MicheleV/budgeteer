@@ -1,6 +1,6 @@
 import React, { FC, useEffect, ReactElement, useRef, useState } from "react";
 import ReactDOM, { render } from "react-dom";
-import { ExpensebyCategoryTab, ReduceExpensebyCategoryTab, Tabs, Tab, Content } from "./components/tab";
+import { ExpensebyCategoryTab, ReduceExpensebyCategoryTab, MonthlyBalanceTab, Tabs, Tab, Content } from "./components/tab";
 
 
 const App = () => {
@@ -22,6 +22,10 @@ const App = () => {
         <Tab onClick={handleClick} active={active === 1} id={1}>
           Expenses aggregate
         </Tab>
+
+        <Tab onClick={handleClick} active={active === 1} id={2}>
+          Monthly balances
+        </Tab>
       </Tabs>
       <>
         <Content active={active === 0}>
@@ -29,6 +33,9 @@ const App = () => {
         </Content>
         <Content active={active === 1}>
           <ReduceExpensebyCategoryTab />
+        </Content>
+        <Content active={active === 2}>
+          <MonthlyBalanceTab />
         </Content>
       </>
   </div>

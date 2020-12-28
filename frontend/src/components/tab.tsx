@@ -52,7 +52,6 @@ const Pulldown: FC<PulldownProps> = ({data, onChange}) : ReactElement => {
 }
 
 export const ExpensebyCategoryTab = () => {
-  const [count, setCount] = useState(0);
   const [isSending, setIsSending] = useState(false);
   const [data, setData] = useState<Array<Expense>>([]);
   const initialRender = useRef(true);
@@ -69,14 +68,8 @@ export const ExpensebyCategoryTab = () => {
     }
   };
 
-  useEffect(() => {
-    if (initialRender.current){
-      initialRender.current = false;
-      getCategories().then(function (data: Array<Category>) {
-        setCategories(data)
-      })
-    } else {
-      if (isSending || CategoryId === 0) return;
+  const fetchData = React.useCallback(() => {
+    if (isSending || CategoryId === 0) return;
       setIsSending(true);
 
       getExpensesByCategoryId(CategoryId, start, end)
@@ -88,8 +81,18 @@ export const ExpensebyCategoryTab = () => {
           console.log('Failed to fetch page: ', err);
           setIsSending(false);
       });
+  },[start,end,CategoryId])
+
+  useEffect(() => {
+    if (initialRender.current){
+      initialRender.current = false;
+      getCategories().then(function (data: Array<Category>) {
+        setCategories(data)
+      })
+    } else {
+      fetchData()
     }
-  }, [count]);
+  }, [fetchData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => setCategoryId(parseInt(e.target.value, 10))
 
@@ -99,7 +102,7 @@ export const ExpensebyCategoryTab = () => {
       <input type="text" onChange={e => setstart(e.target.value)} value={start}/>
       <input type="text" onChange={e => setend(e.target.value)} value={end}/>
       { categories ? <Pulldown data={categories} onChange={handleChange} /> : null }
-      <button onClick={() => {setCount(count + 1)}}>{ isSending ? "Fetching..." : "Fetch" }</button>
+      <button onClick={fetchData}>{ isSending ? "Fetching..." : "Fetch" }</button>
        { data.length > 1 ? <Table data={data} /> : null }
     </div>
   );
@@ -121,7 +124,7 @@ const ReducedTable: FC<ReducedTableProps> = ({data}): ReactElement => {
 }
 
 
-const formatData = (expenses: Array<Expense>) => {
+const aggregateData = (expenses: Array<Expense>) => {
     const data: any = {}
 
     // Aggregate expenses by note text: produces a dictionary
@@ -138,7 +141,6 @@ const formatData = (expenses: Array<Expense>) => {
 }
 
 export const ReduceExpensebyCategoryTab = () => {
-  const [count, setCount] = useState(0);
   const [isFetching, setisFetching] = useState(false);
   const [data, setData] = useState<Array<ExpenseAggregate>>([]);
   const initialRender = useRef(true);
@@ -147,21 +149,15 @@ export const ReduceExpensebyCategoryTab = () => {
   const [start, setstart] = useState<string>("2020-01-01");
   const [end, setend] = useState<string>("2020-12-31");
 
-  useEffect(() => {
-    if (initialRender.current){
-      initialRender.current = false;
-      getCategories().then(function (data: Array<Category>) {
-        setCategories(data)
-      })
-    } else {
-      if (isFetching || CategoryId === 0) return;
+
+  const fetchData = React.useCallback(() => {
+    if (isFetching || CategoryId === 0) return;
       setisFetching(true);
 
       getExpensesByCategoryId(CategoryId, start, end)
       .then((expenses: Array<Expense>) => {
-
             // Aggregate expenses by note text
-            const dataArray = formatData(expenses)
+            const dataArray = aggregateData(expenses)
             setData(dataArray)
 
             setisFetching(false);
@@ -170,8 +166,18 @@ export const ReduceExpensebyCategoryTab = () => {
           console.log('Failed to fetch page: ', err);
           setisFetching(false);
       });
+  },[start,end,CategoryId])
+
+  useEffect(() => {
+    if (initialRender.current){
+      initialRender.current = false;
+      getCategories().then(function (data: Array<Category>) {
+        setCategories(data)
+      })
+    } else {
+      fetchData()
     }
-  }, [count]);
+  }, [fetchData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => setCategoryId(parseInt(e.target.value, 10))
 
@@ -181,12 +187,18 @@ export const ReduceExpensebyCategoryTab = () => {
       <input type="text" onChange={e => setstart(e.target.value)} value={start}/>
       <input type="text" onChange={e => setend(e.target.value)} value={end}/>
       { categories ? <Pulldown data={categories} onChange={handleChange} /> : null }
-      <button onClick={() => {setCount(count + 1)}}>{ isFetching ? "Fetching..." : "Fetch" }</button>
+      <button onClick={fetchData}>{ isFetching ? "Fetching..." : "Fetch" }</button>
        { data.length > 1 ? <ReducedTable data={data} /> : null }
     </div>
   );
 
 };
+
+export const MonthlyBalanceTab = () => {
+  return (
+    <div>Placeholder</div>
+   )
+}
 
 // Styled components
 

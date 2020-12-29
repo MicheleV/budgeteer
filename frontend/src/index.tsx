@@ -1,7 +1,10 @@
 import React, { FC, useEffect, ReactElement, useRef, useState } from "react";
 import ReactDOM, { render } from "react-dom";
-import { ExpensebyCategoryTab, ReduceExpensebyCategoryTab, MonthlyBalanceTab, Tabs, Tab, Content } from "./components/tab";
 
+import { ReduceExpensebyCategoryTab } from "./components/reducedexpenses";
+import { Tabs, Tab, Content } from "./components/shared";
+import { ExpensebyCategoryTab } from "./components/expenses";
+import { MonthlyBalanceTab } from "./components/monthlybalance";
 
 const App = () => {
   const [active, setActive] = useState(0);
@@ -11,7 +14,6 @@ const App = () => {
       setActive(index);
     }
   };
-
 
   return <div>
       <Tabs>
@@ -23,7 +25,7 @@ const App = () => {
           Expenses aggregate
         </Tab>
 
-        <Tab onClick={handleClick} active={active === 1} id={2}>
+        <Tab onClick={handleClick} active={active === 2} id={2}>
           Monthly balances
         </Tab>
       </Tabs>

@@ -21,6 +21,14 @@ export interface MonthlyBalance {
   date: string;
 }
 
+export interface MonthlyBalanceCategory {
+  id: number;
+  amount: number;
+  category_id: number;
+  category_text: string;
+  date: string;
+}
+
 
 export function getExpensesByCategoryId(category_id:number, start:string, end:string): Promise<Expense[]> {
   // TODO: validate parameters!
@@ -37,11 +45,19 @@ export function getCategories(): Promise<Category[]> {
   })
 }
 
+
+export function getMontlhyBalanceCategories(): Promise<MonthlyBalanceCategory[]> {
+  return fetch('/api/monthly_balance_categories')
+    .then(function(response) {
+      return response.json();
+  })
+}
+
 export function getMonthlyBalances(date?:string): Promise<MonthlyBalance[]> {
   let url = "/api/monthly_balances"
+  // TODO: validate parameters!
   if (date) {
-    console.log(date)
-    url += `?date=${date}` // TODO: validate me!
+    url += `?date=${date}`
   }
   return fetch(url)
     .then(function(response) {

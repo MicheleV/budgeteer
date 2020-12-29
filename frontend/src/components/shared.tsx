@@ -1,7 +1,7 @@
 import React, { FC, ReactElement } from "react";
 import { Formatter } from "../common/utilities"
-import { Category, Expense, getCategories, getExpensesByCategoryId } from "../common/api"
-import { ExpenseAggregate, TableProps, PulldownProps, ReducedTableProps } from "../common/interfaces"
+import { getCategories, getExpensesByCategoryId } from "../common/api"
+import { Category, Expense, BalanceTableProps, ExpenseAggregate, TableProps, PulldownProps, ReducedTableProps } from "../common/interfaces"
 
 
 export const Pulldown: FC<PulldownProps> = ({data, onChange}) : ReactElement => {
@@ -22,6 +22,21 @@ export const Table: FC<TableProps> = ({data}): ReactElement => {
     return (
       <li key={item.id}>
         {item.category_text}: {Formatter.format(item.amount)}{ item.note !== '' ? `, (${item.note})` : null} - {item.date}
+      </li>
+    );
+  });
+  const total = data.reduce((acc, curr) => acc + curr.amount, 0)
+  return <div>
+    <div>Total: {Formatter.format(total)}</div>
+    <ul>{list}</ul>
+  </div>
+}
+
+export const BalanceTable: FC<BalanceTableProps> = ({data}): ReactElement => {
+  const list = data.map(item => {
+    return (
+      <li key={item.id}>
+        {item.category_text}: {Formatter.format(item.amount)}
       </li>
     );
   });

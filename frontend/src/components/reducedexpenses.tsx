@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Category, Expense, getCategories, getExpensesByCategoryId } from "../common/api"
+import { getCategories, getExpensesByCategoryId } from "../common/api"
+import { Category, Expense } from "../common/interfaces"
 import { aggregateData } from "../common/utilities"
 import { ExpenseAggregate } from "../common/interfaces"
 import {  Pulldown, ReducedTable } from "./shared"

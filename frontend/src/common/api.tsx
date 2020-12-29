@@ -1,35 +1,3 @@
-export interface Expense {
-  id: number;
-  amount: number;
-  category_id: number;
-  category_text: string;
-  note: string;
-  date: string;
-}
-
-export interface Category {
-  id: number;
-  text: string;
-}
-
-
-export interface MonthlyBalance {
-  id: number;
-  amount: number;
-  category_id: number;
-  category_text: string;
-  date: string;
-}
-
-export interface MonthlyBalanceCategory {
-  id: number;
-  amount: number;
-  category_id: number;
-  category_text: string;
-  date: string;
-}
-
-
 export function getExpensesByCategoryId(category_id:number, start:string, end:string): Promise<Expense[]> {
   // TODO: validate parameters!
   return fetch(`/api/expenses?category_id=${category_id}&format=json&huge_page=yes&start=${start}&end=${end}`)

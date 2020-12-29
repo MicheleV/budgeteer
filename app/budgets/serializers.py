@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from budgets.models import Category
 from budgets.models import Expense
+from budgets.models import MonthlyBalanceCategory
 from budgets.models import MonthlyBalance
 
 
@@ -20,6 +21,12 @@ class ExpenseSerializer(serializers.HyperlinkedModelSerializer):  # pylint: disa
     class Meta:  # pylint: disable=C0115,R0903; # noqa
         model = Expense
         fields = ['id', 'amount', 'category_id', 'category_text', 'note', 'date']
+
+
+class MonthlyBalanceCategorySerializer(serializers.HyperlinkedModelSerializer):  # pylint: disable=C0115; # noqa
+    class Meta:  # pylint: disable=C0115,R0903; # noqa
+        model = MonthlyBalanceCategory
+        fields = ['id', 'text', 'is_foreign_currency']
 
 
 class MonthlyBalanceSerializer(serializers.HyperlinkedModelSerializer):  # pylint: disable=C0115; # noqa

@@ -6,7 +6,6 @@ import { isCorrectFormatDate } from "../common/utilities"
 
 export const MonthlyBalanceTab = () => {
   const [isSending, setIsSending] = useState(false)
-  const initialRender = useRef(true);
   const [data,setData] = useState<Array<MonthlyBalance>>([]);
   // NOTE: This api only accepts YYYY-MM-01 format
   const [month, setMonth] = useState("2020-12-01");

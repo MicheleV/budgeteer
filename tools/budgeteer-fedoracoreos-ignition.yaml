@@ -139,7 +139,7 @@ storage:
         inline: |
           #!/bin/bash
           git clone https://gitlab.com/micheleva/budgeteer.git /home/core/budgeteer
-          chown -R core.core /home/core/budgeteer
+          chown -R core.core /home/core/budgeteer # TODO: this could be moved after and we could remove the other following chown line
           cp /home/core/budgeteer/app/.env.sample /home/core/budgeteer/app/.env
           chown core.core /home/core/budgeteer/app/.env
     - path: /usr/local/bin/install-docker-compose.sh

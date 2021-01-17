@@ -43,7 +43,6 @@ const config: webpack.Configuration = {
     new FileManagerPlugin({
       events: {
         onEnd: {
-          delete: ['/bundle.js', '../app/budgets/static/js/bundle.js'],
           copy: [
             {source: 'build/bundle.js', destination: '../app/budgets/static/js/bundle.js', force: true},
             {source: 'build/bundle.js', destination: '../app/static/js/bundle.js', force: true}, // TODO: this is not strictly needed: we should run "python manage.py collectstatic" instead

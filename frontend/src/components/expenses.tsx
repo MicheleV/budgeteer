@@ -9,7 +9,7 @@ export const ExpensebyCategoryTab = () => {
   const initialRender = useRef(true);
   const [CategoryId, setCategoryId] = useState<number>(1);
   const [categories, setCategories] = useState<Array<Category>>();
-  const [start, setstart] = useState<string>("2020-01-01");
+  const [start, setstart] = useState<string>("2020-01-01"); // TODO: grab date.year dinamically
   const [end, setend] = useState<string>("2020-12-31");
 
   const [active, setActive] = useState(0);
@@ -21,7 +21,7 @@ export const ExpensebyCategoryTab = () => {
   };
 
   const fetchData = React.useCallback(() => {
-    if (isSending || CategoryId === 0) return;
+    if (isSending || CategoryId === 0) return; // TODO: is === 0 really necessary?
       setIsSending(true);
 
       getExpensesByCategoryId(CategoryId, start, end)

@@ -21,7 +21,7 @@ export const Table: FC<TableProps> = ({data}): ReactElement => {
   const list = data.map(item => {
     return (
       <li key={item.id}>
-        {item.category_text}: {Formatter.format(item.amount)}{ item.note !== '' ? `, (${item.note})` : null} - {item.date}
+        {item.date}: {Formatter.format(item.amount)}{ item.note !== '' ? `, (${item.note})` : null}
       </li>
     );
   });

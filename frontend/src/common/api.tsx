@@ -1,3 +1,5 @@
+import { Category, Expense, MonthlyBalanceCategory, MonthlyBalance } from "../common/interfaces"
+
 export function getExpensesByCategoryId(category_id:number, start:string, end:string): Promise<Expense[]> {
   // TODO: validate parameters!
   return fetch(`/api/expenses?category_id=${category_id}&format=json&huge_page=yes&start=${start}&end=${end}`)

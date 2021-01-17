@@ -9,3 +9,8 @@ db.sqlite3
 coverage_html
 htmlcov
 .coverage
+node_modules
+frontend/build/bundle.js
+app/static/js/bundle.js
+app/budgets/static/js/bundle.js
+frontend/build/bundle.js.LICENSE.txt

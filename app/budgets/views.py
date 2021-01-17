@@ -720,6 +720,7 @@ def landing_page(request):
 def home_page(request):
     """Display the home page."""
     currency = os.getenv("CURRENCY")
+    webpack = os.getenv("USE_WEBPACK_DEV_SERVER")
     # TODO: refactor this to enable multiple currencies (and enable currency
     # rates to be edited inside the app: drop the value from .env file)
     rate = int(os.getenv("EXCHANGE_RATE"))
@@ -765,6 +766,7 @@ def home_page(request):
         'two_months_diff': diff,
         'two_months_diff_perc': diff_perc,
         'goals': goals,
+        'webpack': webpack,
     })
 
 

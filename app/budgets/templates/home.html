@@ -138,6 +138,14 @@
     </table>
   </div>
   {% endif %}
+  <div  class="col">
+    <div id="root"></div>
+    {% if webpack == 'y' %}
+      <script src="http://localhost:4000/bundle.js"></script>
+    {% else %}
+      <script src="{% static 'js/bundle.js' %}"></script>
+    {% endif %}
+  </div>
 </div>
 
 {% endblock %}

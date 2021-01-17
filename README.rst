@@ -23,26 +23,25 @@ About the project
 
 Budgeteer is a barebone web application for managing household budgets.
 
-Built with:
+Uses/require with:
 ---------------------
-- Python
-- Django
-- Bootstrap 4
+- Python 3.7+
+- Django 2.2
+- React 17 (Optional SPA frontend with some graphs)
 
 Getting started
 ===============
 
 Prerequisites
 --------------------------
-- Python 3.6 or later installed
-- geckodriver in your system $PATH (needed for functional tests)
+- Python 3.7 or later installed
 
 Installation
 --------------------------
 
 Clone the repo::
 
-    git clone https://github.com/MicheleV/budgeteer
+    git clone https://gitlab.com/micheleva/budgeteer
 
 Install the requirements::
 
@@ -75,6 +74,69 @@ Run the dockerized version of the app::
 Create and start a FedoraCoreOS VM with the dockerized version of the app::
 
     ./tools/prepare_fedoracoreos_containers.sh
+
+
+Optional SPA Frontend
+=======
+
+Make sure to have npm 6.14 or later::
+
+    npm --version
+    6.14.6
+
+Move into the frontend folder and install the dependencies::
+
+    cd frontend
+    npm ci # or `npm install` but this might update the lock file
+
+Run the webpack server to have live reloading::
+
+    npm run start # or `npm start`
+
+Make sure to change the `.env file` inside the app folder to use live reload::
+
+    sed -iE "s/USE_WEBPACK_DEV_SERVER=(.*)/USE_WEBPACK_DEV_SERVER=y/" ../app/.env
+
+In production use a static bundle instead::
+
+    sed -iE "s/USE_WEBPACK_DEV_SERVER=(.*)/USE_WEBPACK_DEV_SERVER=n/" ../app/.env
+
+Build the static bundle to be served by Django::
+
+    npm run build
+    
+    # In the rare event where bundle should not be refreshed properly, manually delete the bundle.js files and rebuild it
+    rm ../app/budgets/static/js/bundle.js
+    rm ../app/static/js/bundle.js
+    npm run build
+
+Confirm the above change is loaded by the app before proceeding::
+
+    # either restart the local server
+    cd ../app
+    source virtualenv/bin/activate
+    (virtualenv) $ python manage.py runserver [0.0.0.0:80]
+     
+     #...or restart gunicorn
+    cd ../app
+    source virtualenv/bin/activate
+    (virtualenv) $ gunicorn budgeteer.wsgi:application
+     
+     # ...or rebuild the container
+     cd .. && docker-compose down && docker-compose -f docker-compose.yml up -d  --build
+
+     # ...or alter the ignition file to include the above sed into the "/usr/local/bin/clone-repo.sh" declaration
+     # (also make sure to edit the ignition file to checkout the current branch if you're not on master)
+     # vi budgeteer-fedoracoreos-ignition.yaml
+
+     # push the current changes
+     # git add ... && commit ... && git push ...
+
+     # and re-provision the FedoraCoreOS VM
+     # cd ../tools
+     # ./prepare_fedoracoreos_containers.sh # make sure the ignition file
+     
+     # TODO: add steps for FedoraCoreOS to connect to the local webpackserver
 
 
 Testing
@@ -161,7 +223,7 @@ Self-memo
 Expense aggregate for each category:
 ---------------------
 
-JS One-liner::
+JS one-liner (need to be logged in)::
 
     fetch('/api/categories').then(response => response.json()).then(data => data.forEach(element => fetch(`/api/expenses?category_id=${element.id}&format=json&huge_page=yes` ).then(response => response.json()).then(data => console.log(new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(data.reduce((accumulator, currentValue) => accumulator + currentValue.amount,0)),element.text))));
 
@@ -169,7 +231,7 @@ JS One-liner::
 Expense aggregate for a single category:
 ---------------------
 
-JS One-liner ::
+JS one-liner (need to be logged in)::
 
     fetch('/api/expenses?category_name=<category-name>&format=json&huge_page=yes&start=<YYYY-mm-dd>&end=<YYYY-mm-dd>').then(response => response.json()).then(data => console.log(new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(data.reduce((accumulator, currentValue) => accumulator + currentValue.amount,0))));
 
@@ -177,7 +239,7 @@ JS One-liner ::
 Expense aggregate, for a given category, and group by note text:
 ---------------------
 
-JS Code::
+JS Code (need to be logged in)::
 
     const res = {}
     const promise = fetch('/api/expenses?category_name=<category-name>&format=json&huge_page=yes&start=<YYYY-mm-dd>&end=<YYYY-mm-dd>').then( response => response.json()).then( data =>
@@ -224,7 +286,7 @@ Force python to print inside the container:
 Author
 =======
 
-Budgeteer was created by `Michele Valsecchi <https://gitlab.com/micheleva>`_
+Budgeteer was created by `Michele Valsecchi <https://gitlab.com/micheleva/budgeteer>`_
 
 
 License

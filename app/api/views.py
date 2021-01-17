@@ -9,6 +9,7 @@ from rest_framework.response import Response
 import budgets.models as m
 from budgets.serializers import CategorySerializer
 from budgets.serializers import ExpenseSerializer
+from budgets.serializers import MonthlyBalanceCategorySerializer
 from budgets.serializers import MonthlyBalanceSerializer
 from budgets.views_utils import current_month_boundaries
 
@@ -89,6 +90,26 @@ def all_expenses(request):
         serializer = ExpenseSerializer(queryset, many=True)
 
     return Response(serializer.data)
+
+
+@login_required
+@api_view(['GET'])
+def monthly_balance_categories(request):
+    """
+    List all monthly balance categories
+    """
+    filters = {
+      'created_by': request.user
+    }
+
+    # Case insensitive: "where name ILIKE '%xxx%'"
+    if request.GET.get('name'):
+        filters['text__icontains'] = request.GET['name']
+
+    categories = m.MonthlyBalanceCategory.objects.filter(**filters).order_by('id')  # pylint: disable=E1101; # noqa
+    serializer = MonthlyBalanceCategorySerializer(categories, many=True)
+    return Response(serializer.data)
+
 
 @login_required
 @api_view(['GET'])

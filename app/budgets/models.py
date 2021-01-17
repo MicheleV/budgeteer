@@ -11,13 +11,13 @@ from django.urls import reverse
 # https://docs.djangoproject.com/en/2.2/howto/writing-migrations/#migrations-that-add-unique-fields
 
 
-class Category(models.Model):
+class Category(models.Model):  # pylint: disable=C0115; # noqa
     text = models.CharField(max_length=40, default=None)
     is_archived = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, default=None,
                                    null=True, on_delete=models.SET_NULL)
 
-    class Meta:
+    class Meta:   # pylint: disable=C0115,R0903; # noqa
         # Different users can have categories with the same text
         constraints = [
           models.UniqueConstraint(fields=['text', 'created_by'],
@@ -28,7 +28,7 @@ class Category(models.Model):
         return f"{self.text}"
 
 
-class Expense(models.Model):
+class Expense(models.Model):  # pylint: disable=C0115; # noqa
     category = models.ForeignKey(Category, default=None, null=True,
                                  on_delete=models.SET_NULL)
     amount = models.IntegerField()
@@ -40,14 +40,14 @@ class Expense(models.Model):
                                    null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        id = self.category.id
+        id = self.category.id  # pylint: disable=C0103; # noqa
         amount = self.amount
         note = self.note
         date = self.date
         return f"{id}: ({note}), {amount}, {date}"
 
 
-class MonthlyBudget(models.Model):
+class MonthlyBudget(models.Model):  # pylint: disable=C0115; # noqa
     category = models.ForeignKey(Category, default=None, null=True,
                                  on_delete=models.SET_NULL)
     amount = models.IntegerField()
@@ -55,16 +55,16 @@ class MonthlyBudget(models.Model):
     created_by = models.ForeignKey(User, default=None,
                                    null=True, on_delete=models.SET_NULL)
 
-    class Meta:
+    class Meta:   # pylint: disable=C0115,R0903; # noqa
         unique_together = ('category', 'date')
 
 
-class IncomeCategory(models.Model):
+class IncomeCategory(models.Model):  # pylint: disable=C0115; # noqa
     text = models.CharField(max_length=40, default=None)
     created_by = models.ForeignKey(User, default=None,
                                    null=True, on_delete=models.SET_NULL)
 
-    class Meta:
+    class Meta:   # pylint: disable=C0115,R0903; # noqa
         # Different users can have monthly balance categories w/ the same text
         constraints = [
           models.UniqueConstraint(fields=['text', 'created_by'],
@@ -75,7 +75,7 @@ class IncomeCategory(models.Model):
         return f"{self.text}"
 
 
-class Income(models.Model):
+class Income(models.Model):  # pylint: disable=C0115; # noqa
     category = models.ForeignKey(IncomeCategory, default=None, null=True,
                                  on_delete=models.SET_NULL)
     amount = models.IntegerField()
@@ -94,13 +94,13 @@ class Income(models.Model):
         return f"{id}: {amount}, {note}, {date}"
 
 
-class MonthlyBalanceCategory(models.Model):
+class MonthlyBalanceCategory(models.Model):  # pylint: disable=C0115; # noqa
     text = models.CharField(max_length=40, default=None)
     is_foreign_currency = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, default=None,
                                    null=True, on_delete=models.SET_NULL)
 
-    class Meta:
+    class Meta:   # pylint: disable=C0115,R0903; # noqa
         # Different users can have monthly balance categories w/ the same text
         constraints = [
           models.UniqueConstraint(fields=['text', 'created_by'],
@@ -115,7 +115,7 @@ class MonthlyBalanceCategory(models.Model):
         return reverse(named_url, args=[str(self.pk)])
 
 
-class MonthlyBalance(models.Model):
+class MonthlyBalance(models.Model):  # pylint: disable=C0115; # noqa
     category = models.ForeignKey(MonthlyBalanceCategory, default=None,
                                  null=True, on_delete=models.SET_NULL)
     amount = models.IntegerField()
@@ -124,12 +124,12 @@ class MonthlyBalance(models.Model):
                                    null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        id = self.category.id   # pylint: disable=C0103; # noqa
+        id = self.category.id  # pylint: disable=C0103; # noqa
         amount = self.amount
         date = self.date
         return f"{id}: {amount}, {date}"
 
-    class Meta:
+    class Meta:   # pylint: disable=C0115,R0903; # noqa
         # FIXME: unique should be (name + created_by) not only name, as we have
         # multiple users now
         unique_together = ('category', 'date')
@@ -138,7 +138,7 @@ class MonthlyBalance(models.Model):
         return reverse('budgets:edit_monthly_balance', args=[str(self.pk)])
 
 
-class Goal(models.Model):
+class Goal(models.Model):  # pylint: disable=C0115; # noqa
     amount = models.IntegerField()
     # TODO: unique should be (name + created_by) not only name, as we have
     # multiple users now
@@ -150,7 +150,7 @@ class Goal(models.Model):
                                    null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        id = self.id
+        id = self.id  # pylint: disable=C0103; # noqa
         amount = self.amount
         text = self.text
         return f"{id}: {amount}, {text}"

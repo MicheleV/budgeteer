@@ -4,7 +4,7 @@ cffi==1.12.3
 coverage==5.0.1
 cryptography==2.7
 cycler==0.10.0
-Django==2.2.13
+Django==2.2.20
 django-debug-toolbar==2.2
 djangorestframework==3.11.0
 gunicorn==19.9.0

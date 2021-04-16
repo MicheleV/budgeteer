@@ -1,6 +1,6 @@
 Django==2.2.13
 djangorestframework==3.11.0
-django-debug-toolbar==2.2
+django-debug-toolbar==2.2.1
 gunicorn==19.9.0
 matplotlib==3.1.2
 numpy==1.18.0
